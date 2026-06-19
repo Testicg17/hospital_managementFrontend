@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect , useCallback} from 'react';
 import axios from 'axios';
-import { Calendar, Users, Activity, AlertCircle, TrendingUp, UserPlus, Search, X, Edit2, Trash2, Bell, Phone, Mail, LogOut, LogIn, Eye, Printer, Download, Shield, UserCog,  } from 'lucide-react';
+import { Calendar, Users, Activity, AlertCircle, TrendingUp, UserPlus, Search, X, Edit2, Trash2, Bell, Phone, Mail, LogOut, LogIn, Eye, Printer, Download, Shield, UserCog } from 'lucide-react';
 
 // API Configuration
 const API_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
@@ -88,17 +88,12 @@ const [selectedUser, setSelectedUser] = useState(null);
   }, []);
 
   // Fetch data when logged in
-//   useEffect(() => {
-//     if (isLoggedIn && token) {
-//       fetchData();
-//     }
-//   }, [isLoggedIn, token, selectedCategory, searchTerm]);
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-  if (isLoggedIn && token) {
-    fetchData();
-  }
-}, [isLoggedIn, token, selectedCategory, searchTerm]);
+    if (isLoggedIn && token) {
+      fetchData();
+    }
+  }, [isLoggedIn, token, selectedCategory, searchTerm]);
 const fetchUsers = async () => {
   try {
     const { data } = await api.get('/users');
