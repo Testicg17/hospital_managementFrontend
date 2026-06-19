@@ -1,7 +1,7 @@
 // frontend/src/App.jsx - Complete Hospital Management Frontend
 // Install dependencies first: npm install axios lucide-react
 
-import React, { useState, useEffect , useCallback} from 'react';
+import React, { useState, useEffect ,useCallback} from 'react';
 import axios from 'axios';
 import { Calendar, Users, Activity, AlertCircle, TrendingUp, UserPlus, Search, X, Edit2, Trash2, Bell, Phone, Mail, LogOut, LogIn, Eye, Printer, Download, Shield, UserCog } from 'lucide-react';
 
@@ -89,11 +89,11 @@ const [selectedUser, setSelectedUser] = useState(null);
 
   // Fetch data when logged in
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    if (isLoggedIn && token) {
-      fetchData();
-    }
-  }, [isLoggedIn, token, selectedCategory, searchTerm]);
+ useEffect(() => {
+  if (isLoggedIn && token) {
+    fetchData();
+  }
+}, [isLoggedIn, token, fetchData]);
 const fetchUsers = async () => {
   try {
     const { data } = await api.get('/users');
@@ -103,19 +103,19 @@ const fetchUsers = async () => {
   }
 }; 
 
-  const fetchData = async () => {
-    try {
-      await Promise.all([
-        fetchPatients(),
-        fetchAppointments(),
-        fetchBills(),
-        fetchStats(),
-        fetchUsers()
-      ]);
-    } catch (err) {
-      console.error('Error fetching data:', err);
-    }
-  };
+ const fetchData = useCallback(async () => {
+  try {
+    await Promise.all([
+      fetchPatients(),
+      fetchAppointments(),
+      fetchBills(),
+      fetchStats(),
+      fetchUsers()
+    ]);
+  } catch (err) {
+    console.error('Error fetching data:', err);
+  }
+}, [selectedCategory, searchTerm]);
 
   const handleLogin = async (email, password) => {
     setLoading(true);
