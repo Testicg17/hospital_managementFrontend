@@ -6,7 +6,7 @@ import axios from 'axios';
 import { Calendar, Users, Activity, AlertCircle, TrendingUp, UserPlus, Search, X, Edit2, Trash2, Bell, Phone, Mail, LogOut, LogIn, Eye, Printer, Download, Shield, UserCog, Key } from 'lucide-react';
 
 // API Configuration
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_URL,

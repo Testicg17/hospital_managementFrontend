@@ -9,7 +9,7 @@ function post(path, data, cb) {
       'Content-Length': Buffer.byteLength(body)
     }
   };
-  const req = http.request('http://localhost:5000/api' + path, options, (res) => {
+  const req = http.request('https://hospital-managementbackend.onrender.com/api' + path, options, (res) => {
     let b = '';
     res.on('data', c => b += c);
     res.on('end', () => cb(null, res.statusCode, b));
@@ -49,7 +49,7 @@ post('/auth/login', { email: 'admin@hospital.com', password: 'password123' }, (e
       }
     };
 
-    const billReq = http.request('http://localhost:5000/api/bills', billOptions, (res) => {
+    const billReq = http.request('https://hospital-managementbackend.onrender.com/api/bills', billOptions, (res) => {
       let b = '';
       res.on('data', c => b += c);
       res.on('end', () => {

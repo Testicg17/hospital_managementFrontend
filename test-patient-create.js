@@ -3,7 +3,7 @@ const http = require('http');
 function post(path, data, cb) {
   const body = JSON.stringify(data);
   const options = { method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) } };
-  const req = http.request('http://localhost:5000/api' + path, options, (res) => { let b=''; res.on('data', c=> b+=c); res.on('end', ()=> cb(null, res.statusCode, b)); });
+  const req = http.request('https://hospital-managementbackend.onrender.com/api' + path, options, (res) => { let b=''; res.on('data', c=> b+=c); res.on('end', ()=> cb(null, res.statusCode, b)); });
   req.on('error', e=> cb(e)); req.write(body); req.end();
 }
 
@@ -14,7 +14,7 @@ post('/auth/login', { email: 'admin@hospital.com', password: 'password123' }, (e
     const patient = { name: 'Test Patient', age: 30, phone: '+91 90000 00000', email: 'test.patient@example.com', category: 'General', history: 'N/A' };
     const patientBody = JSON.stringify(patient);
     const options = { method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(patientBody), 'Authorization': 'Bearer ' + token } };
-    const req = http.request('http://localhost:5000/api/patients', options, (res) => {
+    const req = http.request('https://hospital-managementbackend.onrender.com/api/patients', options, (res) => {
       let b = '';
       res.on('data', c=> b+=c);
       res.on('end', ()=> {
