@@ -107,13 +107,8 @@ const [selectedUser, setSelectedUser] = useState(null);
   if (isLoggedIn && token) {
     fetchData();
   }
-}, [isLoggedIn, token, selectedCategory, searchTerm]); 
+}, [isLoggedIn, token, selectedCategory, searchTerm]);
 
- useEffect(() => {
-  if (isLoggedIn && token) {
-    fetchData();
-  }
-}, [isLoggedIn, token, fetchData]);
 const fetchUsers = async () => {
   try {
     const { data } = await api.get('/users');
