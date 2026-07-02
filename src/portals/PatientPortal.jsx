@@ -249,10 +249,9 @@ function PatientPortal() {
 
   const handleAppointmentRequest = async (appointmentData) => {
     try {
-      await rootApi.request('/appointments', {
+      await api.request('/appointments', {
         method: 'POST',
         body: JSON.stringify({
-          patientId: patient?.id || profile?.id,
           ...appointmentData,
           status: 'Scheduled'
         })
