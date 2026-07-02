@@ -50,6 +50,7 @@ function AdminPortal() {
   const [showAddHospitalLocation, setShowAddHospitalLocation] = useState(false);
   const [searchTerm, setSearchTerm]             = useState('');
   const [selectedPatient, setSelectedPatient]   = useState(null);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [selectedBill, setSelectedBill]         = useState(null);
   const [selectedUser, setSelectedUser]         = useState(null);
   const [selectedHospitalLocation, setSelectedHospitalLocation] = useState(null);
@@ -235,15 +236,41 @@ function AdminPortal() {
   };
 
   // ─── Appointment CRUD ────────────────────────────────────────────────────────
+  const normalizeAppointmentPayload = (appointmentData) => ({
+    patientId: appointmentData.patientId,
+    date: appointmentData.date,
+    time: appointmentData.time,
+    type: appointmentData.type,
+    notes: appointmentData.notes || '',
+    status: appointmentData.status || 'Scheduled',
+    doctorId: appointmentData.doctorId || null,
+    hospitalLocationId: appointmentData.hospitalLocationId || null
+  });
+
   const createAppointment = async (appointmentData) => {
     setActionLoading(true);
     try {
-      await api.post('/appointments', appointmentData);
+      await api.post('/appointments', normalizeAppointmentPayload(appointmentData));
       await fetchAppointments();
       await fetchStats();
       showAlert('Appointment scheduled');
     } catch (err) {
       showAlert(err.response?.data?.error || 'Failed to create appointment', 'error');
+      throw err;
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const updateAppointment = async (id, appointmentData) => {
+    setActionLoading(true);
+    try {
+      await api.put(`/appointments/${id}`, normalizeAppointmentPayload(appointmentData));
+      await fetchAppointments();
+      await fetchStats();
+      showAlert('Appointment rescheduled');
+    } catch (err) {
+      showAlert(err.response?.data?.error || 'Failed to update appointment', 'error');
       throw err;
     } finally {
       setActionLoading(false);
@@ -524,15 +551,26 @@ function AdminPortal() {
     );
   };
 
-  const AppointmentForm = ({ onClose }) => {
+  const AppointmentForm = ({ onClose, editAppointment = null }) => {
     const activeHospitalLocations = hospitalLocations.filter(loc => loc.status !== 'Inactive');
-    const [formData, setFormData] = useState({
+    const getAppointmentDate = (appointment) => appointment?.date?.split('T')[0] || '';
+    const [formData, setFormData] = useState(editAppointment ? {
+      patientId: editAppointment.patient_id || editAppointment.patientId || '',
+      doctorId: editAppointment.doctor_id || editAppointment.doctorId || '',
+      hospitalLocationId: editAppointment.hospital_location_id || editAppointment.hospitalLocationId || '',
+      date: getAppointmentDate(editAppointment),
+      time: editAppointment.time || '',
+      type: editAppointment.type || 'Regular Checkup',
+      status: editAppointment.status || 'Scheduled',
+      notes: editAppointment.notes || ''
+    } : {
       patientId: '',
       doctorId: '',
       hospitalLocationId: '',
       date: '',
       time: '',
       type: 'Regular Checkup',
+      status: 'Scheduled',
       notes: ''
     });
     const handleLocationChange = (locationId) => {
@@ -540,21 +578,30 @@ function AdminPortal() {
       setFormData({
         ...formData,
         hospitalLocationId: locationId,
-        doctorId: selectedLocation?.doctor_id || formData.doctorId
+        doctorId: selectedLocation?.doctor_id || ''
       });
     };
-    const handleSubmit = async (e) => { e.preventDefault(); try { await createAppointment(formData); onClose(); } catch (_) {} };
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      try {
+        editAppointment
+          ? await updateAppointment(editAppointment.id, formData)
+          : await createAppointment(formData);
+        setSelectedAppointment(null);
+        onClose();
+      } catch (_) {}
+    };
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold text-gray-800">Schedule Appointment</h3>
+            <h3 className="text-xl font-bold text-gray-800">{editAppointment ? 'Reschedule Appointment' : 'Schedule Appointment'}</h3>
             <button onClick={onClose}><X size={24} className="text-gray-500" /></button>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Patient *</label>
-              <select required value={formData.patientId} onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
+              <select required disabled={!!editAppointment} value={formData.patientId} onChange={(e) => setFormData({ ...formData, patientId: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                 <option value="">Select patient...</option>
                 {patients.map(p => <option key={p.id} value={p.id}>{p.name} - {p.category}</option>)}
@@ -603,6 +650,18 @@ function AdminPortal() {
                 <option>Regular Checkup</option><option>Follow-up</option><option>Consultation</option><option>Emergency</option>
               </select>
             </div>
+            {editAppointment && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Status *</label>
+                <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                  <option>Scheduled</option>
+                  <option>Rescheduled</option>
+                  <option>Completed</option>
+                  <option>Cancelled</option>
+                </select>
+              </div>
+            )}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
               <textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
@@ -611,7 +670,7 @@ function AdminPortal() {
             <div className="flex gap-3 pt-4">
               <button type="submit" disabled={actionLoading}
                 className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50">
-                {actionLoading ? 'Saving...' : 'Schedule'}
+                {actionLoading ? 'Saving...' : editAppointment ? 'Update Appointment' : 'Schedule'}
               </button>
               <button type="button" onClick={onClose} className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 font-medium">Cancel</button>
             </div>
@@ -1013,11 +1072,17 @@ function AdminPortal() {
     </div>
   );
 
+  const getAppointmentLocationText = (apt) => {
+    const hospitalName = apt.hospital_name || apt.hospitalName;
+    const location = apt.hospital_location || apt.hospitalLocation || apt.location;
+    return hospitalName && location ? `${hospitalName} - ${location}` : 'Location not assigned';
+  };
+
   const Appointments = () => (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-800">Appointments</h2>
-        <button onClick={() => setShowAddAppointment(true)}
+        <button onClick={() => { setSelectedAppointment(null); setShowAddAppointment(true); }}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2">
           <Calendar size={20} /> New Appointment
         </button>
@@ -1041,9 +1106,9 @@ function AdminPortal() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{apt.type}</td>
                 <td className="px-6 py-4 text-sm text-gray-500">
-                  <div className="font-medium text-gray-900">{apt.doctor_name || 'Hospital Staff'}</div>
+                  <div className="font-medium text-gray-900">{apt.doctor_name || apt.doctorName || 'Hospital Staff'}</div>
                   <div className="text-xs text-gray-500">
-                    {apt.hospital_name ? `${apt.hospital_name} - ${apt.hospital_location}` : 'Location not assigned'}
+                    {getAppointmentLocationText(apt)}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -1057,6 +1122,7 @@ function AdminPortal() {
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex gap-2">
                     <button onClick={() => sendAlert(apt.id)} className="text-green-600 hover:text-green-900" title="Send Alert"><Bell size={18} /></button>
+                    <button onClick={() => { setSelectedAppointment(apt); setShowAddAppointment(true); }} className="text-blue-600 hover:text-blue-900" title="Reschedule"><Edit2 size={18} /></button>
                     <button onClick={() => deleteAppointment(apt.id)} className="text-red-600 hover:text-red-900" title="Cancel"><Trash2 size={18} /></button>
                   </div>
                 </td>
@@ -1287,6 +1353,7 @@ function AdminPortal() {
     { id: 'users',        label: 'Users',        icon: Shield },
     { id: 'patients',     label: 'Patients',     icon: Users },
     { id: 'appointments', label: 'Appointments', icon: Calendar },
+    { id: 'locations',    label: 'Locations',    icon: MapPin },
     { id: 'billing',      label: 'Billing',      icon: TrendingUp },
   ];
 
@@ -1340,12 +1407,14 @@ function AdminPortal() {
         {activeTab === 'users'        && <UsersManagement />}
         {activeTab === 'patients'     && <Patients />}
         {activeTab === 'appointments' && <Appointments />}
+        {activeTab === 'locations'    && <HospitalLocations />}
         {activeTab === 'billing'      && <Billing />}
       </div>
 
       {showAddUser      && <UserForm        onClose={() => { setShowAddUser(false);      setSelectedUser(null);    }} editUser={selectedUser} />}
       {showAddPatient   && <PatientForm     onClose={() => { setShowAddPatient(false);   setSelectedPatient(null); }} editPatient={selectedPatient} />}
-      {showAddAppointment && <AppointmentForm onClose={() => setShowAddAppointment(false)} />}
+      {showAddAppointment && <AppointmentForm onClose={() => { setShowAddAppointment(false); setSelectedAppointment(null); }} editAppointment={selectedAppointment} />}
+      {showAddHospitalLocation && <HospitalLocationForm onClose={() => { setShowAddHospitalLocation(false); setSelectedHospitalLocation(null); }} editLocation={selectedHospitalLocation} />}
       {showAddBill      && <BillForm        onClose={() => setShowAddBill(false)} />}
     </div>
   );
