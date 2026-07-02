@@ -1,7 +1,7 @@
 // frontend/src/portals/AdminPortal.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Calendar, Users, Activity, AlertCircle, TrendingUp, UserPlus, Search, X, Edit2, Trash2, Bell, Phone, Mail, LogOut, LogIn, Eye, Printer, Download, Shield, UserCog } from 'lucide-react';
+import { Calendar, Users, Activity, AlertCircle, TrendingUp, UserPlus, Search, X, Edit2, Trash2, Bell, Phone, Mail, LogOut, LogIn, Eye, Printer, Download, Shield, UserCog, MapPin, Building2 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
 
@@ -40,15 +40,19 @@ function AdminPortal() {
   const [appointments, setAppointments]         = useState([]);
   const [bills, setBills]                       = useState([]);
   const [users, setUsers]                       = useState([]);
+  const [doctors, setDoctors]                   = useState([]);
+  const [hospitalLocations, setHospitalLocations] = useState([]);
   const [stats, setStats]                       = useState({ totalPatients: 0, todayAppointments: 0, pendingBills: 0, totalRevenue: 0 });
   const [showAddPatient, setShowAddPatient]     = useState(false);
   const [showAddAppointment, setShowAddAppointment] = useState(false);
   const [showAddBill, setShowAddBill]           = useState(false);
   const [showAddUser, setShowAddUser]           = useState(false);
+  const [showAddHospitalLocation, setShowAddHospitalLocation] = useState(false);
   const [searchTerm, setSearchTerm]             = useState('');
   const [selectedPatient, setSelectedPatient]   = useState(null);
   const [selectedBill, setSelectedBill]         = useState(null);
   const [selectedUser, setSelectedUser]         = useState(null);
+  const [selectedHospitalLocation, setSelectedHospitalLocation] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showInvoice, setShowInvoice]           = useState(false);
   const [loading, setLoading]                   = useState(false);
@@ -112,6 +116,26 @@ function AdminPortal() {
     }
   }, []);
 
+  const fetchDoctors = useCallback(async () => {
+    try {
+      const { data } = await api.get('/hospital-locations/doctors');
+      setDoctors(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error fetching doctors:', err);
+      setDoctors([]);
+    }
+  }, []);
+
+  const fetchHospitalLocations = useCallback(async () => {
+    try {
+      const { data } = await api.get('/hospital-locations');
+      setHospitalLocations(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Error fetching hospital locations:', err);
+      setHospitalLocations([]);
+    }
+  }, []);
+
   // ─── Check stored token on mount ────────────────────────────────────────────
   useEffect(() => {
     const storedToken = localStorage.getItem('admin_token');
@@ -134,7 +158,9 @@ function AdminPortal() {
           fetchAppointments(),
           fetchBills(),
           fetchStats(),
-          fetchUsers()
+          fetchUsers(),
+          fetchDoctors(),
+          fetchHospitalLocations()
         ]);
       } catch (err) {
         console.error('Error fetching data:', err);
@@ -142,7 +168,7 @@ function AdminPortal() {
     };
 
     fetchData();
-  }, [isLoggedIn, token, fetchPatients, fetchAppointments, fetchBills, fetchStats, fetchUsers]);
+  }, [isLoggedIn, token, fetchPatients, fetchAppointments, fetchBills, fetchStats, fetchUsers, fetchDoctors, fetchHospitalLocations]);
   // ↑ All functions are stable (useCallback) so this runs only when truly needed
 
   // ─── Auth ────────────────────────────────────────────────────────────────────
@@ -246,6 +272,55 @@ function AdminPortal() {
   };
 
   // ─── Bill CRUD ───────────────────────────────────────────────────────────────
+  const normalizeHospitalLocationPayload = (locationData) => ({
+    hospitalName: locationData.hospitalName?.trim(),
+    location: locationData.location?.trim(),
+    address: locationData.address?.trim() || null,
+    doctorId: locationData.doctorId || null,
+    status: locationData.status || 'Active'
+  });
+
+  const createHospitalLocation = async (locationData) => {
+    setActionLoading(true);
+    try {
+      await api.post('/hospital-locations', normalizeHospitalLocationPayload(locationData));
+      await fetchHospitalLocations();
+      showAlert('Hospital location created');
+    } catch (err) {
+      showAlert(err.response?.data?.error || 'Failed to create hospital location', 'error');
+      throw err;
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const updateHospitalLocation = async (id, locationData) => {
+    setActionLoading(true);
+    try {
+      await api.put(`/hospital-locations/${id}`, normalizeHospitalLocationPayload(locationData));
+      await fetchHospitalLocations();
+      await fetchAppointments();
+      showAlert('Hospital location updated');
+    } catch (err) {
+      showAlert(err.response?.data?.error || 'Failed to update hospital location', 'error');
+      throw err;
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const deleteHospitalLocation = async (id) => {
+    if (!window.confirm('Delete this hospital location? Used locations will be marked inactive.')) return;
+    try {
+      const { data } = await api.delete(`/hospital-locations/${id}`);
+      await fetchHospitalLocations();
+      await fetchAppointments();
+      showAlert(data?.message || 'Hospital location deleted');
+    } catch (err) {
+      showAlert(err.response?.data?.error || 'Failed to delete hospital location', 'error');
+    }
+  };
+
   const createBill = async (billData) => {
     setActionLoading(true);
     try {
@@ -450,11 +525,28 @@ function AdminPortal() {
   };
 
   const AppointmentForm = ({ onClose }) => {
-    const [formData, setFormData] = useState({ patientId: '', date: '', time: '', type: 'Regular Checkup', notes: '' });
+    const activeHospitalLocations = hospitalLocations.filter(loc => loc.status !== 'Inactive');
+    const [formData, setFormData] = useState({
+      patientId: '',
+      doctorId: '',
+      hospitalLocationId: '',
+      date: '',
+      time: '',
+      type: 'Regular Checkup',
+      notes: ''
+    });
+    const handleLocationChange = (locationId) => {
+      const selectedLocation = activeHospitalLocations.find(loc => String(loc.id) === String(locationId));
+      setFormData({
+        ...formData,
+        hospitalLocationId: locationId,
+        doctorId: selectedLocation?.doctor_id || formData.doctorId
+      });
+    };
     const handleSubmit = async (e) => { e.preventDefault(); try { await createAppointment(formData); onClose(); } catch (_) {} };
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 w-full max-w-md">
+        <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-bold text-gray-800">Schedule Appointment</h3>
             <button onClick={onClose}><X size={24} className="text-gray-500" /></button>
@@ -466,6 +558,30 @@ function AdminPortal() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                 <option value="">Select patient...</option>
                 {patients.map(p => <option key={p.id} value={p.id}>{p.name} - {p.category}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Visit Location</label>
+              <select value={formData.hospitalLocationId} onChange={(e) => handleLocationChange(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">Select hospital/location...</option>
+                {activeHospitalLocations.map(loc => (
+                  <option key={loc.id} value={loc.id}>
+                    {loc.hospital_name} - {loc.location}{loc.doctor_name ? ` (${loc.doctor_name})` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Doctor Present</label>
+              <select value={formData.doctorId} onChange={(e) => setFormData({ ...formData, doctorId: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">Hospital staff / not assigned</option>
+                {doctors.map(doc => (
+                  <option key={doc.id} value={doc.id}>
+                    {doc.name}{doc.specialty ? ` - ${doc.specialty}` : ''}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -496,6 +612,88 @@ function AdminPortal() {
               <button type="submit" disabled={actionLoading}
                 className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50">
                 {actionLoading ? 'Saving...' : 'Schedule'}
+              </button>
+              <button type="button" onClick={onClose} className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 font-medium">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
+  const HospitalLocationForm = ({ onClose, editLocation = null }) => {
+    const [formData, setFormData] = useState(editLocation ? {
+      hospitalName: editLocation.hospital_name || '',
+      location: editLocation.location || '',
+      address: editLocation.address || '',
+      doctorId: editLocation.doctor_id || '',
+      status: editLocation.status || 'Active'
+    } : {
+      hospitalName: '',
+      location: '',
+      address: '',
+      doctorId: '',
+      status: 'Active'
+    });
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      try {
+        editLocation
+          ? await updateHospitalLocation(editLocation.id, formData)
+          : await createHospitalLocation(formData);
+        setSelectedHospitalLocation(null);
+        onClose();
+      } catch (_) {}
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold text-gray-800">{editLocation ? 'Edit Hospital Location' : 'Add Hospital Location'}</h3>
+            <button onClick={onClose}><X size={24} className="text-gray-500" /></button>
+          </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Hospital Name *</label>
+              <input type="text" required value={formData.hospitalName} onChange={(e) => setFormData({ ...formData, hospitalName: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="City Hospital" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Location *</label>
+              <input type="text" required value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Main Branch / Room 204" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+              <textarea value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" rows="3" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Doctor Present</label>
+              <select value={formData.doctorId} onChange={(e) => setFormData({ ...formData, doctorId: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">No doctor assigned</option>
+                {doctors.map(doc => (
+                  <option key={doc.id} value={doc.id}>
+                    {doc.name}{doc.specialty ? ` - ${doc.specialty}` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Status *</label>
+              <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option>Active</option>
+                <option>Inactive</option>
+              </select>
+            </div>
+            <div className="flex gap-3 pt-4">
+              <button type="submit" disabled={actionLoading}
+                className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50">
+                {actionLoading ? 'Saving...' : editLocation ? 'Update' : 'Create'}
               </button>
               <button type="button" onClick={onClose} className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 font-medium">Cancel</button>
             </div>
@@ -828,7 +1026,7 @@ function AdminPortal() {
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
-              {['Patient', 'Date & Time', 'Type', 'Status', 'Actions'].map(h => (
+              {['Patient', 'Date & Time', 'Type', 'Doctor / Location', 'Status', 'Actions'].map(h => (
                 <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{h}</th>
               ))}
             </tr>
@@ -842,6 +1040,12 @@ function AdminPortal() {
                   <div className="text-xs text-gray-400">{apt.time}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{apt.type}</td>
+                <td className="px-6 py-4 text-sm text-gray-500">
+                  <div className="font-medium text-gray-900">{apt.doctor_name || 'Hospital Staff'}</div>
+                  <div className="text-xs text-gray-500">
+                    {apt.hospital_name ? `${apt.hospital_name} - ${apt.hospital_location}` : 'Location not assigned'}
+                  </div>
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
                     apt.status === 'Completed' ? 'bg-green-100 text-green-800' :
@@ -912,6 +1116,84 @@ function AdminPortal() {
       {showInvoice && selectedBill && (
         <InvoiceModal bill={selectedBill} onClose={() => { setShowInvoice(false); setSelectedBill(null); }} />
       )}
+    </div>
+  );
+
+  const HospitalLocations = () => (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-800">Hospital Locations</h2>
+          <p className="text-sm text-gray-600 mt-1">Manage hospital names, visit locations, and doctor presence</p>
+        </div>
+        <button onClick={() => { setSelectedHospitalLocation(null); setShowAddHospitalLocation(true); }}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2">
+          <MapPin size={20} /> Add Location
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[
+          { label: 'Total Locations', value: hospitalLocations.length, icon: Building2, color: 'blue' },
+          { label: 'Active', value: hospitalLocations.filter(loc => loc.status === 'Active').length, icon: Activity, color: 'green' },
+          { label: 'Doctors Mapped', value: hospitalLocations.filter(loc => loc.doctor_id).length, icon: UserCog, color: 'purple' },
+        ].map(({ label, value, icon: Icon, color }) => (
+          <div key={label} className={`bg-${color}-50 border border-${color}-100 rounded-xl p-5`}>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className={`text-${color}-700 text-sm font-medium`}>{label}</p>
+                <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+              </div>
+              <Icon size={34} className={`text-${color}-600`} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-white rounded-xl shadow-md overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-gray-50">
+            <tr>
+              {['Hospital', 'Location', 'Doctor Present', 'Status', 'Actions'].map(h => (
+                <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {hospitalLocations.map(loc => (
+              <tr key={loc.id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm font-medium text-gray-900">{loc.hospital_name}</div>
+                  {loc.address && <div className="text-xs text-gray-500 max-w-xs truncate">{loc.address}</div>}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{loc.location}</td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">{loc.doctor_name || 'Not assigned'}</div>
+                  {loc.doctor_specialty && <div className="text-xs text-gray-500">{loc.doctor_specialty}</div>}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className={`px-2 py-1 text-xs font-semibold rounded-full ${loc.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'}`}>
+                    {loc.status}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <div className="flex gap-2">
+                    <button onClick={() => { setSelectedHospitalLocation(loc); setShowAddHospitalLocation(true); }}
+                      className="text-blue-600 hover:text-blue-900 flex items-center gap-1">
+                      <Edit2 size={18} /> Edit
+                    </button>
+                    <button onClick={() => deleteHospitalLocation(loc.id)}
+                      className="text-red-600 hover:text-red-900 flex items-center gap-1">
+                      <Trash2 size={18} /> Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {hospitalLocations.length === 0 && <div className="text-center py-8 text-gray-500">No hospital locations found</div>}
+      </div>
     </div>
   );
 
