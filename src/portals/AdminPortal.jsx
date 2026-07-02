@@ -1,7 +1,7 @@
 // frontend/src/portals/AdminPortal.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Calendar, Users, Activity, AlertCircle, TrendingUp, UserPlus, Search, X, Edit2, Trash2, Bell, Phone, Mail, LogOut, LogIn, Eye, Printer, Download, Shield, UserCog, MapPin, Building2 } from 'lucide-react';
+import { Calendar, Users, Activity, AlertCircle, TrendingUp, UserPlus, Search, X, Edit2, Trash2, Bell, Phone, Mail, LogOut, LogIn, Eye, Printer, Download, Shield, UserCog, MapPin, Building2, Clock } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
 
@@ -62,6 +62,50 @@ function AdminPortal() {
   const [alert, setAlert]                       = useState({ message: '', type: '' });
 
   const categories = ['All', 'Diabetes', 'Hypertension', 'Cardiac', 'General', 'Orthopedic', 'Other'];
+
+  const getLocationStartTime = (location) => (
+    location?.appointment_start_time || location?.appointmentStartTime || location?.appointment_from_time || location?.appointmentFromTime || location?.start_time || location?.from_time || location?.fromTime || ''
+  );
+
+  const getLocationEndTime = (location) => (
+    location?.appointment_end_time || location?.appointmentEndTime || location?.appointment_to_time || location?.appointmentToTime || location?.end_time || location?.to_time || location?.toTime || ''
+  );
+
+  const formatLocationWindow = (location) => {
+    const start = getLocationStartTime(location);
+    const end = getLocationEndTime(location);
+    return start && end ? `${start} - ${end}` : 'Time not set';
+  };
+
+  const getLocationTimeOptions = (location, date, currentAppointmentId = null) => {
+    const start = getLocationStartTime(location);
+    const end = getLocationEndTime(location);
+    if (!start || !end) return [];
+
+    const [startHour, startMinute] = start.split(':').map(Number);
+    const [endHour, endMinute] = end.split(':').map(Number);
+    const startTotal = (startHour * 60) + (startMinute || 0);
+    const endTotal = (endHour * 60) + (endMinute || 0);
+    if (Number.isNaN(startTotal) || Number.isNaN(endTotal) || endTotal < startTotal) return [];
+
+    const bookedTimes = new Set(
+      appointments
+        .filter((apt) => String(apt.hospital_location_id || apt.hospitalLocationId || '') === String(location.id))
+        .filter((apt) => !date || apt.date?.split('T')[0] === date)
+        .filter((apt) => !currentAppointmentId || String(apt.id) !== String(currentAppointmentId))
+        .filter((apt) => apt.status !== 'Cancelled')
+        .map((apt) => apt.time)
+    );
+
+    const slots = [];
+    for (let total = startTotal; total <= endTotal; total += 30) {
+      const hour = String(Math.floor(total / 60)).padStart(2, '0');
+      const minute = String(total % 60).padStart(2, '0');
+      const time = `${hour}:${minute}`;
+      slots.push({ time, booked: bookedTimes.has(time) });
+    }
+    return slots;
+  };
 
   const showAlert = (message, type = 'success') => {
     setAlert({ message, type });
@@ -304,6 +348,14 @@ function AdminPortal() {
     location: locationData.location?.trim(),
     address: locationData.address?.trim() || null,
     doctorId: locationData.doctorId || null,
+    appointmentStartTime: locationData.appointmentStartTime || null,
+    appointmentEndTime: locationData.appointmentEndTime || null,
+    appointment_start_time: locationData.appointmentStartTime || null,
+    appointment_end_time: locationData.appointmentEndTime || null,
+    appointmentFromTime: locationData.appointmentStartTime || null,
+    appointmentToTime: locationData.appointmentEndTime || null,
+    appointment_from_time: locationData.appointmentStartTime || null,
+    appointment_to_time: locationData.appointmentEndTime || null,
     status: locationData.status || 'Active'
   });
 
@@ -573,12 +625,17 @@ function AdminPortal() {
       status: 'Scheduled',
       notes: ''
     });
+    const selectedLocation = activeHospitalLocations.find(loc => String(loc.id) === String(formData.hospitalLocationId));
+    const timeOptions = selectedLocation
+      ? getLocationTimeOptions(selectedLocation, formData.date, editAppointment?.id)
+      : [];
     const handleLocationChange = (locationId) => {
       const selectedLocation = activeHospitalLocations.find(loc => String(loc.id) === String(locationId));
       setFormData({
         ...formData,
         hospitalLocationId: locationId,
-        doctorId: selectedLocation?.doctor_id || ''
+        doctorId: selectedLocation?.doctor_id || '',
+        time: ''
       });
     };
     const handleSubmit = async (e) => {
@@ -614,22 +671,16 @@ function AdminPortal() {
                 <option value="">Select hospital/location...</option>
                 {activeHospitalLocations.map(loc => (
                   <option key={loc.id} value={loc.id}>
-                    {loc.hospital_name} - {loc.location}{loc.doctor_name ? ` (${loc.doctor_name})` : ''}
+                    {loc.hospital_name} - {loc.location} ({formatLocationWindow(loc)})
                   </option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Doctor Present</label>
-              <select value={formData.doctorId} onChange={(e) => setFormData({ ...formData, doctorId: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                <option value="">Hospital staff / not assigned</option>
-                {doctors.map(doc => (
-                  <option key={doc.id} value={doc.id}>
-                    {doc.name}{doc.specialty ? ` - ${doc.specialty}` : ''}
-                  </option>
-                ))}
-              </select>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Doctor</label>
+              <div className="w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700">
+                {selectedLocation?.doctor_name || doctors.find(doc => String(doc.id) === String(formData.doctorId))?.name || 'Mapped from location'}
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -639,8 +690,20 @@ function AdminPortal() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Time *</label>
-                <input type="time" required value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+                {timeOptions.length > 0 ? (
+                  <select required value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option value="">Select available time...</option>
+                    {timeOptions.map(({ time, booked }) => (
+                      <option key={time} value={time} disabled={booked}>
+                        {time}{booked ? ' - booked' : ''}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input type="time" required value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+                )}
               </div>
             </div>
             <div>
@@ -686,12 +749,16 @@ function AdminPortal() {
       location: editLocation.location || '',
       address: editLocation.address || '',
       doctorId: editLocation.doctor_id || '',
+      appointmentStartTime: getLocationStartTime(editLocation),
+      appointmentEndTime: getLocationEndTime(editLocation),
       status: editLocation.status || 'Active'
     } : {
       hospitalName: '',
       location: '',
       address: '',
       doctorId: '',
+      appointmentStartTime: '',
+      appointmentEndTime: '',
       status: 'Active'
     });
 
@@ -730,7 +797,7 @@ function AdminPortal() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" rows="3" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Doctor Present</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Doctor</label>
               <select value={formData.doctorId} onChange={(e) => setFormData({ ...formData, doctorId: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                 <option value="">No doctor assigned</option>
@@ -740,6 +807,18 @@ function AdminPortal() {
                   </option>
                 ))}
               </select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Appointment From *</label>
+                <input type="time" required value={formData.appointmentStartTime} onChange={(e) => setFormData({ ...formData, appointmentStartTime: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Appointment To *</label>
+                <input type="time" required value={formData.appointmentEndTime} onChange={(e) => setFormData({ ...formData, appointmentEndTime: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Status *</label>
@@ -1202,7 +1281,7 @@ function AdminPortal() {
         {[
           { label: 'Total Locations', value: hospitalLocations.length, icon: Building2, color: 'blue' },
           { label: 'Active', value: hospitalLocations.filter(loc => loc.status === 'Active').length, icon: Activity, color: 'green' },
-          { label: 'Doctors Mapped', value: hospitalLocations.filter(loc => loc.doctor_id).length, icon: UserCog, color: 'purple' },
+          { label: 'Time Windows', value: hospitalLocations.filter(loc => getLocationStartTime(loc) && getLocationEndTime(loc)).length, icon: Clock, color: 'purple' },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className={`bg-${color}-50 border border-${color}-100 rounded-xl p-5`}>
             <div className="flex items-center justify-between">
@@ -1220,7 +1299,7 @@ function AdminPortal() {
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
-              {['Hospital', 'Location', 'Doctor Present', 'Status', 'Actions'].map(h => (
+              {['Hospital', 'Location', 'Doctor', 'Time Window', 'Status', 'Actions'].map(h => (
                 <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{h}</th>
               ))}
             </tr>
@@ -1237,6 +1316,7 @@ function AdminPortal() {
                   <div className="text-sm text-gray-900">{loc.doctor_name || 'Not assigned'}</div>
                   {loc.doctor_specialty && <div className="text-xs text-gray-500">{loc.doctor_specialty}</div>}
                 </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatLocationWindow(loc)}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`px-2 py-1 text-xs font-semibold rounded-full ${loc.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-700'}`}>
                     {loc.status}

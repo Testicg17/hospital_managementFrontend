@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { User, Calendar, CreditCard, Phone, Mail, LogOut, Activity, Clock, AlertCircle, Eye, RefreshCw, FileText, X, History } from 'lucide-react';
+import { User, Calendar, CreditCard, Phone, Mail, LogOut, Activity, Clock, AlertCircle, Eye, RefreshCw, FileText, X, History, MapPin, Plus } from 'lucide-react';
 
 const API_BASE_URL = 'https://hospital-managementbackend.onrender.com/api/patient-portal';
+const API_ROOT_URL = 'https://hospital-managementbackend.onrender.com/api';
 
 // Store token in memory instead of localStorage
 let authToken = null;
@@ -33,6 +34,24 @@ const api = {
   }
 };
 
+const rootApi = {
+  async request(endpoint, options = {}) {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(authToken && { Authorization: `Bearer ${authToken}` })
+    };
+    const response = await fetch(`${API_ROOT_URL}${endpoint}`, {
+      ...options,
+      headers: { ...headers, ...options.headers }
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.error || data.message || 'Request failed');
+    }
+    return data;
+  }
+};
+
 function PatientPortal() {
   const [step, setStep] = useState('email');
   const [email, setEmail] = useState('');
@@ -45,9 +64,11 @@ function PatientPortal() {
   const [profile, setProfile] = useState(null);
   const [history, setHistory] = useState(null);
   const [appointments, setAppointments] = useState([]);
+  const [hospitalLocations, setHospitalLocations] = useState([]);
   const [bills, setBills] = useState([]);
   const [selectedBill, setSelectedBill] = useState(null);
   const [showInvoice, setShowInvoice] = useState(false);
+  const [showRequestAppointment, setShowRequestAppointment] = useState(false);
   const [showReschedule, setShowReschedule] = useState(false);
   const [showRescheduleChoices, setShowRescheduleChoices] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
@@ -74,6 +95,7 @@ function PatientPortal() {
         fetchHistory();
       } else if (activeTab === 'appointments') {
         fetchAppointments();
+        fetchHospitalLocations();
       } else if (activeTab === 'bills') {
         fetchBills();
       }
@@ -165,6 +187,56 @@ function PatientPortal() {
     }
   };
 
+  const fetchHospitalLocations = async () => {
+    try {
+      const data = await rootApi.request('/hospital-locations');
+      setHospitalLocations(Array.isArray(data) ? data.filter(loc => loc.status !== 'Inactive') : []);
+    } catch (err) {
+      console.error('Error fetching hospital locations:', err);
+      setHospitalLocations([]);
+    }
+  };
+
+  const getLocationStartTime = (location) => (
+    location?.appointment_start_time || location?.appointmentStartTime || location?.appointment_from_time || location?.appointmentFromTime || location?.start_time || location?.from_time || location?.fromTime || ''
+  );
+
+  const getLocationEndTime = (location) => (
+    location?.appointment_end_time || location?.appointmentEndTime || location?.appointment_to_time || location?.appointmentToTime || location?.end_time || location?.to_time || location?.toTime || ''
+  );
+
+  const formatLocationWindow = (location) => {
+    const start = getLocationStartTime(location);
+    const end = getLocationEndTime(location);
+    return start && end ? `${start} - ${end}` : 'Time not set';
+  };
+
+  const getLocationTimeOptions = (location) => {
+    const start = getLocationStartTime(location);
+    const end = getLocationEndTime(location);
+    if (!start || !end) return [];
+
+    const [startHour, startMinute] = start.split(':').map(Number);
+    const [endHour, endMinute] = end.split(':').map(Number);
+    const startTotal = (startHour * 60) + (startMinute || 0);
+    const endTotal = (endHour * 60) + (endMinute || 0);
+    if (Number.isNaN(startTotal) || Number.isNaN(endTotal) || endTotal < startTotal) return [];
+
+    const slots = [];
+    for (let total = startTotal; total <= endTotal; total += 30) {
+      const hour = String(Math.floor(total / 60)).padStart(2, '0');
+      const minute = String(total % 60).padStart(2, '0');
+      slots.push(`${hour}:${minute}`);
+    }
+    return slots;
+  };
+
+  const getAppointmentLocationText = (apt) => {
+    const hospitalName = apt.hospital_name || apt.hospitalName;
+    const location = apt.hospital_location || apt.hospitalLocation || apt.location;
+    return hospitalName && location ? `${hospitalName} - ${location}` : 'Location not assigned';
+  };
+
   const fetchBills = async () => {
     try {
       const data = await api.request('/bills');
@@ -175,11 +247,29 @@ function PatientPortal() {
     }
   };
 
-  const handleRescheduleRequest = async (appointmentId, requestedDate, requestedTime, reason) => {
+  const handleAppointmentRequest = async (appointmentData) => {
+    try {
+      await rootApi.request('/appointments', {
+        method: 'POST',
+        body: JSON.stringify({
+          patientId: patient?.id || profile?.id,
+          ...appointmentData,
+          status: 'Scheduled'
+        })
+      });
+      alert('Appointment request submitted.');
+      setShowRequestAppointment(false);
+      fetchAppointments();
+    } catch (err) {
+      alert(`Error: ${err.message}`);
+    }
+  };
+
+  const handleRescheduleRequest = async (appointmentId, requestedDate, requestedTime, reason, requestedHospitalLocationId) => {
     try {
       await api.request(`/appointments/${appointmentId}/reschedule-request`, {
         method: 'POST',
-        body: JSON.stringify({ requestedDate, requestedTime, reason })
+        body: JSON.stringify({ requestedDate, requestedTime, reason, requestedHospitalLocationId })
       });
       alert('Reschedule request submitted! Hospital will contact you soon.');
       setShowReschedule(false);
@@ -364,11 +454,103 @@ function PatientPortal() {
     );
   }
 
+  const RequestAppointmentModal = () => {
+    const [formData, setFormData] = useState({
+      hospitalLocationId: '',
+      date: '',
+      time: '',
+      type: 'Consultation',
+      notes: ''
+    });
+    const selectedLocation = hospitalLocations.find(loc => String(loc.id) === String(formData.hospitalLocationId));
+    const timeOptions = selectedLocation ? getLocationTimeOptions(selectedLocation) : [];
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      await handleAppointmentRequest(formData);
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-xl p-6 w-full max-w-lg">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-gray-800">Request Appointment</h3>
+            <button onClick={() => setShowRequestAppointment(false)} className="text-gray-500 hover:text-gray-700">
+              <X size={22} />
+            </button>
+          </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Location *</label>
+              <select required value={formData.hospitalLocationId} onChange={(e) => setFormData({ ...formData, hospitalLocationId: e.target.value, time: '' })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                <option value="">Select location...</option>
+                {hospitalLocations.map((location) => (
+                  <option key={location.id} value={location.id}>
+                    {location.hospital_name} - {location.location} ({formatLocationWindow(location)})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Date *</label>
+                <input type="date" required value={formData.date} min={new Date().toISOString().split('T')[0]}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Time *</label>
+                {timeOptions.length > 0 ? (
+                  <select required value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                    <option value="">Select time...</option>
+                    {timeOptions.map((time) => <option key={time} value={time}>{time}</option>)}
+                  </select>
+                ) : (
+                  <input type="time" required value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" />
+                )}
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Type *</label>
+              <select value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                <option>Consultation</option>
+                <option>Regular Checkup</option>
+                <option>Follow-up</option>
+                <option>Emergency</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+              <textarea value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" rows="3" />
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button type="submit" className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 font-medium">
+                Submit Request
+              </button>
+              <button type="button" onClick={() => setShowRequestAppointment(false)}
+                className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 font-medium">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    );
+  };
+
   // Reschedule Modal
   const RescheduleModal = () => {
     const [requestedDate, setRequestedDate] = useState('');
     const [requestedTime, setRequestedTime] = useState('');
+    const [requestedHospitalLocationId, setRequestedHospitalLocationId] = useState(selectedAppointment?.hospital_location_id || '');
     const [reason, setReason] = useState('');
+    const selectedLocation = hospitalLocations.find(loc => String(loc.id) === String(requestedHospitalLocationId));
+    const timeOptions = selectedLocation ? getLocationTimeOptions(selectedLocation) : [];
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -382,28 +564,65 @@ function PatientPortal() {
             <p className="text-sm text-gray-600">
               {new Date(selectedAppointment?.date).toLocaleDateString()} at {selectedAppointment?.time}
             </p>
+            <p className="text-sm text-gray-600">
+              {getAppointmentLocationText(selectedAppointment)}
+            </p>
           </div>
 
           <div className="space-y-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Location *</label>
+              <select
+                value={requestedHospitalLocationId}
+                onChange={(e) => {
+                  setRequestedHospitalLocationId(e.target.value);
+                  setRequestedTime('');
+                }}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                required
+              >
+                <option value="">Select location...</option>
+                {hospitalLocations.map((location) => (
+                  <option key={location.id} value={location.id}>
+                    {location.hospital_name} - {location.location} ({formatLocationWindow(location)})
+                  </option>
+                ))}
+              </select>
+            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">New Date *</label>
               <input
                 type="date"
                 value={requestedDate}
-                onChange={(e) => setRequestedDate(e.target.value)}
+                onChange={(e) => {
+                  setRequestedDate(e.target.value);
+                  setRequestedTime('');
+                }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
                 required
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">New Time *</label>
-              <input
-                type="time"
-                value={requestedTime}
-                onChange={(e) => setRequestedTime(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                required
-              />
+              {timeOptions.length > 0 ? (
+                <select
+                  value={requestedTime}
+                  onChange={(e) => setRequestedTime(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                  required
+                >
+                  <option value="">Select time...</option>
+                  {timeOptions.map((time) => <option key={time} value={time}>{time}</option>)}
+                </select>
+              ) : (
+                <input
+                  type="time"
+                  value={requestedTime}
+                  onChange={(e) => setRequestedTime(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                  required
+                />
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Reason (Optional)</label>
@@ -419,8 +638,8 @@ function PatientPortal() {
 
           <div className="flex gap-3 mt-6">
             <button
-              onClick={() => handleRescheduleRequest(selectedAppointment.id, requestedDate, requestedTime, reason)}
-              disabled={!requestedDate || !requestedTime}
+              onClick={() => handleRescheduleRequest(selectedAppointment.id, requestedDate, requestedTime, reason, requestedHospitalLocationId)}
+              disabled={!requestedDate || !requestedTime || !requestedHospitalLocationId}
               className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 font-medium disabled:opacity-50"
             >
               Submit Request
@@ -943,10 +1162,19 @@ function PatientPortal() {
 
         {activeTab === 'appointments' && (
           <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-              <Calendar size={28} className="text-green-600" />
-              My Appointments
-            </h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <Calendar size={28} className="text-green-600" />
+                My Appointments
+              </h2>
+              <button
+                onClick={() => setShowRequestAppointment(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
+              >
+                <Plus size={18} />
+                Request Appointment
+              </button>
+            </div>
             {appointments.length === 0 ? (
               <div className="bg-white rounded-xl shadow-md p-12 text-center">
                 <Calendar className="mx-auto text-gray-400 mb-4" size={48} />
@@ -977,6 +1205,10 @@ function PatientPortal() {
                                   })} at {apt.time}
                                 </span>
                               </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <MapPin size={16} className="text-green-600 flex-shrink-0" />
+                              <span className="text-sm text-gray-700">{getAppointmentLocationText(apt)}</span>
                             </div>
                             
                             {rescheduleInfo?.suggestions?.length > 0 && (
@@ -1121,6 +1353,7 @@ function PatientPortal() {
         )}
       </div>
 
+      {showRequestAppointment && <RequestAppointmentModal />}
       {showReschedule && <RescheduleModal />}
       {showRescheduleChoices && <RescheduleSelectionModal />}
       {showInvoice && <InvoiceModal />}
