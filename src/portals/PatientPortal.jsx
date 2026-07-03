@@ -172,10 +172,11 @@ function PatientPortal() {
   const fetchHospitalLocations = async () => {
     try {
       // Fetch locations without sending patient auth token to avoid role-based denial
-      const res = await fetch(`${API_ROOT_URL}/hospital-locations`, {
-        headers: { 'Content-Type': 'application/json' }
-      });
+      const url = `${API_ROOT_URL}/hospital-locations`;
+      console.debug('[PatientPortal] fetching hospital locations from', url);
+      const res = await fetch(url, { headers: { 'Content-Type': 'application/json' } });
       const data = await res.json();
+      console.debug('[PatientPortal] hospital-locations response', res.status, data);
       if (!res.ok) throw new Error(data.error || data.message || 'Failed to fetch locations');
       setHospitalLocations(Array.isArray(data) ? data.filter(loc => loc.status !== 'Inactive') : []);
     } catch (err) {

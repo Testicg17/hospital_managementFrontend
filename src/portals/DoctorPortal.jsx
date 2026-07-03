@@ -243,19 +243,20 @@ function DoctorPortal() {
   const createAppointment = async (appointmentData) => {
     setLoading(true);
     try {
-      await api.request('/appointments', {
-        method: 'POST',
-        body: JSON.stringify({
-          ...appointmentData,
-          doctorId: appointmentData.doctorId || appointmentData.doctor_id || doctor?.id || doctor?.doctor_id || null,
-          hospitalLocationId: appointmentData.hospitalLocationId || appointmentData.hospital_location_id || null,
-          status: 'Scheduled'
-        })
-      });
+      const payload = {
+        ...appointmentData,
+        doctorId: appointmentData.doctorId || appointmentData.doctor_id || doctor?.id || doctor?.doctor_id || null,
+        hospitalLocationId: appointmentData.hospitalLocationId || appointmentData.hospital_location_id || null,
+        status: 'Scheduled'
+      };
+      console.debug('[DoctorPortal] createAppointment payload', payload);
+      const resp = await api.request('/appointments', { method: 'POST', body: JSON.stringify(payload) });
+      console.debug('[DoctorPortal] createAppointment response', resp);
       setSuccessMessage('Appointment scheduled');
       setShowCreateAppointment(false);
       fetchAppointments();
     } catch (err) {
+      console.error('[DoctorPortal] createAppointment error', err);
       alert(err.message || 'Failed to create appointment');
     } finally {
       setLoading(false);
@@ -478,17 +479,20 @@ function DoctorPortal() {
 
       setLoading(true);
       try {
+        const body = {
+          reason,
+          hospitalLocationId: hospitalLocationId || null,
+          doctorId: getAppointmentDoctorId(selectedAppointment) || doctor?.id || null,
+          suggestedDates: validSlots
+        };
+        console.debug('[DoctorPortal] reschedule.suggest body', body);
         const response = await api.request(`/doctor/appointments/${selectedAppointment.id}/reschedule/suggest`, {
           method: 'POST',
-          body: JSON.stringify({
-            reason,
-            hospitalLocationId: hospitalLocationId || null,
-            doctorId: getAppointmentDoctorId(selectedAppointment) || doctor?.id || null,
-            suggestedDates: validSlots
-          })
+          body: JSON.stringify(body)
         });
+        console.debug('[DoctorPortal] reschedule.suggest response', response);
 
-        if (response.success) {
+        if (response && response.success) {
           setSuccessMessage('✉️ Reschedule request sent to patient via email');
           setShowRescheduleInitiate(false);
           setSelectedAppointment(null);
@@ -660,19 +664,22 @@ function DoctorPortal() {
         const newDate = decision === 'approve' ? rescheduleInfo.requestedDate : alternateDate;
         const newTime = decision === 'approve' ? rescheduleInfo.requestedTime : alternateTime;
         
+        const body = {
+          newDate: decision === 'approve' ? newDate : null,
+          newTime: decision === 'approve' ? newTime : null,
+          alternateDate: decision === 'alternate' ? alternateDate : null,
+          alternateTime: decision === 'alternate' ? alternateTime : null,
+          hospitalLocationId: hospitalLocationId || null,
+          doctorId: getAppointmentDoctorId(selectedAppointment) || doctor?.id || null
+        };
+        console.debug('[DoctorPortal] reschedule.approve body', body);
         const response = await api.request(`/doctor/appointments/${selectedAppointment.id}/reschedule/approve`, {
           method: 'PUT',
-          body: JSON.stringify({
-            newDate: decision === 'approve' ? newDate : null,
-            newTime: decision === 'approve' ? newTime : null,
-            alternateDate: decision === 'alternate' ? alternateDate : null,
-            alternateTime: decision === 'alternate' ? alternateTime : null,
-            hospitalLocationId: hospitalLocationId || null,
-            doctorId: getAppointmentDoctorId(selectedAppointment) || doctor?.id || null
-          })
+          body: JSON.stringify(body)
         });
-        
-        if (response.success) {
+        console.debug('[DoctorPortal] reschedule.approve response', response);
+
+        if (response && response.success) {
           setSuccessMessage('✉️ Reschedule approved! Patient notified via email');
           setShowRescheduleApproval(false);
           setSelectedAppointment(null);
