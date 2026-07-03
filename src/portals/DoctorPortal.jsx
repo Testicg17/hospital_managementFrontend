@@ -247,7 +247,8 @@ function DoctorPortal() {
         method: 'POST',
         body: JSON.stringify({
           ...appointmentData,
-          doctorId: appointmentData.doctorId || doctor?.id || null,
+          doctorId: appointmentData.doctorId || appointmentData.doctor_id || doctor?.id || doctor?.doctor_id || null,
+          hospitalLocationId: appointmentData.hospitalLocationId || appointmentData.hospital_location_id || null,
           status: 'Scheduled'
         })
       });
