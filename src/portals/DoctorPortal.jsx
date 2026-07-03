@@ -232,6 +232,14 @@ function DoctorPortal() {
     return hospitalName && location ? `${hospitalName} - ${location}` : 'Location not assigned';
   };
 
+  const getAppointmentHospitalLocationId = (apt) => (
+    apt?.hospitalLocationId || apt?.hospital_location_id || apt?.hospitalLocation || apt?.hospital_location || ''
+  );
+
+  const getAppointmentDoctorId = (apt) => (
+    apt?.doctorId || apt?.doctor_id || ''
+  );
+
   const createAppointment = async (appointmentData) => {
     setLoading(true);
     try {
@@ -434,7 +442,7 @@ function DoctorPortal() {
   // Doctor Initiate Reschedule Modal
   const RescheduleInitiateModal = () => {
     const [reason, setReason] = useState('');
-    const [hospitalLocationId, setHospitalLocationId] = useState(selectedAppointment?.hospital_location_id || '');
+    const [hospitalLocationId, setHospitalLocationId] = useState(getAppointmentHospitalLocationId(selectedAppointment));
     const [suggestedDates, setSuggestedDates] = useState([
       { date: '', time: '' },
       { date: '', time: '' }
@@ -474,6 +482,7 @@ function DoctorPortal() {
           body: JSON.stringify({
             reason,
             hospitalLocationId: hospitalLocationId || null,
+            doctorId: getAppointmentDoctorId(selectedAppointment) || doctor?.id || null,
             suggestedDates: validSlots
           })
         });
@@ -529,6 +538,11 @@ function DoctorPortal() {
                     {location.hospital_name} - {location.location} ({formatLocationWindow(location)})
                   </option>
                 ))}
+                {!selectedLocation && hospitalLocationId && (
+                  <option key="current-location" value={hospitalLocationId}>
+                    {(selectedAppointment?.hospital_name || selectedAppointment?.hospitalName || 'Current location')} - {(selectedAppointment?.hospital_location || selectedAppointment?.hospitalLocation || selectedAppointment?.location || 'Location')}
+                  </option>
+                )}
               </select>
             </div>
             <div>
@@ -633,7 +647,7 @@ function DoctorPortal() {
   const RescheduleApprovalModal = () => {
     const rescheduleInfo = extractRescheduleInfo(selectedAppointment?.notes);
     const [decision, setDecision] = useState('approve');
-    const [hospitalLocationId, setHospitalLocationId] = useState(rescheduleInfo?.requestedHospitalLocationId || selectedAppointment?.hospital_location_id || '');
+    const [hospitalLocationId, setHospitalLocationId] = useState(rescheduleInfo?.requestedHospitalLocationId || getAppointmentHospitalLocationId(selectedAppointment));
     const [alternateDate, setAlternateDate] = useState('');
     const [alternateTime, setAlternateTime] = useState('');
     const selectedLocation = hospitalLocations.find(loc => String(loc.id) === String(hospitalLocationId));
@@ -652,7 +666,8 @@ function DoctorPortal() {
             newTime: decision === 'approve' ? newTime : null,
             alternateDate: decision === 'alternate' ? alternateDate : null,
             alternateTime: decision === 'alternate' ? alternateTime : null,
-            hospitalLocationId: hospitalLocationId || null
+            hospitalLocationId: hospitalLocationId || null,
+            doctorId: getAppointmentDoctorId(selectedAppointment) || doctor?.id || null
           })
         });
         
@@ -732,6 +747,11 @@ function DoctorPortal() {
                     {location.hospital_name} - {location.location} ({formatLocationWindow(location)})
                   </option>
                 ))}
+                {!selectedLocation && hospitalLocationId && (
+                  <option key="current-location" value={hospitalLocationId}>
+                    {(selectedAppointment?.hospital_name || selectedAppointment?.hospitalName || 'Current location')} - {(selectedAppointment?.hospital_location || selectedAppointment?.hospitalLocation || selectedAppointment?.location || 'Location')}
+                  </option>
+                )}
               </select>
             </div>
             <div className="flex gap-4">
