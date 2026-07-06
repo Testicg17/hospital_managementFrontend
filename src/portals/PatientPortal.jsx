@@ -171,16 +171,46 @@ function PatientPortal() {
 
   const fetchHospitalLocations = async () => {
     try {
-      // Fetch locations without sending patient auth token to avoid role-based denial
-      const url = `${API_ROOT_URL}/hospital-locations`;
-      console.debug('[PatientPortal] fetching hospital locations from', url);
-      const res = await fetch(url, { headers: { 'Content-Type': 'application/json' } });
-      const data = await res.json();
-      console.debug('[PatientPortal] hospital-locations response', res.status, data);
-      if (!res.ok) throw new Error(data.error || data.message || 'Failed to fetch locations');
-      setHospitalLocations(Array.isArray(data) ? data.filter(loc => loc.status !== 'Inactive') : []);
+      // Try patient-portal endpoint first, fallback to root endpoint
+      const endpoints = [
+        `${API_BASE_URL}/hospital-locations`,
+        `${API_ROOT_URL}/hospital-locations`
+      ];
+      
+      let data = null;
+      let lastError = null;
+      
+      for (const url of endpoints) {
+        try {
+          console.debug('[PatientPortal] fetching hospital locations from', url);
+          const headers = { 'Content-Type': 'application/json' };
+          if (authToken) {
+            headers.Authorization = `Bearer ${authToken}`;
+          }
+          const res = await fetch(url, { headers });
+          const responseData = await res.json();
+          console.debug('[PatientPortal] hospital-locations response', res.status, responseData);
+          
+          if (res.ok && Array.isArray(responseData)) {
+            data = responseData;
+            break;
+          }
+          if (!res.ok) {
+            lastError = `${url}: ${res.status} ${responseData.error || responseData.message || 'Unknown error'}`;
+          }
+        } catch (err) {
+          lastError = `${url}: ${err.message}`;
+          console.debug(`Endpoint ${url} failed, trying next...`);
+        }
+      }
+      
+      if (!data) {
+        throw new Error(lastError || 'Failed to fetch locations from any endpoint');
+      }
+      
+      setHospitalLocations(data.filter(loc => loc.status !== 'Inactive'));
     } catch (err) {
-      console.error('Error fetching hospital locations:', err);
+      console.error('[PatientPortal] Error fetching hospital locations:', err);
       setHospitalLocations([]);
     }
   };
