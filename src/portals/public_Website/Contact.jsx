@@ -3,6 +3,7 @@ import { AlertCircle, CalendarCheck, CheckCircle2, Mail, MapPin, Phone, Share2 }
 import { clinic, services } from './siteData';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
+const PUBLIC_BOOKING_ENDPOINT = process.env.REACT_APP_PUBLIC_BOOKING_ENDPOINT || '/public/appointments';
 const patientCategories = ['General', 'Diabetes', 'Hypertension', 'Cardiac', 'Orthopedic', 'Other'];
 
 const initialFormData = {
@@ -34,10 +35,6 @@ async function apiRequest(endpoint, options = {}) {
   }
 
   return data;
-}
-
-function getPatientId(patientResponse) {
-  return patientResponse?.id || patientResponse?.patient?.id || patientResponse?.data?.id || patientResponse?.patientId;
 }
 
 function Contact() {
@@ -97,18 +94,7 @@ function Contact() {
           : 'Public website appointment request',
       };
 
-      const patient = await apiRequest('/patients', {
-        method: 'POST',
-        body: JSON.stringify(patientPayload),
-      });
-      const patientId = getPatientId(patient);
-
-      if (!patientId) {
-        throw new Error('Patient was created, but the backend did not return a patient id for appointment booking.');
-      }
-
       const appointmentPayload = {
-        patientId,
         hospitalLocationId: formData.hospitalLocationId || null,
         doctorId: selectedLocation?.doctor_id || selectedLocation?.doctorId || null,
         date: formData.date,
@@ -122,9 +108,12 @@ function Contact() {
         ].filter(Boolean).join('\n'),
       };
 
-      await apiRequest('/appointments', {
+      await apiRequest(PUBLIC_BOOKING_ENDPOINT, {
         method: 'POST',
-        body: JSON.stringify(appointmentPayload),
+        body: JSON.stringify({
+          patient: patientPayload,
+          appointment: appointmentPayload,
+        }),
       });
 
       setFormData(initialFormData);
@@ -135,7 +124,9 @@ function Contact() {
     } catch (error) {
       setAlert({
         type: 'error',
-        message: error.message || 'Unable to submit appointment request. Please call the clinic.',
+        message: error.message?.includes('Cannot POST')
+          ? 'Public booking API is not available yet. Please add a backend route that creates the patient and appointment without requiring an admin token.'
+          : error.message || 'Unable to submit appointment request. Please call the clinic.',
       });
     } finally {
       setSubmitting(false);

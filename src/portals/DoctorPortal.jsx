@@ -34,16 +34,21 @@ const api = {
     try {
       const token = localStorage.getItem('doctor_token');
       const user = localStorage.getItem('doctor_user');
-      if (token && user) return { token, user: JSON.parse(user) };
+      if (token && user) {
+        authToken = token;
+        authUser = JSON.parse(user);
+        return { token: authToken, user: authUser };
+      }
     } catch (e) {
       // ignore
     }
     return { token: authToken, user: authUser };
   },
   async request(endpoint, options = {}) {
+    const auth = api.getAuth();
     const headers = {
       'Content-Type': 'application/json',
-      ...(authToken && { Authorization: `Bearer ${authToken}` })
+      ...(auth.token && { Authorization: `Bearer ${auth.token}` })
     };
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
@@ -55,11 +60,15 @@ const api = {
     }
     const data = await response.json();
     if (!response.ok) {
-      throw new Error(data.error || `HTTP ${response.status}`);
+      throw new Error(data.error || data.message || `HTTP ${response.status}`);
     }
     return data;
   }
 };
+
+const isSuccessfulResponse = (response) => (
+  response?.success === true || response?.message || response?.appointment || response?.data || response?.id
+);
 
 function DoctorPortal() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -492,7 +501,7 @@ function DoctorPortal() {
         });
         console.debug('[DoctorPortal] reschedule.suggest response', response);
 
-        if (response && response.success) {
+        if (isSuccessfulResponse(response)) {
           setSuccessMessage('✉️ Reschedule request sent to patient via email');
           setShowRescheduleInitiate(false);
           setSelectedAppointment(null);
@@ -501,7 +510,7 @@ function DoctorPortal() {
           alert(response.error || 'Failed to send reschedule request');
         }
       } catch (err) {
-        alert('Error sending reschedule request');
+        alert(err.message || 'Error sending reschedule request');
       } finally {
         setLoading(false);
       }
@@ -679,7 +688,7 @@ function DoctorPortal() {
         });
         console.debug('[DoctorPortal] reschedule.approve response', response);
 
-        if (response && response.success) {
+        if (isSuccessfulResponse(response)) {
           setSuccessMessage('✉️ Reschedule approved! Patient notified via email');
           setShowRescheduleApproval(false);
           setSelectedAppointment(null);
@@ -688,7 +697,7 @@ function DoctorPortal() {
           alert(response.error || 'Failed to approve reschedule');
         }
       } catch (err) {
-        alert('Error approving reschedule');
+        alert(err.message || 'Error approving reschedule');
       } finally {
         setLoading(false);
       }
@@ -704,7 +713,7 @@ function DoctorPortal() {
           })
         });
         
-        if (response.success) {
+        if (isSuccessfulResponse(response)) {
           setSuccessMessage('Reschedule request rejected and patient notified');
           setShowRescheduleApproval(false);
           setSelectedAppointment(null);
@@ -713,7 +722,7 @@ function DoctorPortal() {
           alert(response.error || 'Failed to reject reschedule');
         }
       } catch (err) {
-        alert('Error rejecting reschedule');
+        alert(err.message || 'Error rejecting reschedule');
       } finally {
         setLoading(false);
       }
@@ -891,7 +900,7 @@ function DoctorPortal() {
           })
         });
 
-        if (response.success) {
+        if (isSuccessfulResponse(response)) {
           setSuccessMessage('✉️ Visit completed! Summary sent to patient via email');
           setShowConsultation(false);
           setSelectedAppointment(null);
@@ -901,7 +910,7 @@ function DoctorPortal() {
           alert(response.error || 'Failed to complete visit');
         }
       } catch (err) {
-        alert('Error completing visit');
+        alert(err.message || 'Error completing visit');
       } finally {
         setLoading(false);
       }
