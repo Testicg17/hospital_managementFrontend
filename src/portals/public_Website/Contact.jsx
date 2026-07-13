@@ -99,10 +99,12 @@ function Contact() {
         doctorId: selectedLocation?.doctor_id || selectedLocation?.doctorId || null,
         date: formData.date,
         time: formData.time,
-        type: formData.department,
+        type: formData.department === 'Emergency' ? 'Emergency' : 'Consultation',
+        department: formData.department,
         status: 'Scheduled',
         notes: [
           'Booked from public website',
+          `Requested department: ${formData.department}`,
           formData.message && `Patient note: ${formData.message.trim()}`,
           selectedLocation && `Requested location: ${selectedLocation.hospital_name || selectedLocation.hospitalName || ''} ${selectedLocation.location || ''}`.trim(),
         ].filter(Boolean).join('\n'),
