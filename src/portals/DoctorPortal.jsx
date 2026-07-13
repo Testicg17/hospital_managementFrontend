@@ -242,7 +242,7 @@ function DoctorPortal() {
   };
 
   const getAppointmentHospitalLocationId = (apt) => (
-    apt?.hospitalLocationId || apt?.hospital_location_id || apt?.hospitalLocation || apt?.hospital_location || ''
+    apt?.hospitalLocationId || apt?.hospital_location_id || ''
   );
 
   const getAppointmentDoctorId = (apt) => (
@@ -254,7 +254,7 @@ function DoctorPortal() {
     try {
       const payload = {
         ...appointmentData,
-        doctorId: appointmentData.doctorId || appointmentData.doctor_id || doctor?.id || doctor?.doctor_id || null,
+        doctorId: appointmentData.doctorId || appointmentData.doctor_id || null,
         hospitalLocationId: appointmentData.hospitalLocationId || appointmentData.hospital_location_id || null,
         status: 'Scheduled'
       };
@@ -491,7 +491,7 @@ function DoctorPortal() {
         const body = {
           reason,
           hospitalLocationId: hospitalLocationId || null,
-          doctorId: getAppointmentDoctorId(selectedAppointment) || doctor?.id || null,
+          doctorId: getAppointmentDoctorId(selectedAppointment) || null,
           suggestedDates: validSlots
         };
         console.debug('[DoctorPortal] reschedule.suggest body', body);
@@ -679,7 +679,7 @@ function DoctorPortal() {
           alternateDate: decision === 'alternate' ? alternateDate : null,
           alternateTime: decision === 'alternate' ? alternateTime : null,
           hospitalLocationId: hospitalLocationId || null,
-          doctorId: getAppointmentDoctorId(selectedAppointment) || doctor?.id || null
+          doctorId: getAppointmentDoctorId(selectedAppointment) || null
         };
         console.debug('[DoctorPortal] reschedule.approve body', body);
         const response = await api.request(`/doctor/appointments/${selectedAppointment.id}/reschedule/approve`, {
