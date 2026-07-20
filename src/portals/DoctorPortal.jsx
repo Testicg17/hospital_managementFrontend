@@ -879,6 +879,9 @@ function DoctorPortal() {
     const [prescription, setPrescription] = useState('');
     const [tests, setTests] = useState('');
     const [diagnosis, setDiagnosis] = useState('');
+    const [nextCheckupDate, setNextCheckupDate] = useState(
+      selectedPatient?.next_checkup ? selectedPatient.next_checkup.split('T')[0] : ''
+    );
     const [notes, setNotes] = useState('');
 
     const handleCompleteVisit = async () => {
@@ -895,6 +898,7 @@ function DoctorPortal() {
             diagnosis,
             prescription,
             tests,
+            nextCheckupDate,
             notes,
             patient_id: selectedAppointment.patient_id
           })
@@ -906,6 +910,7 @@ function DoctorPortal() {
           setSelectedAppointment(null);
           setSelectedPatient(null);
           fetchAppointments();
+          fetchPatients();
         } else {
           alert(response.error || 'Failed to complete visit');
         }
@@ -978,6 +983,20 @@ function DoctorPortal() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 rows="3"
                 placeholder="Enter tests to be conducted..."
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                <Calendar size={18} />
+                Next Checkup Date
+              </label>
+              <input
+                type="date"
+                value={nextCheckupDate}
+                min={new Date().toISOString().split('T')[0]}
+                onChange={(e) => setNextCheckupDate(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>
 

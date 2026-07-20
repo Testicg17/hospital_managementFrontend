@@ -38,11 +38,43 @@ async function apiRequest(endpoint, options = {}) {
   return data;
 }
 
+const getLocationStartTime = (location) => (
+  location?.appointment_start_time || location?.appointmentStartTime || location?.appointment_from_time || location?.appointmentFromTime || location?.start_time || location?.from_time || location?.fromTime || ''
+);
+
+const getLocationEndTime = (location) => (
+  location?.appointment_end_time || location?.appointmentEndTime || location?.appointment_to_time || location?.appointmentToTime || location?.end_time || location?.to_time || location?.toTime || ''
+);
+
+const buildFallbackSlots = (location) => {
+  const start = getLocationStartTime(location);
+  const end = getLocationEndTime(location);
+  if (!start || !end) return [];
+
+  const [startHour, startMinute] = start.split(':').map(Number);
+  const [endHour, endMinute] = end.split(':').map(Number);
+  const startTotal = (startHour * 60) + (startMinute || 0);
+  const endTotal = (endHour * 60) + (endMinute || 0);
+
+  if (Number.isNaN(startTotal) || Number.isNaN(endTotal) || endTotal < startTotal) return [];
+
+  const slots = [];
+  for (let total = startTotal; total <= endTotal; total += 30) {
+    const hour = String(Math.floor(total / 60)).padStart(2, '0');
+    const minute = String(total % 60).padStart(2, '0');
+    slots.push({ time: `${hour}:${minute}`, booked: false, available: true });
+  }
+
+  return slots;
+};
+
 function Contact() {
   const { dictionary } = useLanguage();
   const [formData, setFormData] = useState(initialFormData);
   const [hospitalLocations, setHospitalLocations] = useState([]);
+  const [availableSlots, setAvailableSlots] = useState([]);
   const [loadingLocations, setLoadingLocations] = useState(false);
+  const [loadingSlots, setLoadingSlots] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [alert, setAlert] = useState(null);
 
@@ -74,9 +106,52 @@ function Contact() {
     [formData.hospitalLocationId, hospitalLocations]
   );
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchAvailableSlots() {
+      if (!formData.hospitalLocationId || !formData.date) {
+        setAvailableSlots([]);
+        return;
+      }
+
+      setLoadingSlots(true);
+      try {
+        const data = await apiRequest(`/public/locations/${formData.hospitalLocationId}/available-times?date=${encodeURIComponent(formData.date)}`);
+        if (!cancelled) {
+          setAvailableSlots(Array.isArray(data?.slots) ? data.slots : []);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setAvailableSlots(buildFallbackSlots(selectedLocation));
+        }
+      } finally {
+        if (!cancelled) setLoadingSlots(false);
+      }
+    }
+
+    fetchAvailableSlots();
+    return () => {
+      cancelled = true;
+    };
+  }, [formData.hospitalLocationId, formData.date, selectedLocation]);
+
   const handleChange = (field, value) => {
     setFormData((current) => ({ ...current, [field]: value }));
   };
+
+  const handleLocationChange = (value) => {
+    setFormData((current) => ({ ...current, hospitalLocationId: value, time: '' }));
+  };
+
+  const handleDateChange = (value) => {
+    setFormData((current) => ({ ...current, date: value, time: '' }));
+  };
+
+  const hasSlotLookupInput = Boolean(formData.hospitalLocationId && formData.date);
+  const selectableSlots = availableSlots.filter((slot) => slot.available !== false && !slot.booked);
+  const cannotSubmit = submitting || !formData.time;
+
   const localizedServices = services.map((service, index) => ({
     ...service,
     localizedTitle: dictionary.services[index]?.[0] || service.title,
@@ -238,7 +313,7 @@ function Contact() {
             </label>
             <label className="block text-sm font-medium text-slate-700 sm:col-span-2">
               {dictionary.contactPage.location}
-              <select value={formData.hospitalLocationId} onChange={(event) => handleChange('hospitalLocationId', event.target.value)}
+              <select value={formData.hospitalLocationId} onChange={(event) => handleLocationChange(event.target.value)}
                 className="mt-1 w-full rounded-lg border border-pink-200 px-3 py-2 focus:border-[#e84faf] focus:outline-none focus:ring-2 focus:ring-pink-100">
                 <option value="">{loadingLocations ? dictionary.contactPage.loadingLocations : dictionary.contactPage.assignLocation}</option>
                 {hospitalLocations.map((location) => (
@@ -251,13 +326,36 @@ function Contact() {
             <label className="block text-sm font-medium text-slate-700">
               {dictionary.contactPage.date}
               <input required type="date" min={new Date().toISOString().split('T')[0]} value={formData.date}
-                onChange={(event) => handleChange('date', event.target.value)}
+                onChange={(event) => handleDateChange(event.target.value)}
                 className="mt-1 w-full rounded-lg border border-pink-200 px-3 py-2 focus:border-[#e84faf] focus:outline-none focus:ring-2 focus:ring-pink-100" />
             </label>
             <label className="block text-sm font-medium text-slate-700">
               {dictionary.contactPage.time}
-              <input required type="time" value={formData.time} onChange={(event) => handleChange('time', event.target.value)}
-                className="mt-1 w-full rounded-lg border border-pink-200 px-3 py-2 focus:border-[#e84faf] focus:outline-none focus:ring-2 focus:ring-pink-100" />
+              <select
+                required
+                value={formData.time}
+                disabled={!hasSlotLookupInput || loadingSlots || selectableSlots.length === 0}
+                onChange={(event) => handleChange('time', event.target.value)}
+                className="mt-1 w-full rounded-lg border border-pink-200 px-3 py-2 focus:border-[#e84faf] focus:outline-none focus:ring-2 focus:ring-pink-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+              >
+                <option value="">
+                  {!hasSlotLookupInput
+                    ? dictionary.contactPage.selectLocationDate
+                    : loadingSlots
+                      ? dictionary.contactPage.loadingTimes
+                      : selectableSlots.length
+                        ? dictionary.contactPage.selectAvailableTime
+                        : dictionary.contactPage.noAvailableSlots}
+                </option>
+                {availableSlots.map((slot) => {
+                  const isBooked = slot.available === false || slot.booked;
+                  return (
+                    <option key={slot.time} value={slot.time} disabled={isBooked}>
+                      {slot.time}{isBooked ? ` - ${dictionary.contactPage.booked}` : ''}
+                    </option>
+                  );
+                })}
+              </select>
             </label>
           </div>
           <label className="mt-4 block text-sm font-medium text-slate-700">
@@ -265,7 +363,7 @@ function Contact() {
             <textarea rows="4" value={formData.message} onChange={(event) => handleChange('message', event.target.value)}
               className="mt-1 w-full rounded-lg border border-pink-200 px-3 py-2 focus:border-[#e84faf] focus:outline-none focus:ring-2 focus:ring-pink-100" placeholder={dictionary.contactPage.placeholders.message} />
           </label>
-          <button type="submit" disabled={submitting}
+          <button type="submit" disabled={cannotSubmit}
             className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#e84faf] px-5 py-3 text-sm font-semibold text-white hover:bg-[#d83d9f] disabled:cursor-not-allowed disabled:opacity-60">
             <CalendarCheck size={18} />
             {submitting ? dictionary.common.submitting : dictionary.common.submitAppointment}
