@@ -7,20 +7,23 @@ import Services from './services';
 import Articles from './Articles';
 import Gallery from './Gallery';
 import Contact from './Contact';
+import { LanguageProvider } from './LanguageContext';
 
 function PublicWebsite() {
   return (
-    <PublicLayout>
-      <Routes>
-        <Route index element={<Home />} />
-        <Route path="about" element={<About />} />
-        <Route path="services" element={<Services />} />
-        <Route path="articles" element={<Articles />} />
-        <Route path="gallery" element={<Gallery />} />
-        <Route path="contact" element={<Contact />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </PublicLayout>
+    <LanguageProvider>
+      <PublicLayout>
+        <Routes>
+          <Route index element={<Home />} />
+          <Route path="about" element={<About />} />
+          <Route path="services" element={<Services />} />
+          <Route path="articles" element={<Articles />} />
+          <Route path="gallery" element={<Gallery />} />
+          <Route path="contact" element={<Contact />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </PublicLayout>
+    </LanguageProvider>
   );
 }
 
