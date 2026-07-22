@@ -30,11 +30,7 @@ const CONFIG = {
     { label: "LinkedIn", url: "https://linkedin.com/", icon: "linkedin" },
     { label: "YouTube", url: "https://youtube.com/", icon: "youtube" },
   ],
-<<<<<<<< HEAD:src/portals/public_Website/DrRaveendraGondhali .jsx
-========
-
->>>>>>>> 96e0745f2f68e15d92243fbdf62cbc8a7d415ed2:src/portals/public_Website/DrRaveendraGondhali.jsx
-  qrTargetUrl: "https://hospital-management-frontend-gold.vercel.app/Dr_Raveendra_Gondhali",
+  qrTargetUrl: "https://hospital-management-frontend-gold.vercel.app/DrRaveendraGondhali",
 };
 
 /** ---------- helpers ---------- */
