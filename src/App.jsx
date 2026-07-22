@@ -5,6 +5,7 @@ import AdminPortal from './portals/AdminPortal';
 import PatientPortal from './portals/PatientPortal';
 import DoctorPortal from './portals/DoctorPortal';
 import PublicWebsite from './portals/public_Website';
+import DrRaveendraGondhali  from './portals/public_Website/DrRaveendraGondhali ';
 
 function App() {
   return (
@@ -19,6 +20,8 @@ function App() {
         <Route path="/doctor/*" element={<DoctorPortal />} />
         {/* Public Website Routes */}
         <Route path="/*" element={<PublicWebsite />} />
+         {/* Public Website Routes */}
+        <Route path="/*" element={<DrRaveendraGondhali  />} />
       </Routes>
     </BrowserRouter>
   );
