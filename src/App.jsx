@@ -21,7 +21,7 @@ function App() {
         {/* Public Website Routes */}
         <Route path="/*" element={<PublicWebsite />} />
          {/* Public Website Routes */}
-        <Route path="/*" element={<DrRaveendraGondhali />} />
+        <Route path="/DrRaveendraGondhali/*" element={<DrRaveendraGondhali />} />
       </Routes>
     </BrowserRouter>
   );
