@@ -9,7 +9,7 @@ import { useMemo,  } from "react";
 const CONFIG = {
   name: "Dr. Raveendra Gondhali",
   credentials: "MBBS, MD",
-  specialty: "Consultant Physician",
+  specialty: "Eva Fertility and Laparascopy",
   photoUrl: "", // paste an image URL here, or leave blank for the monogram
 
   hours: [
