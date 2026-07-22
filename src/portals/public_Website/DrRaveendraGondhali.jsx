@@ -1,4 +1,4 @@
-import { useMemo,  } from "react";
+import { useMemo, } from "react";
 
 /**
  * ============================================================
@@ -20,10 +20,10 @@ const CONFIG = {
   address: "123 MG Road, Camp, Pune, Maharashtra 411001",
   mapsUrl: "https://maps.google.com/?q=123+MG+Road+Camp+Pune",
 
-  phone: "+91 98765 43210",
-  email: "dr.gondhali@example.com",
-  whatsapp: "+91 98765 43210",
-  website: "https://drgondhali.com",
+  phone: "+91 70661 04777",
+  email: "evafertilitypune@gmail.com",
+  whatsapp: "+91 86054 70491",
+  website: "https://evafertilitypune.com",
 
   socials: [
     { label: "Instagram", url: "https://instagram.com/", icon: "instagram" },
@@ -500,6 +500,53 @@ function qrEncode(text, errorCorrectLevel = QRErrorCorrectLevel.M) {
   }
 }
 
+/**
+ * Renders the QR at a high pixel resolution on an off-screen <canvas> (no
+ * external image, no SVG-to-image conversion — modules are drawn directly
+ * as filled rectangles) and triggers a PNG download. Entirely client-side.
+ */
+function downloadQRPng(value, filename = "qr-code.png", pixelSize = 1024, quietZone = 2, fgColor = "#16241f", bgColor = "#ffffff") {
+  const { moduleCount, matrix } = qrEncode(value, QRErrorCorrectLevel.M);
+  const dim = moduleCount + quietZone * 2;
+  const scale = Math.max(1, Math.floor(pixelSize / dim));
+  const canvasSize = dim * scale;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = canvasSize;
+  canvas.height = canvasSize;
+  const ctx = canvas.getContext("2d");
+
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, canvasSize, canvasSize);
+  ctx.fillStyle = fgColor;
+  for (let r = 0; r < moduleCount; r++) {
+    for (let c = 0; c < moduleCount; c++) {
+      if (matrix[r][c]) {
+        ctx.fillRect((c + quietZone) * scale, (r + quietZone) * scale, scale, scale);
+      }
+    }
+  }
+
+  const triggerDownload = (url) => {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
+  if (canvas.toBlob) {
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      triggerDownload(url);
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+    }, "image/png");
+  } else {
+    triggerDownload(canvas.toDataURL("image/png"));
+  }
+}
+
 /** Renders a QR code as inline SVG — no image request, generated entirely client-side. */
 function QRCodeSVG({ value, size = 96, quietZone = 2, fgColor = "#16241f", bgColor = "#ffffff", className }) {
   const { moduleCount, matrix } = useMemo(() => qrEncode(value, QRErrorCorrectLevel.M), [value]);
@@ -577,6 +624,9 @@ const ICONS = {
   ),
   globe: (
     <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm6.9 8h-3.1a15 15 0 0 0-1.2-4.6A8 8 0 0 1 18.9 10zM12 4.1c.7 1 1.4 2.7 1.7 5.9h-3.4C10.6 6.8 11.3 5.1 12 4.1zM4 12c0-.7.1-1.4.2-2h3.4c-.1.6-.1 1.3-.1 2s0 1.4.1 2H4.2c-.1-.6-.2-1.3-.2-2zm1.1 4h3.1a15 15 0 0 0 1.2 4.6A8 8 0 0 1 5.1 16zm3.1-8H5.1a8 8 0 0 1 4.3-4.6A15 15 0 0 0 8.2 8zM12 19.9c-.7-1-1.4-2.7-1.7-5.9h3.4c-.3 3.2-1 4.9-1.7 5.9zm-1.9-7.9c-.1-.6-.1-1.3-.1-2s0-1.4.1-2h3.8c.1.6.1 1.3.1 2s0 1.4-.1 2h-3.8zm4.1 7.5a15 15 0 0 0 1.2-4.6h3.1a8 8 0 0 1-4.3 4.6zM16.4 14c.1-.6.1-1.3.1-2s0-1.4-.1-2h3.4c.1.6.2 1.3.2 2s-.1 1.4-.2 2h-3.4z" />
+  ),
+  download: (
+    <path d="M12 3a1 1 0 0 1 1 1v9.6l2.6-2.6a1 1 0 1 1 1.4 1.4l-4.3 4.3a1 1 0 0 1-1.4 0L7 12.4A1 1 0 1 1 8.4 11L11 13.6V4a1 1 0 0 1 1-1zM5 19a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1z" />
   ),
 };
 
@@ -844,9 +894,10 @@ export default function DoctorLandingPage() {
         .social-chip svg { width: 45%; height: 45%; fill: currentColor; }
 
         .qr-mini {
-          display: flex; align-items: center; gap: 8px;
+          display: flex; align-items: center; gap: 7px;
+          min-width: 0;
         }
-        .qr-mini svg {
+        .qr-mini > svg {
           width: clamp(34px, 9vw, 42px);
           height: clamp(34px, 9vw, 42px);
           border-radius: 6px;
@@ -860,8 +911,29 @@ export default function DoctorLandingPage() {
           font-size: clamp(8px, 2vw, 9.5px);
           color: #6a7a71;
           line-height: 1.3;
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
         .qr-mini-text a { color: var(--teal-deep); text-decoration: none; font-weight: 600; }
+        .qr-download-btn {
+          appearance: none;
+          border: 1px solid var(--line);
+          background: var(--paper-2);
+          color: var(--teal-deep);
+          width: clamp(26px, 7vw, 30px);
+          height: clamp(26px, 7vw, 30px);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          flex-shrink: 0;
+          padding: 0;
+        }
+        .qr-download-btn:active { background: var(--teal); color: #fff; }
+        .qr-download-btn svg { width: 55%; height: 55%; fill: currentColor; }
       `}</style>
 
       <div className="shell">
@@ -941,8 +1013,22 @@ export default function DoctorLandingPage() {
             <QRCodeSVG value={CONFIG.qrTargetUrl} size={42} quietZone={2} />
             <div className="qr-mini-text">
               <a href={CONFIG.website} target="_blank" rel="noreferrer">{websiteHost}</a>
-              <br />scan · connect · visit
             </div>
+            <button
+              className="qr-download-btn"
+              type="button"
+              aria-label="Download QR code as PNG"
+              title="Download QR code"
+              onClick={() =>
+                downloadQRPng(
+                  CONFIG.qrTargetUrl,
+                  `${CONFIG.name.replace(/\s+/g, "-").replace(/[^\w-]/g, "")}-qr.png`,
+                  1024
+                )
+              }
+            >
+              <svg viewBox="0 0 24 24">{ICONS.download}</svg>
+            </button>
           </div>
         </div>
       </div>
