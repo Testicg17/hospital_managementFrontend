@@ -713,7 +713,7 @@ export default function DoctorLandingPage() {
         }
 
         .shell {
-          width: 80%;
+          width: 100%;
           height: 100%;
           // max-width: 460px;
           // max-height: 900px;
