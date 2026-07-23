@@ -7,17 +7,28 @@ import { useMemo, } from "react";
  * ============================================================
  */
 const CONFIG = {
-  name: "Dr. Raveendra Gondhali",
-  credentials: "MBBS, MD",
-  specialty: "Consultant Physician",
-  photoUrl: "", // paste an image URL here, or leave blank for the monogram
+  name: "Eva Fertility and Laparoscopy (स्त्री क्लिनिक)",
+  credentials: "Dr. Raveendra Gondhali",
+  specialty: "Senior Gynecologist & Obstretics, Infertility & IVF MS(OBGY), MBBS, F.MAS Obstetrics & Gynecology",
+  photoUrl: "/images/logo.jpeg", // paste an image URL here, or leave blank for the monogram
 
-  hours: [
-    { day: "Mon–Sat", slots: [["09:00", "13:00"], ["17:00", "20:00"]] },
-    { day: "Sunday", slots: [] }, // empty = closed
-  ],
+ hours: [
+  {
+    day: "Mon–Sat",
+    slots: [
+      ["9:00", "18:00", "By Appointment"],
+      ["18:00", "21:00", "OPD"]
+    ]
+  },
+  {
+    day: "Sunday",
+    slots: [
+      ["9:00", "14:00", "By Appointment"]
+    ]
+  }
+],
 
-  address: "123 MG Road, Camp, Pune, Maharashtra 411001",
+  address: "Eva Fertility & Laparoscopy (स्त्री क्लिनिक), Silver Birch Multispeciality Hospital, Datta Mandir Road, Thergaon, Pimpri-Chinchwad, Pune 411033",
   mapsUrl: "https://maps.google.com/?q=123+MG+Road+Camp+Pune",
 
   phone: "+91 70661 04777",
@@ -676,9 +687,9 @@ export default function DoctorLandingPage() {
         :root {
           --ink: #16241f;
           --paper: #eef2ed;
-          --paper-2: #ffffff;
-          --teal: #2f6f62;
-          --teal-deep: #21534a;
+          --paper-2: #fff7fc;
+          --teal: #3157b7;
+          --teal-deep: #002277;
           --coral: #e2543f;
           --line: #d7ded4;
           --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -702,10 +713,10 @@ export default function DoctorLandingPage() {
         }
 
         .shell {
-          width: 100%;
+          width: 80%;
           height: 100%;
-          max-width: 460px;
-          max-height: 900px;
+          // max-width: 460px;
+          // max-height: 900px;
           margin: 0 auto;
           display: flex;
           flex-direction: column;
@@ -745,7 +756,7 @@ export default function DoctorLandingPage() {
           font-family: var(--serif);
           font-weight: 600;
           font-size: clamp(15px, 4.6vw, 20px);
-          line-height: 1.15;
+          line-height: 1.5;
           margin: 0;
           white-space: nowrap;
           overflow: hidden;
@@ -955,7 +966,7 @@ export default function DoctorLandingPage() {
         <PulseTrace id="div1" />
 
         {/* HOURS + LOCATION */}
-        <div className="grid2">
+        <div className="">
           <div className="mini-card">
             <div className="eyebrow">Hours</div>
             {CONFIG.hours.map((h) => (
