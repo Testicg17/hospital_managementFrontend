@@ -12,11 +12,52 @@ const CONFIG = {
   specialty: "Senior Gynecologist & Obstretics, Infertility & IVF MS(OBGY), MBBS, F.MAS Obstetrics & Gynecology",
   photoUrl: "/images/logo.jpeg", // paste an image URL here, or leave blank for the monogram
 
+areas: [
+  {
+    icon: "",
+    text: "Fertility Evaluation &Infertility Treatment",
+    
+  },
+  
+  {
+    icon: "",
+    text: "Ovulation Induction & Monitoring",
+    
+  },
+  {
+    icon: "",
+    text: "IUI/IVF Treatment, Guidance & Support ",
+    
+  },
+  
+  {
+    icon: "",
+    text: "PCOS/PCOD Management",
+    
+  },
+  {
+    icon: "",
+    text: "Laparascopy / Hysteroscopy Diagnosis & Treatment",
+    
+  },
+  
+{
+    icon: "",
+    text: "Pregnancy Care & Antenatal Support",
+    
+  },
+],
+
  hours: [
   {
     day: "Mon–Sat",
     slots: [
       ["9:00", "18:00", "By Appointment"],
+    ]
+  },
+  {
+    day: "",
+    slots: [
       ["18:00", "21:00", "OPD"]
     ]
   },
@@ -684,98 +725,116 @@ export default function DoctorLandingPage() {
   return (
     <div className="page">
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
         :root {
           --ink: #16241f;
-          --paper: #eef2ed;
-          --paper-2: #fff7fc;
+          --paper: #f6f4ee;
+          --paper-2: #ffffff;
           --teal: #3157b7;
           --teal-deep: #002277;
           --coral: #e2543f;
-          --line: #d7ded4;
+          --blush: #fbe9e7;
+          --line: #e3e1d8;
           --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
           --serif: 'Fraunces', Georgia, serif;
           --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+          --shadow-sm: 0 1px 2px rgba(22,36,31,0.04), 0 1px 1px rgba(22,36,31,0.03);
+          --shadow-md: 0 10px 30px -12px rgba(0,34,119,0.18);
         }
         * { box-sizing: border-box; }
-        html, body, #root { height: 100%; margin: 0; }
+        html, body, #root { margin: 0; }
 
         .page {
-          height: 100dvh;
-          width: 100vw;
-          background: var(--paper);
+          min-height: 100dvh;
+          width: 100%;
+          background:
+            radial-gradient(900px 480px at 8% -8%, rgba(49,87,183,0.08), transparent 60%),
+            radial-gradient(760px 420px at 108% 6%, rgba(226,84,63,0.07), transparent 55%),
+            var(--paper);
           color: var(--ink);
           font-family: var(--sans);
           display: flex;
-          align-items: center;
           justify-content: center;
-          overflow: hidden;
-          padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+          padding: clamp(16px, 4vw, 48px) clamp(14px, 4.5vw, 28px) clamp(48px, 8vw, 80px);
         }
 
-        .shell {
+        .wrap {
           width: 100%;
-          height: 100%;
-          // max-width: 460px;
-          // max-height: 900px;
-          margin: 0 auto;
+          max-width: 720px;
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
-          padding: clamp(10px, 3vh, 22px) clamp(14px, 4.5vw, 24px);
-          gap: clamp(6px, 1.4vh, 12px);
-          min-height: 0;
-          overflow: hidden;
+          gap: clamp(14px, 2.6vw, 20px);
+        }
+        @media (min-width: 900px) {
+          .wrap { max-width: 900px; gap: 22px; }
         }
 
-        /* ---- identity bar ---- */
-        .identity {
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          * { animation: none !important; transition: none !important; }
+        }
+        .wrap > * { animation: fadeUp 0.55s ease both; }
+        .wrap > *:nth-child(1) { animation-delay: 0.02s; }
+        .wrap > *:nth-child(2) { animation-delay: 0.08s; }
+        .wrap > *:nth-child(3) { animation-delay: 0.14s; }
+        .wrap > *:nth-child(4) { animation-delay: 0.18s; }
+        .wrap > *:nth-child(5) { animation-delay: 0.22s; }
+        .wrap > *:nth-child(6) { animation-delay: 0.26s; }
+
+        /* ---- hero ---- */
+        .hero {
           display: flex;
           align-items: center;
-          gap: clamp(10px, 3vw, 14px);
+          gap: clamp(14px, 3vw, 20px);
           background: linear-gradient(135deg, var(--teal) 0%, var(--teal-deep) 100%);
-          border-radius: 16px;
-          padding: clamp(10px, 2.2vh, 16px) clamp(12px, 3.5vw, 18px);
+          border-radius: 22px;
+          padding: clamp(18px, 3.6vw, 28px) clamp(18px, 4vw, 30px);
           color: #fff;
-          flex: 0 0 auto;
+          box-shadow: var(--shadow-md);
+          flex-wrap: wrap;
         }
         .avatar {
-          width: clamp(44px, 12vw, 58px);
-          height: clamp(44px, 12vw, 58px);
+          width: clamp(64px, 12vw, 84px);
+          height: clamp(64px, 12vw, 84px);
           border-radius: 50%;
           background: rgba(255,255,255,0.16);
-          border: 1.5px solid rgba(255,255,255,0.4);
+          border: 2px solid rgba(255,255,255,0.45);
           display: flex; align-items: center; justify-content: center;
           font-family: var(--serif);
-          font-size: clamp(15px, 4vw, 20px);
+          font-weight: 600;
+          font-size: clamp(20px, 4vw, 26px);
           flex-shrink: 0;
           overflow: hidden;
         }
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .identity-text { min-width: 0; flex: 1; }
+        .hero-text { min-width: 0; flex: 1; }
         .name {
           font-family: var(--serif);
           font-weight: 600;
-          font-size: clamp(15px, 4.6vw, 20px);
-          line-height: 1.5;
+          font-size: clamp(19px, 3.6vw, 28px);
+          line-height: 1.25;
           margin: 0;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
         }
         .cred-spec {
-          font-size: clamp(10.5px, 2.8vw, 12.5px);
-          opacity: 0.9;
-          margin-top: 2px;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
+          font-size: clamp(12px, 2.2vw, 14px);
+          opacity: 0.92;
+          margin-top: 6px;
+          line-height: 1.45;
         }
         .status-row {
-          display: flex; align-items: center; gap: 6px;
-          margin-top: 5px;
+          display: inline-flex; align-items: center; gap: 7px;
+          margin-top: 12px;
           font-family: var(--mono);
-          font-size: clamp(9.5px, 2.4vw, 11px);
-          letter-spacing: 0.04em;
+          font-size: clamp(10.5px, 2vw, 11.5px);
+          letter-spacing: 0.06em;
+          background: rgba(255,255,255,0.14);
+          border: 1px solid rgba(255,255,255,0.3);
+          padding: 5px 12px 5px 9px;
+          border-radius: 999px;
         }
         .dot {
           width: 7px; height: 7px; border-radius: 50%;
@@ -788,129 +847,188 @@ export default function DoctorLandingPage() {
           50% { box-shadow: 0 0 0 5px rgba(124,224,184,0); }
         }
 
-        .pulse-trace { width: 100%; height: clamp(10px, 2vh, 16px); display: block; flex: 0 0 auto; }
+        .pulse-trace { width: 100%; height: 20px; display: block; opacity: 0.85; }
 
-        /* ---- generic mini card ---- */
-        .grid2 {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: clamp(8px, 2.2vw, 12px);
-          flex: 1 1 auto;
-          min-height: 0;
-        }
-        .mini-card {
+        /* ---- cards ---- */
+        .card {
           background: var(--paper-2);
           border: 1px solid var(--line);
-          border-radius: 14px;
-          padding: clamp(9px, 2vh, 13px) clamp(10px, 2.5vw, 14px);
-          display: flex;
-          flex-direction: column;
-          min-height: 0;
-          overflow: hidden;
+          border-radius: 18px;
+          padding: clamp(16px, 3vw, 22px) clamp(16px, 3.4vw, 24px);
+          box-shadow: var(--shadow-sm);
         }
         .eyebrow {
           font-family: var(--mono);
-          font-size: clamp(8.5px, 2vw, 9.5px);
+          font-size: clamp(9.5px, 1.8vw, 10.5px);
           letter-spacing: 0.1em;
           text-transform: uppercase;
           color: var(--teal-deep);
-          margin-bottom: clamp(5px, 1.2vh, 8px);
+          margin-bottom: clamp(10px, 2vw, 14px);
+          font-weight: 600;
         }
 
+        .grid2 {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: clamp(12px, 2.4vw, 18px);
+        }
+        @media (min-width: 620px) {
+          .grid2 { grid-template-columns: 1fr 1fr; }
+        }
+
+        /* ---- areas list ---- */
+        .areas-list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+        @media (min-width: 560px) {
+          .areas-list { grid-template-columns: 1fr 1fr; }
+        }
+        .areas-list li {
+          position: relative;
+          display: flex;
+          align-items: flex-start;
+          gap: 9px;
+          padding: 10px 12px;
+          font-size: clamp(12.5px, 2vw, 13.5px);
+          line-height: 1.4;
+          color: #2b3a34;
+          background: var(--paper);
+          border: 1px solid var(--line);
+          border-radius: 12px;
+          transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+        }
+        @media (hover: hover) {
+          .areas-list li:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+            border-color: var(--coral);
+          }
+        }
+        .areas-list li::before {
+          content: "";
+          margin-top: 6px;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: var(--coral);
+          flex-shrink: 0;
+        }
+
+        /* ---- hours ---- */
         .hours-row {
-          display: flex; justify-content: space-between; align-items: baseline;
-          padding: clamp(3px, 0.8vh, 6px) 0;
+          display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+          padding: 7px 0;
           border-bottom: 1px dashed var(--line);
           font-family: var(--mono);
-          font-size: clamp(10.5px, 2.6vw, 12.5px);
+          font-size: clamp(11.5px, 2vw, 12.5px);
         }
         .hours-row:last-child { border-bottom: none; }
         .hours-day { font-weight: 600; }
         .hours-slots { color: #5b6b62; text-align: right; }
         .closed-tag { color: #b56464; }
 
+        /* ---- location ---- */
         .addr {
-          font-size: clamp(10.5px, 2.6vw, 12.5px);
-          line-height: 1.4;
+          font-size: clamp(12px, 2vw, 13.5px);
+          line-height: 1.5;
           color: #2b3a34;
-          flex: 1;
-          display: -webkit-box;
-          -webkit-line-clamp: 3;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
+          margin-bottom: 14px;
         }
         .mini-btn {
-          margin-top: 6px;
-          align-self: flex-start;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
           font-family: var(--sans);
           font-weight: 600;
-          font-size: clamp(10px, 2.4vw, 11.5px);
+          font-size: clamp(11.5px, 2vw, 12.5px);
           color: #fff;
           background: var(--teal);
           border: none;
-          border-radius: 8px;
-          padding: clamp(5px, 1.2vh, 7px) clamp(9px, 2vw, 12px);
+          border-radius: 10px;
+          padding: 9px 16px;
           text-decoration: none;
           white-space: nowrap;
+          transition: background 0.15s ease, transform 0.15s ease;
         }
+        .mini-btn:hover { background: var(--teal-deep); transform: translateY(-1px); }
 
-        /* ---- contact chips row ---- */
+        /* ---- contact chips ---- */
         .chip-row {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: clamp(6px, 1.8vw, 10px);
-          flex: 0 0 auto;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+        }
+        @media (min-width: 480px) {
+          .chip-row { grid-template-columns: repeat(4, 1fr); }
         }
         .chip {
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          gap: 4px;
+          gap: 6px;
           background: var(--paper-2);
           border: 1px solid var(--line);
-          border-radius: 12px;
-          padding: clamp(7px, 1.6vh, 10px) 4px;
+          border-radius: 14px;
+          padding: 14px 6px;
           text-decoration: none;
           color: var(--teal-deep);
-          transition: background 0.15s ease, color 0.15s ease;
+          transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
         }
         .chip:active { background: var(--teal); color: #fff; }
-        .chip svg { width: clamp(15px, 4vw, 18px); height: clamp(15px, 4vw, 18px); fill: currentColor; }
+        @media (hover: hover) {
+          .chip:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); border-color: var(--teal); }
+        }
+        .chip svg { width: 19px; height: 19px; fill: currentColor; }
         .chip span {
           font-family: var(--mono);
-          font-size: clamp(8px, 2vw, 9.5px);
-          letter-spacing: 0.02em;
+          font-size: 10px;
+          letter-spacing: 0.03em;
+          font-weight: 600;
         }
 
-        /* ---- social + footer row ---- */
+        /* ---- social + qr footer ---- */
         .bottom-row {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 10px;
-          flex: 0 0 auto;
+          gap: 12px;
+          flex-wrap: wrap;
         }
-        .social-row { display: flex; gap: clamp(6px, 1.8vw, 9px); }
+        .social-row { display: flex; gap: 9px; }
         .social-chip {
-          width: clamp(28px, 7.5vw, 34px);
-          height: clamp(28px, 7.5vw, 34px);
+          width: 36px;
+          height: 36px;
           border-radius: 50%;
           background: var(--paper-2);
           border: 1px solid var(--line);
           display: flex; align-items: center; justify-content: center;
           color: var(--teal-deep);
           text-decoration: none;
+          transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+        }
+        @media (hover: hover) {
+          .social-chip:hover { background: var(--teal); color: #fff; transform: translateY(-2px); }
         }
         .social-chip svg { width: 45%; height: 45%; fill: currentColor; }
 
         .qr-mini {
-          display: flex; align-items: center; gap: 7px;
+          display: flex; align-items: center; gap: 10px;
           min-width: 0;
+          background: var(--paper-2);
+          border: 1px solid var(--line);
+          border-radius: 14px;
+          padding: 8px 12px 8px 8px;
+          box-shadow: var(--shadow-sm);
         }
         .qr-mini > svg {
-          width: clamp(34px, 9vw, 42px);
-          height: clamp(34px, 9vw, 42px);
+          width: 40px;
+          height: 40px;
           border-radius: 6px;
           border: 1px solid var(--line);
           background: #fff;
@@ -919,22 +1037,19 @@ export default function DoctorLandingPage() {
         }
         .qr-mini-text {
           font-family: var(--mono);
-          font-size: clamp(8px, 2vw, 9.5px);
+          font-size: 10.5px;
           color: #6a7a71;
           line-height: 1.3;
           min-width: 0;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
         }
         .qr-mini-text a { color: var(--teal-deep); text-decoration: none; font-weight: 600; }
         .qr-download-btn {
           appearance: none;
           border: 1px solid var(--line);
-          background: var(--paper-2);
+          background: var(--paper);
           color: var(--teal-deep);
-          width: clamp(26px, 7vw, 30px);
-          height: clamp(26px, 7vw, 30px);
+          width: 30px;
+          height: 30px;
           border-radius: 50%;
           display: flex;
           align-items: center;
@@ -942,18 +1057,23 @@ export default function DoctorLandingPage() {
           cursor: pointer;
           flex-shrink: 0;
           padding: 0;
+          transition: background 0.15s ease, color 0.15s ease;
         }
-        .qr-download-btn:active { background: var(--teal); color: #fff; }
-        .qr-download-btn svg { width: 55%; height: 55%; fill: currentColor; }
+        .qr-download-btn:hover, .qr-download-btn:active { background: var(--teal); color: #fff; }
+
+        a:focus-visible, button:focus-visible {
+          outline: 2px solid var(--teal);
+          outline-offset: 2px;
+        }
       `}</style>
 
-      <div className="shell">
-        {/* IDENTITY BAR */}
-        <div className="identity">
+      <div className="wrap">
+        {/* IDENTITY / HERO */}
+        <header className="hero">
           <div className="avatar">
             {CONFIG.photoUrl ? <img src={CONFIG.photoUrl} alt={CONFIG.name} /> : initials}
           </div>
-          <div className="identity-text">
+          <div className="hero-text">
             <h1 className="name">{CONFIG.name}</h1>
             <div className="cred-spec">{CONFIG.credentials} · {CONFIG.specialty}</div>
             <div className="status-row">
@@ -961,13 +1081,23 @@ export default function DoctorLandingPage() {
               {isOpen ? "OPEN NOW" : "CLOSED NOW"}
             </div>
           </div>
-        </div>
+        </header>
 
         <PulseTrace id="div1" />
 
+        {/* AREAS OF CARE */}
+        <section className="card">
+          <div className="eyebrow">Dedicated to Providing Comprehensive Care in :</div>
+          <ul className="areas-list">
+            {CONFIG.areas.map((a) => (
+              <li key={a.text}>{a.text}</li>
+            ))}
+          </ul>
+        </section>
+
         {/* HOURS + LOCATION */}
-        <div className="">
-          <div className="mini-card">
+        <div className="grid2">
+          <section className="card">
             <div className="eyebrow">Hours</div>
             {CONFIG.hours.map((h) => (
               <div className="hours-row" key={h.day}>
@@ -981,14 +1111,14 @@ export default function DoctorLandingPage() {
                 </span>
               </div>
             ))}
-          </div>
-          <div className="mini-card">
+          </section>
+          <section className="card">
             <div className="eyebrow">Location</div>
             <div className="addr">{CONFIG.address}</div>
             <a className="mini-btn" href={CONFIG.mapsUrl} target="_blank" rel="noreferrer">
               Directions →
             </a>
-          </div>
+          </section>
         </div>
 
         {/* CONTACT CHIPS */}
