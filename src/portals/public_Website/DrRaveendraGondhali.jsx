@@ -7,7 +7,8 @@ import { useMemo, } from "react";
  * ============================================================
  */
 const CONFIG = {
-  name: "Eva Fertility and Laparoscopy (स्त्री क्लिनिक)",
+  name: "Eva Fertility and Laparoscopy",
+  namemarathi: "(स्त्री क्लिनिक)",
   credentials: "Dr. Raveendra Gondhali",
   specialty: "Senior Gynecologist & Obstretics, Infertility & IVF MS(OBGY), MBBS, F.MAS Obstetrics & Gynecology",
   photoUrl: "/images/logo.jpeg", // paste an image URL here, or leave blank for the monogram
@@ -728,14 +729,14 @@ export default function DoctorLandingPage() {
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
         :root {
-          --ink: #16241f;
-          --paper: #f6f4ee;
+          --ink: #1c2245;
+          --paper: #fef8fa;
           --paper-2: #ffffff;
-          --teal: #3157b7;
-          --teal-deep: #002277;
-          --coral: #e2543f;
-          --blush: #fbe9e7;
-          --line: #e3e1d8;
+          --teal: #283593;
+          --teal-deep: #171d5c;
+          --coral: #E91E63;
+          --blush: #fde7ef;
+          --line: #f0d9e2;
           --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
           --serif: 'Fraunces', Georgia, serif;
           --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -749,8 +750,8 @@ export default function DoctorLandingPage() {
           min-height: 100dvh;
           width: 100%;
           background:
-            radial-gradient(900px 480px at 8% -8%, rgba(49,87,183,0.08), transparent 60%),
-            radial-gradient(760px 420px at 108% 6%, rgba(226,84,63,0.07), transparent 55%),
+            radial-gradient(900px 480px at 8% -8%, rgba(40,53,147,0.07), transparent 60%),
+            radial-gradient(760px 420px at 108% 6%, rgba(233,30,99,0.07), transparent 55%),
             var(--paper);
           color: var(--ink);
           font-family: var(--sans);
@@ -806,7 +807,7 @@ export default function DoctorLandingPage() {
           display: flex; align-items: center; justify-content: center;
           font-family: var(--serif);
           font-weight: 600;
-          font-size: clamp(20px, 4vw, 26px);
+          font-size: clamp(22px, 4.3vw, 28px);
           flex-shrink: 0;
           overflow: hidden;
         }
@@ -815,12 +816,12 @@ export default function DoctorLandingPage() {
         .name {
           font-family: var(--serif);
           font-weight: 600;
-          font-size: clamp(19px, 3.6vw, 28px);
+          font-size: clamp(21px, 3.9vw, 30px);
           line-height: 1.25;
           margin: 0;
         }
         .cred-spec {
-          font-size: clamp(12px, 2.2vw, 14px);
+          font-size: clamp(13px, 2.4vw, 15px);
           opacity: 0.92;
           margin-top: 6px;
           line-height: 1.45;
@@ -829,7 +830,7 @@ export default function DoctorLandingPage() {
           display: inline-flex; align-items: center; gap: 7px;
           margin-top: 12px;
           font-family: var(--mono);
-          font-size: clamp(10.5px, 2vw, 11.5px);
+          font-size: clamp(11px, 2.1vw, 12px);
           letter-spacing: 0.06em;
           background: rgba(255,255,255,0.14);
           border: 1px solid rgba(255,255,255,0.3);
@@ -859,7 +860,7 @@ export default function DoctorLandingPage() {
         }
         .eyebrow {
           font-family: var(--mono);
-          font-size: clamp(9.5px, 1.8vw, 10.5px);
+          font-size: clamp(10px, 1.9vw, 11px);
           letter-spacing: 0.1em;
           text-transform: uppercase;
           color: var(--teal-deep);
@@ -894,7 +895,7 @@ export default function DoctorLandingPage() {
           align-items: flex-start;
           gap: 9px;
           padding: 10px 12px;
-          font-size: clamp(12.5px, 2vw, 13.5px);
+          font-size: clamp(13.5px, 2.1vw, 14.5px);
           line-height: 1.4;
           color: #2b3a34;
           background: var(--paper);
@@ -925,16 +926,16 @@ export default function DoctorLandingPage() {
           padding: 7px 0;
           border-bottom: 1px dashed var(--line);
           font-family: var(--mono);
-          font-size: clamp(11.5px, 2vw, 12.5px);
+          font-size: clamp(12.5px, 2.1vw, 13.5px);
         }
         .hours-row:last-child { border-bottom: none; }
-        .hours-day { font-weight: 600; }
-        .hours-slots { color: #5b6b62; text-align: right; }
+        .hours-day { font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+        .hours-slots { color: #5b6b62; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
         .closed-tag { color: #b56464; }
 
         /* ---- location ---- */
         .addr {
-          font-size: clamp(12px, 2vw, 13.5px);
+          font-size: clamp(13px, 2.1vw, 14.5px);
           line-height: 1.5;
           color: #2b3a34;
           margin-bottom: 14px;
@@ -945,7 +946,7 @@ export default function DoctorLandingPage() {
           gap: 6px;
           font-family: var(--sans);
           font-weight: 600;
-          font-size: clamp(11.5px, 2vw, 12.5px);
+          font-size: clamp(12.5px, 2.1vw, 13.5px);
           color: #fff;
           background: var(--teal);
           border: none;
@@ -990,6 +991,7 @@ export default function DoctorLandingPage() {
           font-size: 10px;
           letter-spacing: 0.03em;
           font-weight: 600;
+          white-space: nowrap;
         }
 
         /* ---- social + qr footer ---- */
@@ -1041,6 +1043,9 @@ export default function DoctorLandingPage() {
           color: #6a7a71;
           line-height: 1.3;
           min-width: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
         .qr-mini-text a { color: var(--teal-deep); text-decoration: none; font-weight: 600; }
         .qr-download-btn {
@@ -1094,24 +1099,24 @@ export default function DoctorLandingPage() {
           .avatar {
             width: clamp(44px, 12vw, 58px);
             height: clamp(44px, 12vw, 58px);
-            font-size: clamp(15px, 4vw, 20px);
+            font-size: clamp(16px, 4.2vw, 21px);
           }
           .name {
-            font-size: clamp(15px, 4.4vw, 19px);
+            font-size: clamp(16.5px, 4.7vw, 20.5px);
             line-height: 1.3;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
           }
           .cred-spec {
-            font-size: clamp(10px, 2.6vw, 12px);
+            font-size: clamp(11px, 2.8vw, 13px);
             margin-top: 3px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
           }
           .status-row {
-            font-size: clamp(9px, 2.2vw, 10.5px);
+            font-size: clamp(10.5px, 2.4vw, 12px);
             margin-top: 6px;
             padding: 4px 10px 4px 8px;
           }
@@ -1124,7 +1129,7 @@ export default function DoctorLandingPage() {
             overflow: hidden;
           }
           .eyebrow {
-            font-size: clamp(8px, 1.8vw, 9px);
+            font-size: clamp(8.5px, 1.9vw, 9.5px);
             margin-bottom: clamp(4px, 1vh, 7px);
           }
 
@@ -1134,7 +1139,7 @@ export default function DoctorLandingPage() {
           }
           .areas-list li {
             padding: clamp(5px, 1.2vh, 8px) 8px;
-            font-size: clamp(9.5px, 2.4vw, 11px);
+            font-size: clamp(10.5px, 2.5vw, 12px);
             line-height: 1.25;
             border-radius: 9px;
           }
@@ -1144,11 +1149,11 @@ export default function DoctorLandingPage() {
 
           .hours-row {
             padding: clamp(2px, 0.6vh, 5px) 0;
-            font-size: clamp(9.5px, 2.3vw, 11px);
+            font-size: clamp(10.5px, 2.4vw, 12px);
           }
 
           .addr {
-            font-size: clamp(9.5px, 2.3vw, 11px);
+            font-size: clamp(10.5px, 2.4vw, 12px);
             line-height: 1.3;
             margin-bottom: clamp(6px, 1.2vh, 10px);
             display: -webkit-box;
@@ -1157,21 +1162,21 @@ export default function DoctorLandingPage() {
             overflow: hidden;
           }
           .mini-btn {
-            font-size: clamp(9.5px, 2.2vw, 11px);
+            font-size: clamp(10.5px, 2.3vw, 12px);
             padding: clamp(5px, 1.1vh, 7px) clamp(9px, 2vw, 12px);
           }
 
           .chip-row { grid-template-columns: repeat(4, 1fr); gap: clamp(5px, 1.5vw, 8px); }
           .chip { padding: clamp(6px, 1.4vh, 9px) 3px; gap: 3px; border-radius: 11px; }
           .chip svg { width: clamp(14px, 3.6vw, 17px); height: clamp(14px, 3.6vw, 17px); }
-          .chip span { font-size: clamp(7.5px, 1.8vw, 9px); }
+          .chip span { font-size: clamp(8.5px, 1.9vw, 10px); }
 
           .social-row { gap: clamp(5px, 1.6vw, 8px); }
           .social-chip { width: clamp(26px, 7vw, 32px); height: clamp(26px, 7vw, 32px); }
 
           .qr-mini { padding: clamp(5px, 1.2vh, 7px) clamp(8px, 2vw, 10px) clamp(5px, 1.2vh, 7px) 6px; }
           .qr-mini > svg { width: clamp(30px, 8vw, 38px); height: clamp(30px, 8vw, 38px); }
-          .qr-mini-text { font-size: clamp(7.5px, 1.8vw, 9px); }
+          .qr-mini-text { font-size: clamp(8.5px, 1.9vw, 10px); }
           .qr-download-btn { width: clamp(24px, 6vw, 28px); height: clamp(24px, 6vw, 28px); }
         }
       `}</style>
@@ -1184,7 +1189,8 @@ export default function DoctorLandingPage() {
           </div>
           <div className="hero-text">
             <h1 className="name">{CONFIG.name}</h1>
-            <div className="specialty">{CONFIG.credentials}</div>
+            <h1 className="name">{CONFIG.namemarathi}</h1>
+            <div className="specialty">{CONFIG.credentials} </div>
              <div className="cred-spec">{CONFIG.specialty}</div>
             <div className="status-row">
               <span className={`dot ${isOpen ? "open" : ""}`} />
