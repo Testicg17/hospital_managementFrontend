@@ -1184,7 +1184,8 @@ export default function DoctorLandingPage() {
           </div>
           <div className="hero-text">
             <h1 className="name">{CONFIG.name}</h1>
-            <div className="cred-spec">{CONFIG.credentials} · {CONFIG.specialty}</div>
+            <div className="specialty">{CONFIG.credentials}</div>
+             <div className="cred-spec">{CONFIG.specialty}</div>
             <div className="status-row">
               <span className={`dot ${isOpen ? "open" : ""}`} />
               {isOpen ? "OPEN NOW" : "CLOSED NOW"}
