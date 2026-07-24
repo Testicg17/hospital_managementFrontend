@@ -1065,6 +1065,115 @@ export default function DoctorLandingPage() {
           outline: 2px solid var(--teal);
           outline-offset: 2px;
         }
+
+        /* ---- mobile: fit one screen, no scroll ---- */
+        @media (max-width: 700px) {
+          html, body, #root { height: 100%; }
+          .page {
+            height: 100dvh;
+            min-height: 0;
+            overflow: hidden;
+            align-items: center;
+            padding: clamp(8px, 3vh, 16px) clamp(12px, 4vw, 20px);
+          }
+          .wrap {
+            height: 100%;
+            max-width: 460px;
+            justify-content: space-between;
+            gap: clamp(6px, 1.3vh, 11px);
+            min-height: 0;
+          }
+          .wrap > * { animation: none; flex: 0 0 auto; min-height: 0; }
+
+          .hero {
+            gap: clamp(10px, 3vw, 14px);
+            padding: clamp(10px, 2.2vh, 16px) clamp(12px, 3.5vw, 18px);
+            border-radius: 16px;
+            flex-wrap: nowrap;
+          }
+          .avatar {
+            width: clamp(44px, 12vw, 58px);
+            height: clamp(44px, 12vw, 58px);
+            font-size: clamp(15px, 4vw, 20px);
+          }
+          .name {
+            font-size: clamp(15px, 4.4vw, 19px);
+            line-height: 1.3;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          .cred-spec {
+            font-size: clamp(10px, 2.6vw, 12px);
+            margin-top: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          .status-row {
+            font-size: clamp(9px, 2.2vw, 10.5px);
+            margin-top: 6px;
+            padding: 4px 10px 4px 8px;
+          }
+
+          .pulse-trace { height: clamp(8px, 1.6vh, 14px); }
+
+          .card {
+            padding: clamp(8px, 1.8vh, 12px) clamp(10px, 3vw, 14px);
+            border-radius: 14px;
+            overflow: hidden;
+          }
+          .eyebrow {
+            font-size: clamp(8px, 1.8vw, 9px);
+            margin-bottom: clamp(4px, 1vh, 7px);
+          }
+
+          .areas-list {
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(4px, 1vh, 7px);
+          }
+          .areas-list li {
+            padding: clamp(5px, 1.2vh, 8px) 8px;
+            font-size: clamp(9.5px, 2.4vw, 11px);
+            line-height: 1.25;
+            border-radius: 9px;
+          }
+          .areas-list li::before { margin-top: 5px; width: 5px; height: 5px; }
+
+          .grid2 { grid-template-columns: 1fr 1fr; gap: clamp(6px, 1.6vw, 10px); }
+
+          .hours-row {
+            padding: clamp(2px, 0.6vh, 5px) 0;
+            font-size: clamp(9.5px, 2.3vw, 11px);
+          }
+
+          .addr {
+            font-size: clamp(9.5px, 2.3vw, 11px);
+            line-height: 1.3;
+            margin-bottom: clamp(6px, 1.2vh, 10px);
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
+          .mini-btn {
+            font-size: clamp(9.5px, 2.2vw, 11px);
+            padding: clamp(5px, 1.1vh, 7px) clamp(9px, 2vw, 12px);
+          }
+
+          .chip-row { grid-template-columns: repeat(4, 1fr); gap: clamp(5px, 1.5vw, 8px); }
+          .chip { padding: clamp(6px, 1.4vh, 9px) 3px; gap: 3px; border-radius: 11px; }
+          .chip svg { width: clamp(14px, 3.6vw, 17px); height: clamp(14px, 3.6vw, 17px); }
+          .chip span { font-size: clamp(7.5px, 1.8vw, 9px); }
+
+          .social-row { gap: clamp(5px, 1.6vw, 8px); }
+          .social-chip { width: clamp(26px, 7vw, 32px); height: clamp(26px, 7vw, 32px); }
+
+          .qr-mini { padding: clamp(5px, 1.2vh, 7px) clamp(8px, 2vw, 10px) clamp(5px, 1.2vh, 7px) 6px; }
+          .qr-mini > svg { width: clamp(30px, 8vw, 38px); height: clamp(30px, 8vw, 38px); }
+          .qr-mini-text { font-size: clamp(7.5px, 1.8vw, 9px); }
+          .qr-download-btn { width: clamp(24px, 6vw, 28px); height: clamp(24px, 6vw, 28px); }
+        }
       `}</style>
 
       <div className="wrap">
