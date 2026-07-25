@@ -699,6 +699,9 @@ const ICONS = {
   calendar: (
     <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 0 1 1-1zM4 9v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9H4zm12.7 2.3a1 1 0 0 1 0 1.4l-4.5 4.5a1 1 0 0 1-1.4 0l-2-2a1 1 0 1 1 1.4-1.4l1.3 1.3 3.8-3.8a1 1 0 0 1 1.4 0z" />
   ),
+  pin: (
+    <path d="M12 2a7 7 0 0 0-7 7c0 5.25 6.28 11.63 6.55 11.9a.63.63 0 0 0 .9 0C12.72 20.63 19 14.25 19 9a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z" />
+  ),
 };
 
 /** signature element: animated ECG / pulse trace, used as thin dividers */
@@ -1091,11 +1094,11 @@ const currentSession = useMemo(() => {
         /* ---- contact chips ---- */
         .chip-row {
           display: grid;
-          grid-template-columns: repeat(2, 1fr);
+          grid-template-columns: repeat(3, 1fr);
           gap: 10px;
         }
         @media (min-width: 480px) {
-          .chip-row { grid-template-columns: repeat(4, 1fr); }
+          .chip-row { grid-template-columns: repeat(5, 1fr); }
         }
         .chip {
           display: flex;
@@ -1371,10 +1374,10 @@ const currentSession = useMemo(() => {
             padding: clamp(5px, 1.1vh, 7px) clamp(9px, 2vw, 12px);
           }
 
-          .chip-row { grid-template-columns: repeat(4, 1fr); gap: clamp(5px, 1.5vw, 8px); }
-          .chip { padding: clamp(6px, 1.4vh, 9px) 3px; gap: 3px; border-radius: 11px; }
-          .chip svg { width: clamp(14px, 3.6vw, 17px); height: clamp(14px, 3.6vw, 17px); }
-          .chip span { font-size: clamp(8.5px, 1.9vw, 10px); }
+          .chip-row { grid-template-columns: repeat(5, 1fr); gap: clamp(4px, 1.2vw, 7px); }
+          .chip { padding: clamp(6px, 1.4vh, 9px) 2px; gap: 3px; border-radius: 11px; }
+          .chip svg { width: clamp(13px, 3.2vw, 16px); height: clamp(13px, 3.2vw, 16px); }
+          .chip span { font-size: clamp(7.5px, 1.7vw, 9px); }
 
           .social-row { gap: clamp(5px, 1.6vw, 8px); }
           .social-chip { width: clamp(26px, 7vw, 32px); height: clamp(26px, 7vw, 32px); }
@@ -1447,6 +1450,10 @@ const currentSession = useMemo(() => {
             <svg viewBox="0 0 24 24">{ICONS.globe}</svg>
             <span>WEBSITE</span>
           </a>
+          <a className="chip" href={CONFIG.mapsUrl} target="_blank" rel="noreferrer">
+            <svg viewBox="0 0 24 24">{ICONS.pin}</svg>
+            <span>DIRECTIONS</span>
+          </a>
         </div>
         <PulseTrace id="div1" />
 
@@ -1495,9 +1502,6 @@ const currentSession = useMemo(() => {
 
           <div className="eyebrow">Location</div>
           <div className="addr">{CONFIG.address}</div>
-          <a className="mini-btn" href={CONFIG.mapsUrl} target="_blank" rel="noreferrer">
-            Directions →
-          </a>
         </section>
 
        
