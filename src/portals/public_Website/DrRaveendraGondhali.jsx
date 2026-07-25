@@ -1099,8 +1099,9 @@ const currentSession = useMemo(() => {
           gap: 6px;
           // background: var(--paper-2);
           // border: 1px solid var(--line);
-          background: rgba(246,195,67,0.10);
-          border: 1px solid rgba(246,195,67,0.4);
+          background: linear-gradient(135deg, var(--teal) 0%, var(--teal-deep) 100%);
+          box-shadow: var(--shadow-md);
+          border: 1px solid rgba(255, 255, 255, 0.08);
           border-radius: 14px;
           padding: 14px 6px;
           text-decoration: none;
