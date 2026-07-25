@@ -71,7 +71,7 @@ areas: [
   }
 ],
 
-  address: "Eva Fertility & Laparoscopy (स्त्री क्लिनिक), Silver Birch Multispeciality Hospital, Datta Mandir Road, Thergaon, Pimpri-Chinchwad, Pune 411033",
+  address: "Silver Birch Multispeciality Hospital, Datta Mandir Road, Thergaon, Pimpri-Chinchwad, Pune 411033",
   mapsUrl: "https://maps.app.goo.gl/UyErkwtNR8UaDQCC6",
 
   phone: "+91 70661 04777",
@@ -1401,6 +1401,8 @@ const currentSession = useMemo(() => {
             <div className="specialty">{CONFIG.credentials} </div>
              <div className="cred-spec">{CONFIG.specialty}</div>
                <div className="cred-spec">{CONFIG.specialty1}</div>
+               <hr/>
+               <div className="addr">{CONFIG.address}</div>
                 <div className="grid2">
                   <div className="status-row">
                      <span className={`dot ${isOpen ? "open" : ""}`} />
@@ -1500,7 +1502,7 @@ const currentSession = useMemo(() => {
 
           <div className="card-divider" />
 
-          <div className="eyebrow">Location</div>
+          {/* <div className="eyebrow">Location</div> */}
           <div className="addr">{CONFIG.address}</div>
         </section>
 
