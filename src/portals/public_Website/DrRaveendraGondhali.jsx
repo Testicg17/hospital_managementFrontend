@@ -946,7 +946,7 @@ const currentSession = useMemo(() => {
           grid-template-columns: 1fr;
           gap: clamp(12px, 2.4vw, 18px);
         }
-        @media (min-width: 620px) {
+        @media (min-width: 720px) {
           .grid2 { grid-template-columns: 1fr 1fr; }
         }
 
@@ -1328,7 +1328,7 @@ const currentSession = useMemo(() => {
           }
           .areas-list li::before { margin-top: 5px; width: 5px; height: 5px; }
 
-          .grid2 { grid-template-columns: 1fr 1fr; gap: clamp(6px, 1.6vw, 10px); }
+          .grid2 { grid-template-columns: 1fr; gap: clamp(6px, 1.6vw, 10px); }
 
           .hours-row {
             padding: clamp(3px, 0.8vh, 6px) 0;
