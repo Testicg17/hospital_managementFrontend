@@ -902,8 +902,7 @@ const currentSession = useMemo(() => {
         .pulse-trace { width: 100%; height: 20px; display: block; opacity: 0.85; }
 
         .book-btn {
-          // display: inline-flex;
-          display: flex;
+          display: inline-flex;
           justify-content: center;
           align-items: center;
           gap: 8px;
@@ -1436,29 +1435,7 @@ const currentSession = useMemo(() => {
            
           </div>
         </header>
- {/* CONTACT CHIPS */}
-        <div className="chip-row">
-          <a className="chip" href={telHref}>
-            <svg viewBox="0 0 24 24">{ICONS.call}</svg>
-            <span>CALL</span>
-          </a>
-          <a className="chip" href={`mailto:${CONFIG.email}`}>
-            <svg viewBox="0 0 24 24">{ICONS.mail}</svg>
-            <span>EMAIL</span>
-          </a>
-          <a className="chip" href={waHref} target="_blank" rel="noreferrer">
-            <svg viewBox="0 0 24 24">{ICONS.whatsapp}</svg>
-            <span>WHATSAPP</span>
-          </a>
-          <a className="chip" href={CONFIG.website} target="_blank" rel="noreferrer">
-            <svg viewBox="0 0 24 24">{ICONS.globe}</svg>
-            <span>WEBSITE</span>
-          </a>
-          <a className="chip" href={CONFIG.mapsUrl} target="_blank" rel="noreferrer">
-            <svg viewBox="0 0 24 24">{ICONS.pin}</svg>
-            <span>DIRECTIONS</span>
-          </a>
-        </div>
+
         <PulseTrace id="div1" />
 
         {/* AREAS OF CARE */}
@@ -1508,7 +1485,29 @@ const currentSession = useMemo(() => {
           {/* <div className="addr">{CONFIG.address}</div> */}
         </section>
 
-       
+        {/* CONTACT CHIPS */}
+        <div className="chip-row">
+          <a className="chip" href={telHref}>
+            <svg viewBox="0 0 24 24">{ICONS.call}</svg>
+            <span>CALL</span>
+          </a>
+          <a className="chip" href={`mailto:${CONFIG.email}`}>
+            <svg viewBox="0 0 24 24">{ICONS.mail}</svg>
+            <span>EMAIL</span>
+          </a>
+          <a className="chip" href={waHref} target="_blank" rel="noreferrer">
+            <svg viewBox="0 0 24 24">{ICONS.whatsapp}</svg>
+            <span>WHATSAPP</span>
+          </a>
+          <a className="chip" href={CONFIG.website} target="_blank" rel="noreferrer">
+            <svg viewBox="0 0 24 24">{ICONS.globe}</svg>
+            <span>WEBSITE</span>
+          </a>
+          <a className="chip" href={CONFIG.mapsUrl} target="_blank" rel="noreferrer">
+            <svg viewBox="0 0 24 24">{ICONS.pin}</svg>
+            <span>DIRECTIONS</span>
+          </a>
+        </div>
 
         {/* SOCIAL + QR */}
         <div className="bottom-row">
