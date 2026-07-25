@@ -86,7 +86,7 @@ areas: [
     { label: "Google", url: "https://share.google/1zRkyyY6Q2zjwdlnD", icon: "google" },
   ],
 
-  qrTargetUrl: "https://hospital-management-frontend-gold.vercel.app/DrRaveendraGondhali",
+  qrTargetUrl: "https://evafertilitypune.com/DrRaveendraGondhali",
 };
 
 /**
@@ -765,9 +765,7 @@ const currentSession = useMemo(() => {
 
   const telHref = `tel:${CONFIG.phone.replace(/\s/g, "")}`;
   const waHref = `https://wa.me/${CONFIG.whatsapp.replace(/[^0-9]/g, "")}`;
-  const bookingHref = `${waHref}?text=${encodeURIComponent(
-    `Hi, I would like to book an appointment at ${CONFIG.name}.`
-  )}`;
+  const bookingHref = `${CONFIG.website}/contact`;
   const websiteHost = CONFIG.website.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
   return (
@@ -780,6 +778,7 @@ const currentSession = useMemo(() => {
           --paper: #071614;
           --paper-2: #102420;
           --teal: #14b8a6;
+          --pink: #ce0060;
           --teal-deep: #063b34;
           --coral: #f6c343;
           --blush: #123832;
@@ -909,7 +908,7 @@ const currentSession = useMemo(() => {
           font-weight: 700;
           font-size: clamp(12.5px, 2.2vw, 14px);
           color: #fff;
-          background: var(--coral);
+          background: var(--pink);
           border: 1px solid rgba(255,255,255,0.28);
           border-radius: 999px;
           padding: 10px 20px;
