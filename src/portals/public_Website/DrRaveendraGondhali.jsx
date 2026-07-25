@@ -902,7 +902,9 @@ const currentSession = useMemo(() => {
         .pulse-trace { width: 100%; height: 20px; display: block; opacity: 0.85; }
 
         .book-btn {
-          display: inline-flex;
+          // display: inline-flex;
+          display: flex;
+          justify-content: center;
           align-items: center;
           gap: 8px;
           align-self: flex-start;
@@ -1503,7 +1505,7 @@ const currentSession = useMemo(() => {
           <div className="card-divider" />
 
           {/* <div className="eyebrow">Location</div> */}
-          <div className="addr">{CONFIG.address}</div>
+          {/* <div className="addr">{CONFIG.address}</div> */}
         </section>
 
        
