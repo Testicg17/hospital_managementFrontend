@@ -696,9 +696,6 @@ const ICONS = {
   download: (
     <path d="M12 3a1 1 0 0 1 1 1v9.6l2.6-2.6a1 1 0 1 1 1.4 1.4l-4.3 4.3a1 1 0 0 1-1.4 0L7 12.4A1 1 0 1 1 8.4 11L11 13.6V4a1 1 0 0 1 1-1zM5 19a1 1 0 0 1 1-1h12a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1z" />
   ),
-  calendar: (
-    <path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h1a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1V3a1 1 0 0 1 1-1zM4 9v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9H4zm12.7 2.3a1 1 0 0 1 0 1.4l-4.5 4.5a1 1 0 0 1-1.4 0l-2-2a1 1 0 1 1 1.4-1.4l1.3 1.3 3.8-3.8a1 1 0 0 1 1.4 0z" />
-  ),
 };
 
 /** signature element: animated ECG / pulse trace, used as thin dividers */
@@ -765,9 +762,6 @@ const currentSession = useMemo(() => {
 
   const telHref = `tel:${CONFIG.phone.replace(/\s/g, "")}`;
   const waHref = `https://wa.me/${CONFIG.whatsapp.replace(/[^0-9]/g, "")}`;
-  const bookingHref = `${waHref}?text=${encodeURIComponent(
-    `Hi, I would like to book an appointment at ${CONFIG.name}.`
-  )}`;
   const websiteHost = CONFIG.website.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
   return (
@@ -776,19 +770,19 @@ const currentSession = useMemo(() => {
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
         :root {
-          --ink: #eaf7f3;
-          --paper: #071614;
-          --paper-2: #102420;
-          --teal: #14b8a6;
-          --teal-deep: #063b34;
-          --coral: #f6c343;
-          --blush: #123832;
-          --line: rgba(255,255,255,0.10);
+          --ink: #1c2245;
+          --paper: #fef8fa;
+          --paper-2: #ffffff;
+          --teal: #283593;
+          --teal-deep: #171d5c;
+          --coral: #E91E63;
+          --blush: #fde7ef;
+          --line: #f0d9e2;
           --mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
           --serif: 'Fraunces', Georgia, serif;
           --sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-          --shadow-sm: 0 1px 2px rgba(0,0,0,0.35), 0 1px 1px rgba(0,0,0,0.25);
-          --shadow-md: 0 20px 50px -18px rgba(20,184,166,0.45), 0 0 0 1px rgba(255,255,255,0.05);
+          --shadow-sm: 0 1px 2px rgba(22,36,31,0.04), 0 1px 1px rgba(22,36,31,0.03);
+          --shadow-md: 0 10px 30px -12px rgba(0,34,119,0.18);
         }
         * { box-sizing: border-box; }
         html, body, #root { margin: 0; }
@@ -797,9 +791,8 @@ const currentSession = useMemo(() => {
           min-height: 100dvh;
           width: 100%;
           background:
-            radial-gradient(900px 480px at 8% -8%, rgba(20,184,166,0.28), transparent 60%),
-            radial-gradient(760px 420px at 108% 6%, rgba(246,195,67,0.15), transparent 55%),
-            radial-gradient(1000px 600px at 50% 120%, rgba(20,184,166,0.14), transparent 60%),
+            radial-gradient(900px 480px at 8% -8%, rgba(40,53,147,0.07), transparent 60%),
+            radial-gradient(760px 420px at 108% 6%, rgba(233,30,99,0.07), transparent 55%),
             var(--paper);
           color: var(--ink);
           font-family: var(--sans);
@@ -844,7 +837,6 @@ const currentSession = useMemo(() => {
           padding: clamp(18px, 3.6vw, 28px) clamp(18px, 4vw, 30px);
           color: #fff;
           box-shadow: var(--shadow-md);
-          border: 1px solid rgba(255,255,255,0.08);
           flex-wrap: wrap;
         }
         .avatar {
@@ -899,31 +891,6 @@ const currentSession = useMemo(() => {
 
         .pulse-trace { width: 100%; height: 20px; display: block; opacity: 0.85; }
 
-        .book-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          align-self: flex-start;
-          margin-top: 14px;
-          font-family: var(--sans);
-          font-weight: 700;
-          font-size: clamp(12.5px, 2.2vw, 14px);
-          color: #fff;
-          background: var(--coral);
-          border: 1px solid rgba(255,255,255,0.28);
-          border-radius: 999px;
-          padding: 10px 20px;
-          text-decoration: none;
-          box-shadow: 0 10px 24px -8px color-mix(in srgb, var(--coral) 70%, transparent);
-          transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
-        }
-        .book-btn svg { width: 16px; height: 16px; fill: currentColor; flex-shrink: 0; }
-        .book-btn:hover {
-          transform: translateY(-2px);
-          filter: brightness(1.06);
-          box-shadow: 0 14px 30px -8px color-mix(in srgb, var(--coral) 85%, transparent);
-        }
-
         /* ---- cards ---- */
         .card {
           background: var(--paper-2);
@@ -937,7 +904,7 @@ const currentSession = useMemo(() => {
           font-size: clamp(10px, 1.9vw, 11px);
           letter-spacing: 0.1em;
           text-transform: uppercase;
-          color: var(--teal);
+          color: var(--teal-deep);
           margin-bottom: clamp(10px, 2vw, 14px);
           font-weight: 600;
         }
@@ -971,7 +938,7 @@ const currentSession = useMemo(() => {
           padding: 10px 12px;
           font-size: clamp(13.5px, 2.1vw, 14.5px);
           line-height: 1.4;
-          color: var(--ink);
+          color: #2b3a34;
           background: var(--paper);
           border: 1px solid var(--line);
           border-radius: 12px;
@@ -996,73 +963,22 @@ const currentSession = useMemo(() => {
 
         /* ---- hours ---- */
         .hours-row {
-          display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
-          padding: 10px 0;
+          display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+          padding: 7px 0;
           border-bottom: 1px dashed var(--line);
+          font-family: var(--mono);
+          font-size: clamp(12.5px, 2.1vw, 13.5px);
         }
         .hours-row:last-child { border-bottom: none; }
-        .hours-day {
-          font-family: var(--mono);
-          font-weight: 700;
-          font-size: clamp(12px, 2vw, 13px);
-          letter-spacing: 0.02em;
-          color: var(--ink);
-          white-space: nowrap;
-          flex-shrink: 0;
-          padding-top: 4px;
-        }
-        .hours-slots {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          gap: 7px;
-          min-width: 0;
-        }
-        .slot-row {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          flex-wrap: nowrap;
-        }
-        .slot-time {
-          font-family: var(--mono);
-          font-weight: 600;
-          font-size: clamp(12px, 2vw, 13px);
-          color: var(--ink);
-          white-space: nowrap;
-        }
-        .slot-type {
-          font-family: var(--sans);
-          font-size: 10px;
-          font-weight: 700;
-          letter-spacing: 0.04em;
-          text-transform: uppercase;
-          padding: 3px 9px;
-          border-radius: 999px;
-          white-space: nowrap;
-          flex-shrink: 0;
-        }
-        .slot-type.opd {
-          color: var(--coral);
-          background: color-mix(in srgb, var(--coral) 18%, transparent);
-          border: 1px solid color-mix(in srgb, var(--coral) 45%, transparent);
-        }
-        .slot-type.appointment {
-          color: var(--teal);
-          background: color-mix(in srgb, var(--teal) 24%, transparent);
-          border: 1px solid color-mix(in srgb, var(--teal) 55%, transparent);
-        }
-        .closed-tag {
-          font-family: var(--mono);
-          font-size: clamp(12px, 2vw, 13px);
-          color: #f2a3ac;
-        }
+        .hours-day { font-weight: 600; white-space: nowrap; flex-shrink: 0; }
+        .hours-slots { color: #5b6b62; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+        .closed-tag { color: #b56464; }
 
         /* ---- location ---- */
         .addr {
           font-size: clamp(13px, 2.1vw, 14.5px);
           line-height: 1.5;
-          color: var(--ink);
+          color: #2b3a34;
           margin-bottom: 14px;
         }
         .mini-btn {
@@ -1100,12 +1016,12 @@ const currentSession = useMemo(() => {
           gap: 6px;
           // background: var(--paper-2);
           // border: 1px solid var(--line);
-          background: rgba(246,195,67,0.10);
-          border: 1px solid rgba(246,195,67,0.4);
+          background: #ffdae8;
+          border: 1px solid #ff0064;
           border-radius: 14px;
           padding: 14px 6px;
           text-decoration: none;
-          color: var(--ink);
+          color: var(--teal-deep);
           transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
         }
         .chip:active { background: var(--teal); color: #fff; }
@@ -1138,7 +1054,7 @@ const currentSession = useMemo(() => {
           background: var(--paper-2);
           border: 1px solid var(--line);
           display: flex; align-items: center; justify-content: center;
-          color: var(--ink);
+          color: var(--teal-deep);
           text-decoration: none;
           transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
         }
@@ -1215,19 +1131,19 @@ const currentSession = useMemo(() => {
         .qr-mini-text {
           font-family: var(--mono);
           font-size: 10.5px;
-          color: #a89fd1;
+          color: #6a7a71;
           line-height: 1.3;
           min-width: 0;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
-        .qr-mini-text a { color: var(--coral); text-decoration: none; font-weight: 600; }
+        .qr-mini-text a { color: var(--teal-deep); text-decoration: none; font-weight: 600; }
         .qr-download-btn {
           appearance: none;
           border: 1px solid var(--line);
           background: var(--paper);
-          color: var(--ink);
+          color: var(--teal-deep);
           width: 30px;
           height: 30px;
           border-radius: 50%;
@@ -1296,14 +1212,6 @@ const currentSession = useMemo(() => {
             padding: 4px 10px 4px 8px;
           }
 
-          .book-btn {
-            margin-top: clamp(6px, 1.3vh, 10px);
-            font-size: clamp(10.5px, 2.4vw, 12px);
-            padding: clamp(6px, 1.2vh, 8px) clamp(12px, 3vw, 16px);
-            gap: 6px;
-          }
-          .book-btn svg { width: 13px; height: 13px; }
-
           .pulse-trace { height: clamp(8px, 1.6vh, 14px); }
 
           .card {
@@ -1331,22 +1239,9 @@ const currentSession = useMemo(() => {
           .grid2 { grid-template-columns: 1fr 1fr; gap: clamp(6px, 1.6vw, 10px); }
 
           .hours-row {
-            padding: clamp(3px, 0.8vh, 6px) 0;
-            gap: 8px;
+            padding: clamp(2px, 0.6vh, 5px) 0;
+            font-size: clamp(10.5px, 2.4vw, 12px);
           }
-          .hours-day {
-            font-size: clamp(10px, 2.3vw, 11.5px);
-            padding-top: 2px;
-          }
-          .hours-slots { gap: clamp(3px, 0.8vh, 5px); }
-          .slot-row { gap: 6px; }
-          .slot-time { font-size: clamp(10px, 2.3vw, 11.5px); }
-          .slot-type {
-            font-size: 8px;
-            padding: 2px 6px;
-            letter-spacing: 0.02em;
-          }
-          .closed-tag { font-size: clamp(10px, 2.3vw, 11.5px); }
 
           .addr {
             font-size: clamp(10.5px, 2.4vw, 12px);
@@ -1417,7 +1312,6 @@ const currentSession = useMemo(() => {
   ))}
 </div>
             </div>
-           
           </div>
         </header>
 
@@ -1450,7 +1344,7 @@ const currentSession = useMemo(() => {
         ) : (
           h.slots.map(([start, end, type], i) => (
             <div key={i} className="slot-row">
-              <span className="slot-time">{start}–{end}</span>
+              <span>{start}–{end}</span>
               <span className={`slot-type ${type === "OPD" ? "opd" : "appointment"}`}>
                 {type}
               </span>
@@ -1460,10 +1354,6 @@ const currentSession = useMemo(() => {
       </span>
     </div>
   ))}
-   <a className="book-btn" href={bookingHref} target="_blank" rel="noreferrer">
-              <svg viewBox="0 0 24 24">{ICONS.calendar}</svg>
-              Book Appointment
-            </a>
 </section>
           <section className="card">
             <div className="eyebrow">Location</div>
