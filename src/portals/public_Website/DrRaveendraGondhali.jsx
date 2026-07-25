@@ -1099,7 +1099,7 @@ const currentSession = useMemo(() => {
         }
         .chip {
           display: flex;
-          flex-direction: column;
+          //flex-direction: column;
           align-items: center;
           justify-content: center;
           gap: 6px;
@@ -1429,7 +1429,25 @@ const currentSession = useMemo(() => {
            
           </div>
         </header>
-
+ {/* CONTACT CHIPS */}
+        <div className="chip-row">
+          <a className="chip" href={telHref}>
+            <svg viewBox="0 0 24 24">{ICONS.call}</svg>
+            <span>CALL</span>
+          </a>
+          <a className="chip" href={`mailto:${CONFIG.email}`}>
+            <svg viewBox="0 0 24 24">{ICONS.mail}</svg>
+            <span>EMAIL</span>
+          </a>
+          <a className="chip" href={waHref} target="_blank" rel="noreferrer">
+            <svg viewBox="0 0 24 24">{ICONS.whatsapp}</svg>
+            <span>WHATSAPP</span>
+          </a>
+          <a className="chip" href={CONFIG.website} target="_blank" rel="noreferrer">
+            <svg viewBox="0 0 24 24">{ICONS.globe}</svg>
+            <span>WEBSITE</span>
+          </a>
+        </div>
         <PulseTrace id="div1" />
 
         {/* AREAS OF CARE */}
@@ -1482,25 +1500,7 @@ const currentSession = useMemo(() => {
           </a>
         </section>
 
-        {/* CONTACT CHIPS */}
-        <div className="chip-row">
-          <a className="chip" href={telHref}>
-            <svg viewBox="0 0 24 24">{ICONS.call}</svg>
-            <span>CALL</span>
-          </a>
-          <a className="chip" href={`mailto:${CONFIG.email}`}>
-            <svg viewBox="0 0 24 24">{ICONS.mail}</svg>
-            <span>EMAIL</span>
-          </a>
-          <a className="chip" href={waHref} target="_blank" rel="noreferrer">
-            <svg viewBox="0 0 24 24">{ICONS.whatsapp}</svg>
-            <span>WHATSAPP</span>
-          </a>
-          <a className="chip" href={CONFIG.website} target="_blank" rel="noreferrer">
-            <svg viewBox="0 0 24 24">{ICONS.globe}</svg>
-            <span>WEBSITE</span>
-          </a>
-        </div>
+       
 
         {/* SOCIAL + QR */}
         <div className="bottom-row">
