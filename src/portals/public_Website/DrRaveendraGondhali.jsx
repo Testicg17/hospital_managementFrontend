@@ -941,6 +941,12 @@ const currentSession = useMemo(() => {
           font-weight: 600;
         }
 
+        .card-divider {
+          height: 1px;
+          background: var(--line);
+          margin: 18px 0 14px;
+        }
+
         .grid2 {
           display: grid;
           grid-template-columns: 1fr;
@@ -1315,6 +1321,9 @@ const currentSession = useMemo(() => {
             font-size: clamp(8.5px, 1.9vw, 9.5px);
             margin-bottom: clamp(4px, 1vh, 7px);
           }
+          .card-divider {
+            margin: clamp(8px, 1.8vh, 12px) 0 clamp(6px, 1.4vh, 9px);
+          }
 
           .areas-list {
             grid-template-columns: 1fr 1fr;
@@ -1434,45 +1443,44 @@ const currentSession = useMemo(() => {
         </section>
 
         {/* HOURS + LOCATION */}
-        <div className="grid2">
-         <section className="card">
-  <div className="eyebrow">Hours</div>
+        <section className="card">
+          <div className="eyebrow">Hours</div>
 
-  {CONFIG.hours.map((h, index) => (
-    <div className="hours-row" key={index}>
-      <span className="hours-day">
-        {h.day || ""}
-      </span>
+          {CONFIG.hours.map((h, index) => (
+            <div className="hours-row" key={index}>
+              <span className="hours-day">
+                {h.day || ""}
+              </span>
 
-      <span className="hours-slots">
-        {h.slots.length === 0 ? (
-          <span className="closed-tag">Closed</span>
-        ) : (
-          h.slots.map(([start, end, type], i) => (
-            <div key={i} className="slot-row">
-              <span className="slot-time">{start}–{end}</span>
-              <span className={`slot-type ${type === "OPD" ? "opd" : "appointment"}`}>
-                {type}
+              <span className="hours-slots">
+                {h.slots.length === 0 ? (
+                  <span className="closed-tag">Closed</span>
+                ) : (
+                  h.slots.map(([start, end, type], i) => (
+                    <div key={i} className="slot-row">
+                      <span className="slot-time">{start}–{end}</span>
+                      <span className={`slot-type ${type === "OPD" ? "opd" : "appointment"}`}>
+                        {type}
+                      </span>
+                    </div>
+                  ))
+                )}
               </span>
             </div>
-          ))
-        )}
-      </span>
-    </div>
-  ))}
-   <a className="book-btn" href={bookingHref} target="_blank" rel="noreferrer">
-              <svg viewBox="0 0 24 24">{ICONS.calendar}</svg>
-              Book Appointment
-            </a>
-</section>
-          <section className="card">
-            <div className="eyebrow">Location</div>
-            <div className="addr">{CONFIG.address}</div>
-            <a className="mini-btn" href={CONFIG.mapsUrl} target="_blank" rel="noreferrer">
-              Directions →
-            </a>
-          </section>
-        </div>
+          ))}
+          <a className="book-btn" href={bookingHref} target="_blank" rel="noreferrer">
+            <svg viewBox="0 0 24 24">{ICONS.calendar}</svg>
+            Book Appointment
+          </a>
+
+          <div className="card-divider" />
+
+          <div className="eyebrow">Location</div>
+          <div className="addr">{CONFIG.address}</div>
+          <a className="mini-btn" href={CONFIG.mapsUrl} target="_blank" rel="noreferrer">
+            Directions →
+          </a>
+        </section>
 
         {/* CONTACT CHIPS */}
         <div className="chip-row">
