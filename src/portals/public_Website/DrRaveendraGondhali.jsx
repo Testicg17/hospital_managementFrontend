@@ -39,7 +39,7 @@ areas: [
   },
   {
     icon: "",
-    text: "Laparascopy/Hysteroscopy Diagnosis & Treatment",
+    text: "Laparascopy / Hysteroscopy Diagnosis & Treatment",
     
   },
   
@@ -54,10 +54,15 @@ areas: [
   {
     day: "Mon–Sat",
     slots: [
-      ["9:00", "17:00", "By Appointment"],["18:00", "21:00", "OPD"]
+      ["9:00", "17:00", "By Appointment"],
     ]
   },
-
+  {
+    day: "",
+    slots: [
+      ["18:00", "21:00", "OPD"]
+    ]
+  },
   {
     day: "Sunday",
     slots: [
@@ -66,7 +71,7 @@ areas: [
   }
 ],
 
-  address: "Silver Birch Multispeciality Hospital, Datta Mandir Road, Thergaon, Pimpri-Chinchwad, Pune 411033",
+  address: "Eva Fertility & Laparoscopy (स्त्री क्लिनिक), Silver Birch Multispeciality Hospital, Datta Mandir Road, Thergaon, Pimpri-Chinchwad, Pune 411033",
   mapsUrl: "https://maps.app.goo.gl/UyErkwtNR8UaDQCC6",
 
   phone: "+91 70661 04777",
@@ -898,7 +903,6 @@ const currentSession = useMemo(() => {
 
         .book-btn {
           display: inline-flex;
-          justify-content: center;
           align-items: center;
           gap: 8px;
           align-self: flex-start;
@@ -1086,15 +1090,16 @@ const currentSession = useMemo(() => {
           transition: background 0.15s ease, transform 0.15s ease;
         }
         .mini-btn:hover { background: var(--teal-deep); transform: translateY(-1px); }
+        .mini-btn svg { width: 15px; height: 15px; fill: currentColor; flex-shrink: 0; }
 
         /* ---- contact chips ---- */
         .chip-row {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(2, 1fr);
           gap: 10px;
         }
         @media (min-width: 480px) {
-          .chip-row { grid-template-columns: repeat(5, 1fr); }
+          .chip-row { grid-template-columns: repeat(4, 1fr); }
         }
         .chip {
           display: flex;
@@ -1339,15 +1344,22 @@ const currentSession = useMemo(() => {
           .grid2 { grid-template-columns: 1fr 1fr; gap: clamp(6px, 1.6vw, 10px); }
 
           .hours-row {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
             padding: clamp(3px, 0.8vh, 6px) 0;
-            gap: 8px;
+            gap: 4px;
           }
           .hours-day {
             font-size: clamp(10px, 2.3vw, 11.5px);
-            padding-top: 2px;
+            padding-top: 0;
           }
-          .hours-slots { gap: clamp(3px, 0.8vh, 5px); }
-          .slot-row { gap: 6px; }
+          .hours-slots {
+            align-items: stretch;
+            width: 100%;
+            gap: clamp(3px, 0.8vh, 5px);
+          }
+          .slot-row { width: 100%; justify-content: space-between; gap: 6px; }
           .slot-time { font-size: clamp(10px, 2.3vw, 11.5px); }
           .slot-type {
             font-size: 8px;
@@ -1370,10 +1382,10 @@ const currentSession = useMemo(() => {
             padding: clamp(5px, 1.1vh, 7px) clamp(9px, 2vw, 12px);
           }
 
-          .chip-row { grid-template-columns: repeat(5, 1fr); gap: clamp(4px, 1.2vw, 7px); }
-          .chip { padding: clamp(6px, 1.4vh, 9px) 2px; gap: 3px; border-radius: 11px; }
-          .chip svg { width: clamp(13px, 3.2vw, 16px); height: clamp(13px, 3.2vw, 16px); }
-          .chip span { font-size: clamp(7.5px, 1.7vw, 9px); }
+          .chip-row { grid-template-columns: repeat(4, 1fr); gap: clamp(5px, 1.5vw, 8px); }
+          .chip { padding: clamp(6px, 1.4vh, 9px) 3px; gap: 3px; border-radius: 11px; }
+          .chip svg { width: clamp(14px, 3.6vw, 17px); height: clamp(14px, 3.6vw, 17px); }
+          .chip span { font-size: clamp(8.5px, 1.9vw, 10px); }
 
           .social-row { gap: clamp(5px, 1.6vw, 8px); }
           .social-chip { width: clamp(26px, 7vw, 32px); height: clamp(26px, 7vw, 32px); }
@@ -1397,7 +1409,6 @@ const currentSession = useMemo(() => {
             <div className="specialty">{CONFIG.credentials} </div>
              <div className="cred-spec">{CONFIG.specialty}</div>
                <div className="cred-spec">{CONFIG.specialty1}</div>
-             
                 <div className="grid2">
                   <div className="status-row">
                      <span className={`dot ${isOpen ? "open" : ""}`} />
@@ -1429,59 +1440,7 @@ const currentSession = useMemo(() => {
            
           </div>
         </header>
-
-        <PulseTrace id="div1" />
-
-        {/* AREAS OF CARE */}
-        <section className="card">
-          <div className="eyebrow">Dedicated to Providing Comprehensive Care in :</div>
-          <ul className="areas-list">
-            {CONFIG.areas.map((a) => (
-              <li key={a.text}>{a.text}</li>
-            ))}
-          </ul>
-        </section>
-
-        {/* HOURS + LOCATION */}
-        <section className="card">
-           <div className="eyebrow">Location</div>
-          <div className="addr">{CONFIG.address}</div>
-          <div className="eyebrow">Hours</div>
-
-          {CONFIG.hours.map((h, index) => (
-            <div className="hours-row" key={index}>
-              <span className="hours-day">
-                {h.day || ""}
-              </span>
-
-              <span className="hours-slots">
-                {h.slots.length === 0 ? (
-                  <span className="closed-tag">Closed</span>
-                ) : (
-                  h.slots.map(([start, end, type], i) => (
-                    <div key={i} className="slot-row">
-                      <span className="slot-time">{start}–{end}</span>
-                      <span className={`slot-type ${type === "OPD" ? "opd" : "appointment"}`}>
-                        {type}
-                      </span>
-                    </div>
-                  ))
-                )}
-              </span>
-            </div>
-          ))}
-          <a className="book-btn" href={bookingHref} target="_blank" rel="noreferrer">
-            <svg viewBox="0 0 24 24">{ICONS.calendar}</svg>
-            Book Appointment
-          </a>
-
-          <div className="card-divider" />
-
-          {/* <div className="eyebrow">Location</div> */}
-          {/* <div className="addr">{CONFIG.address}</div> */}
-        </section>
-
-        {/* CONTACT CHIPS */}
+ {/* CONTACT CHIPS */}
         <div className="chip-row">
           <a className="chip" href={telHref}>
             <svg viewBox="0 0 24 24">{ICONS.call}</svg>
@@ -1499,10 +1458,60 @@ const currentSession = useMemo(() => {
             <svg viewBox="0 0 24 24">{ICONS.globe}</svg>
             <span>WEBSITE</span>
           </a>
-          <a className="chip" href={CONFIG.mapsUrl} target="_blank" rel="noreferrer">
-            <svg viewBox="0 0 24 24">{ICONS.pin}</svg>
-            <span>DIRECTIONS</span>
-          </a>
+        </div>
+        <PulseTrace id="div1" />
+
+        {/* AREAS OF CARE */}
+        <section className="card">
+          <div className="eyebrow">Dedicated to Providing Comprehensive Care in :</div>
+          <ul className="areas-list">
+            {CONFIG.areas.map((a) => (
+              <li key={a.text}>{a.text}</li>
+            ))}
+          </ul>
+        </section>
+
+        {/* HOURS + LOCATION */}
+        <div className="grid2">
+          <section className="card">
+            <div className="eyebrow">Hours</div>
+
+            {CONFIG.hours.map((h, index) => (
+              <div className="hours-row" key={index}>
+                <span className="hours-day">
+                  {h.day || ""}
+                </span>
+
+                <span className="hours-slots">
+                  {h.slots.length === 0 ? (
+                    <span className="closed-tag">Closed</span>
+                  ) : (
+                    h.slots.map(([start, end, type], i) => (
+                      <div key={i} className="slot-row">
+                        <span className="slot-time">{start}–{end}</span>
+                        <span className={`slot-type ${type === "OPD" ? "opd" : "appointment"}`}>
+                          {type}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </span>
+              </div>
+            ))}
+            <a className="book-btn" href={bookingHref} target="_blank" rel="noreferrer">
+              <svg viewBox="0 0 24 24">{ICONS.calendar}</svg>
+              Book Appointment
+            </a>
+          </section>
+
+          <section className="card">
+            <div className="eyebrow">Location</div>
+            <div className="addr">{CONFIG.address}</div>
+            <a className="mini-btn" href={CONFIG.mapsUrl} target="_blank" rel="noreferrer">
+              <svg viewBox="0 0 24 24">{ICONS.pin}</svg>
+              Directions
+            </a>
+          </section>
         </div>
 
         {/* SOCIAL + QR */}
