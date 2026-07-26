@@ -39,7 +39,7 @@ areas: [
   },
   {
     icon: "",
-    text: "Laparascopy / Hysteroscopy Diagnosis & Treatment",
+    text: "Laparascopy/Hysteroscopy Diagnosis & Treatment",
     
   },
   
