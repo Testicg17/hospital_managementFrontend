@@ -902,7 +902,7 @@ const currentSession = useMemo(() => {
           align-items: center;
           gap: 8px;
           align-self: flex-start;
-          margin-top: 1px;
+          margin-top: 10px;
           font-family: var(--sans);
           font-weight: 700;
           font-size: clamp(12.5px, 2.2vw, 14px);
@@ -1504,13 +1504,14 @@ const currentSession = useMemo(() => {
               <svg viewBox="0 0 24 24">{ICONS.pin}</svg>
               Directions
             </a>
+              <a className="book-btn" href={bookingHref} target="_blank" rel="noreferrer">
+              <svg viewBox="0 0 24 24">{ICONS.calendar}</svg>
+              Book Appointment
+            </a>
           </section>
         </div>
         <div className="book-appointment">
-  <a className="book-btn" href={bookingHref} target="_blank" rel="noreferrer">
-              <svg viewBox="0 0 24 24">{ICONS.calendar}</svg>
-              Book Appointment
-            </a></div>
+</div>
         {/* SOCIAL + QR */}
         <div className="bottom-row">
         
