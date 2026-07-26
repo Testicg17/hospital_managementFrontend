@@ -327,14 +327,6 @@ const currentSession = useMemo(() => {
           opacity: 0.92;
           margin-top: 6px;
           line-height: 1.45;
-
-          /* Mobile text wrapping */
-          white-space: normal;
-          overflow-wrap: break-word;
-          word-break: break-word;
-          hyphens: auto;
-
-          max-width: 100%;
         }
         .status-row {
           display: inline-flex; align-items: center; gap: 7px;
@@ -756,9 +748,16 @@ const currentSession = useMemo(() => {
           .cred-spec {
             font-size: clamp(11px, 2.8vw, 13px);
             margin-top: 3px;
-            white-space: nowrap;
-            overflow: hidden;
+            // white-space: nowrap;
+            // overflow: hidden;
             text-overflow: ellipsis;
+             /* Mobile text wrapping */
+          white-space: normal;
+          overflow-wrap: break-word;
+          word-break: break-word;
+          hyphens: auto;
+
+          max-width: 100%;
           }
           .status-row {
             font-size: clamp(10.5px, 2.4vw, 12px);
