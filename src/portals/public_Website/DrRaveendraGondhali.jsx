@@ -895,13 +895,14 @@ const currentSession = useMemo(() => {
         }
 
         .pulse-trace { width: 100%; height: 20px; display: block; opacity: 0.85; }
-
+        book-appointment{ display: inline-flex;
+        justify-content: center;}
         .book-btn {
           display: inline-flex;
           align-items: center;
           gap: 8px;
           align-self: flex-start;
-          margin-top: 14px;
+          margin-top: 1px;
           font-family: var(--sans);
           font-weight: 700;
           font-size: clamp(12.5px, 2.2vw, 14px);
@@ -1493,10 +1494,7 @@ const currentSession = useMemo(() => {
                 </span>
               </div>
             ))}
-            <a className="book-btn" href={bookingHref} target="_blank" rel="noreferrer">
-              <svg viewBox="0 0 24 24">{ICONS.calendar}</svg>
-              Book Appointment
-            </a>
+          
           </section>
 
           <section className="card">
@@ -1508,7 +1506,11 @@ const currentSession = useMemo(() => {
             </a>
           </section>
         </div>
-
+        <div className="book-appointment">
+  <a className="book-btn" href={bookingHref} target="_blank" rel="noreferrer">
+              <svg viewBox="0 0 24 24">{ICONS.calendar}</svg>
+              Book Appointment
+            </a></div>
         {/* SOCIAL + QR */}
         <div className="bottom-row">
         
