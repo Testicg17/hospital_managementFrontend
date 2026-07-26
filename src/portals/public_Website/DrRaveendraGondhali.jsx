@@ -11,7 +11,7 @@ const CONFIG = {
   namemarathi: "(स्त्री क्लिनिक)",
   credentials: "Dr. Raveendra Gondhali",
   specialty: "MBBS, MS (Gynecology) F.MAS.",
-  specialty1: "Fellowship&Ex.Asst.Professor  in Reproductive Medicine(ivf)& endoscopy Surgery.",
+  specialty1: "Fellowship & Ex.Asst.Professor  in Reproductive Medicine(ivf) & endoscopy Surgery.",
   photoUrl: "/images/logo.jpeg", // paste an image URL here, or leave blank for the monogram
 
 areas: [
