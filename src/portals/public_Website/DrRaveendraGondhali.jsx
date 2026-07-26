@@ -972,7 +972,7 @@ const currentSession = useMemo(() => {
           display: flex;
           align-items: flex-start;
           gap: 9px;
-          padding: 10px 12px;
+          padding: 5px 12px;
           font-size: clamp(13.5px, 2.1vw, 14.5px);
           line-height: 1.4;
           color: var(--ink);
