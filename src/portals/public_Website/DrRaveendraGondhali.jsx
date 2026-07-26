@@ -54,7 +54,7 @@ areas: [
   {
     day: "Mon–Sat",
     slots: [
-      ["9:00", "17:00", "By Appointment"],["18:00", "21:00", "OPD"]
+      ["9:00", "18:00", "By Appointment"],["18:00", "21:00", "OPD"]
     ]
   },
  
