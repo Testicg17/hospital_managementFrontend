@@ -17,7 +17,7 @@ const CONFIG = {
 areas: [
   {
     icon: "",
-    text: "Fertility Evaluation &Infertility Treatment",
+    text: "Fertility Evaluation & Infertility Treatment",
     
   },
   
@@ -327,6 +327,14 @@ const currentSession = useMemo(() => {
           opacity: 0.92;
           margin-top: 6px;
           line-height: 1.45;
+
+          /* Mobile text wrapping */
+          white-space: normal;
+          overflow-wrap: break-word;
+          word-break: break-word;
+          hyphens: auto;
+
+          max-width: 100%;
         }
         .status-row {
           display: inline-flex; align-items: center; gap: 7px;
