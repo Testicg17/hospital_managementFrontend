@@ -1402,8 +1402,7 @@ const currentSession = useMemo(() => {
             <div className="specialty">{CONFIG.credentials} </div>
              <div className="cred-spec">{CONFIG.specialty}</div>
                <div className="cred-spec">{CONFIG.specialty1}</div>
-               <hr/>
-               <div className="addr">{CONFIG.address}</div>
+             
                 <div className="grid2">
                   <div className="status-row">
                      <span className={`dot ${isOpen ? "open" : ""}`} />
@@ -1450,6 +1449,8 @@ const currentSession = useMemo(() => {
 
         {/* HOURS + LOCATION */}
         <section className="card">
+           <div className="eyebrow">Location</div>
+          <div className="addr">{CONFIG.address}</div>
           <div className="eyebrow">Hours</div>
 
           {CONFIG.hours.map((h, index) => (
