@@ -20,7 +20,7 @@ function App() {
         <Route path="/doctor/*" element={<DoctorPortal />} />
         {/* Public Website Routes */}
         <Route path="/*" element={<PublicWebsite />} />
-         {/* Public Website Routes */}
+         {/* QR Website Routes */}
         <Route path="/DrRaveendraGondhali/*" element={<DrRaveendraGondhali />} />
       </Routes>
     </BrowserRouter>
