@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { User, Calendar, CreditCard, Phone, Mail, LogOut, Activity, Clock, AlertCircle, Eye, RefreshCw, FileText, X, History, MapPin, Plus } from 'lucide-react';
 
-const API_BASE_URL = 'https://hospital-managementbackend.onrender.com/api/patient-portal';
-const API_ROOT_URL = 'https://hospital-managementbackend.onrender.com/api';
+const API_ROOT_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
+const API_BASE_URL = `${API_ROOT_URL}/patient-portal`;
 
 // Store token in memory instead of localStorage
 let authToken = null;

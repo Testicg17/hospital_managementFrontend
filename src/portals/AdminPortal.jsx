@@ -22,7 +22,10 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const authFailed = [401, 403].includes(error.response?.status)
+      && ['Access token required', 'Token expired', 'Invalid token', 'Forbidden: Insufficient permissions'].includes(error.response?.data?.error);
+
+    if (authFailed) {
       localStorage.removeItem('admin_token');
       localStorage.removeItem('admin_user');
       window.location.reload();
@@ -222,6 +225,12 @@ function AdminPortal() {
     setError(null);
     try {
       const { data } = await api.post('/auth/login', { email, password });
+      if (data.user?.role !== 'admin') {
+        setError('Please login with an admin account.');
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_user');
+        return;
+      }
       setToken(data.token);
       setUser(data.user);
       setIsLoggedIn(true);
