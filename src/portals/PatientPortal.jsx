@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Calendar, CreditCard, Phone, Mail, LogOut, Activity, Clock, AlertCircle, Eye, RefreshCw, FileText, X, History, MapPin, Plus } from 'lucide-react';
+import { User, Calendar, CreditCard, Phone, Mail, LogOut, Activity, Clock, AlertCircle, Eye, RefreshCw, FileText, X, History, MapPin, Plus, Printer } from 'lucide-react';
 
 const API_ROOT_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
 const API_BASE_URL = `${API_ROOT_URL}/patient-portal`;
@@ -55,6 +55,7 @@ function PatientPortal() {
   const [showRescheduleChoices, setShowRescheduleChoices] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [selectedRescheduleIndex, setSelectedRescheduleIndex] = useState(0);
+  const [selectedLetterAppointment, setSelectedLetterAppointment] = useState(null);
 
   useEffect(() => {
     try {
@@ -253,6 +254,289 @@ function PatientPortal() {
     const hospitalName = apt.hospital_name || apt.hospitalName;
     const location = apt.hospital_location || apt.hospitalLocation || apt.location;
     return hospitalName && location ? `${hospitalName} - ${location}` : 'Location not assigned';
+  };
+
+  const getLocationTextById = (locationId) => {
+    const location = hospitalLocations.find((loc) => String(loc.id) === String(locationId));
+    return location ? `${location.hospital_name} - ${location.location}` : `Location ${locationId}`;
+  };
+
+  const formatNoteDateTime = (value) => {
+    if (!value) return '';
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return value;
+    return parsed.toLocaleString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  const formatAppointmentNotes = (notes) => {
+    if (!notes) return [];
+
+    return notes
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        let match = line.match(/^Requested location ID:\s*(\d+)/i);
+        if (match) {
+          return { type: 'location', label: 'Requested location', value: getLocationTextById(match[1]) };
+        }
+
+        match = line.match(/^Location ID:\s*(\d+)/i);
+        if (match) {
+          return { type: 'location', label: 'Confirmed location', value: getLocationTextById(match[1]) };
+        }
+
+        match = line.match(/^\[RESCHEDULE REQUEST\]\s*Requested:\s*(.*?)\s*-\s*Requested location ID:\s*(\d+)\s*-\s*Reason:\s*(.*)/i);
+        if (match) {
+          return {
+            type: 'reschedule',
+            label: 'Patient requested reschedule',
+            value: `${formatNoteDateTime(match[1])} at ${getLocationTextById(match[2])}`,
+            detail: match[3]
+          };
+        }
+
+        match = line.match(/^\[DOCTOR RESCHEDULE REQUEST\]\s*(.*)/i);
+        if (match) {
+          return { type: 'reschedule', label: 'Doctor requested reschedule', value: formatNoteDateTime(match[1]) };
+        }
+
+        match = line.match(/^\[APPROVED BY DOCTOR\]\s*(.*)/i);
+        if (match) {
+          return { type: 'approved', label: 'Reschedule approved', value: formatNoteDateTime(match[1]) };
+        }
+
+        match = line.match(/^\[COMPLETED\]\s*(.*)/i);
+        if (match) {
+          return { type: 'completed', label: 'Visit completed', value: formatNoteDateTime(match[1]) };
+        }
+
+        match = line.match(/^New schedule:\s*(.*)/i);
+        if (match) {
+          return { type: 'schedule', label: 'New schedule', value: formatNoteDateTime(match[1]) };
+        }
+
+        match = line.match(/^Patient note:\s*(.*)/i);
+        if (match) {
+          return { type: 'note', label: 'Patient note', value: match[1] };
+        }
+
+        match = line.match(/^Requested department:\s*(.*)/i);
+        if (match) {
+          return { type: 'department', label: 'Department', value: match[1] };
+        }
+
+        match = line.match(/^Reason:\s*(.*)/i);
+        if (match) {
+          return { type: 'reason', label: 'Reason', value: match[1] };
+        }
+
+        match = line.match(/^Diagnosis:\s*(.*)/i);
+        if (match) {
+          return { type: 'clinical', label: 'Diagnosis', value: match[1] };
+        }
+
+        return { type: 'note', label: 'Note', value: line.replace(/^Notes:\s*/i, '') };
+      })
+      .filter((item) => item.value);
+  };
+
+  const AppointmentNotes = ({ notes }) => {
+    const items = formatAppointmentNotes(notes);
+    if (!items.length) return null;
+
+    const getNoteIcon = (type) => {
+      if (type === 'location') return <MapPin size={16} className="text-blue-600" />;
+      if (type === 'reschedule' || type === 'approved') return <RefreshCw size={16} className="text-orange-600" />;
+      if (type === 'completed' || type === 'clinical') return <Activity size={16} className="text-green-600" />;
+      return <FileText size={16} className="text-gray-500" />;
+    };
+
+    return (
+      <div className="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-200">
+        <div className="flex items-center gap-2 mb-3">
+          <FileText size={17} className="text-gray-600" />
+          <p className="text-sm font-semibold text-gray-800">Visit notes</p>
+        </div>
+        <div className="grid gap-2 md:grid-cols-2">
+          {items.map((item, index) => (
+            <div key={`${item.label}-${index}`} className="flex gap-3 rounded-lg bg-white border border-gray-100 p-3">
+              <div className="mt-0.5">{getNoteIcon(item.type)}</div>
+              <div>
+                <p className="text-xs font-semibold uppercase text-gray-500">{item.label}</p>
+                <p className="text-sm font-medium text-gray-900">{item.value}</p>
+                {item.detail && <p className="text-xs text-gray-600 mt-1">Reason: {item.detail}</p>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const getNoteValue = (notes, label) => {
+    const match = String(notes || '').match(new RegExp(`^${label}:\\s*(.*)$`, 'im'));
+    return match?.[1]?.trim() || '';
+  };
+
+  const escapeHtml = (value) => String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;')
+    .replace(/\n/g, '<br>');
+
+  const formatLetterDate = (value) => {
+    if (!value || value === 'Not scheduled') return value || 'Not scheduled';
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+  };
+
+  const buildConsultationLetterData = (appointment) => ({
+    appointmentId: appointment?.id || '',
+    patientName: profile?.name || patient?.name || 'Patient',
+    patientAge: profile?.age || patient?.age || '',
+    patientPhone: profile?.phone || patient?.phone || '',
+    doctorName: appointment?.doctor_name || 'Hospital Doctor',
+    appointmentType: appointment?.type || 'Consultation',
+    appointmentDate: appointment?.date,
+    appointmentTime: appointment?.time,
+    location: getAppointmentLocationText(appointment || {}),
+    diagnosis: getNoteValue(appointment?.notes, 'Diagnosis') || 'Not specified',
+    prescription: getNoteValue(appointment?.notes, 'Prescription') || 'None',
+    tests: getNoteValue(appointment?.notes, 'Tests Ordered') || 'None',
+    nextCheckup: getNoteValue(appointment?.notes, 'Next Checkup') || profile?.next_checkup || 'Not scheduled',
+    advice: getNoteValue(appointment?.notes, 'Advice') || getNoteValue(appointment?.notes, 'Notes') || 'Follow prescribed treatment plan'
+  });
+
+  const getConsultationLetterHtml = (letterData) => `
+    <!doctype html>
+    <html>
+      <head>
+        <title>Consultation Letter - ${escapeHtml(letterData.patientName)}</title>
+        <style>
+          body { font-family: Arial, sans-serif; color: #111827; margin: 0; padding: 32px; }
+          .letter { max-width: 820px; margin: 0 auto; border: 1px solid #d1d5db; padding: 32px; }
+          .header { border-bottom: 2px solid #16a34a; padding-bottom: 16px; margin-bottom: 24px; }
+          h1 { margin: 0; color: #15803d; font-size: 26px; }
+          .muted { color: #6b7280; font-size: 13px; }
+          .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; margin-bottom: 24px; }
+          .field { border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; }
+          .label { font-size: 11px; text-transform: uppercase; color: #6b7280; font-weight: 700; }
+          .value { margin-top: 4px; font-size: 15px; }
+          .section { margin-top: 18px; }
+          .section h2 { font-size: 15px; color: #111827; margin: 0 0 8px; }
+          .box { background: #f9fafb; border: 1px solid #e5e7eb; padding: 12px; min-height: 34px; }
+          .footer { margin-top: 42px; display: flex; justify-content: space-between; align-items: end; }
+          .sign { text-align: right; min-width: 220px; border-top: 1px solid #111827; padding-top: 8px; }
+          @media print { body { padding: 0; } .letter { border: none; } }
+        </style>
+      </head>
+      <body>
+        <div class="letter">
+          <div class="header">
+            <h1>${escapeHtml(process.env.REACT_APP_HOSPITAL_NAME || 'Hospital Consultation Letter')}</h1>
+            <div class="muted">Generated on ${new Date().toLocaleString('en-IN')}</div>
+          </div>
+          <div class="grid">
+            <div class="field"><div class="label">Patient</div><div class="value">${escapeHtml(letterData.patientName)}</div></div>
+            <div class="field"><div class="label">Age / Phone</div><div class="value">${escapeHtml(letterData.patientAge || 'N/A')} ${letterData.patientPhone ? ` / ${escapeHtml(letterData.patientPhone)}` : ''}</div></div>
+            <div class="field"><div class="label">Doctor</div><div class="value">Dr. ${escapeHtml(letterData.doctorName)}</div></div>
+            <div class="field"><div class="label">Appointment</div><div class="value">#${escapeHtml(letterData.appointmentId)} - ${escapeHtml(letterData.appointmentType)}</div></div>
+            <div class="field"><div class="label">Date & Time</div><div class="value">${escapeHtml(formatLetterDate(letterData.appointmentDate))} at ${escapeHtml(letterData.appointmentTime || '')}</div></div>
+            <div class="field"><div class="label">Location</div><div class="value">${escapeHtml(letterData.location)}</div></div>
+          </div>
+          <div class="section"><h2>Diagnosis</h2><div class="box">${escapeHtml(letterData.diagnosis)}</div></div>
+          <div class="section"><h2>Prescription / Medications</h2><div class="box">${escapeHtml(letterData.prescription)}</div></div>
+          <div class="section"><h2>Tests / Lab Work Ordered</h2><div class="box">${escapeHtml(letterData.tests)}</div></div>
+          <div class="section"><h2>Advice / Notes</h2><div class="box">${escapeHtml(letterData.advice)}</div></div>
+          <div class="section"><h2>Next Checkup</h2><div class="box">${escapeHtml(formatLetterDate(letterData.nextCheckup))}</div></div>
+          <div class="footer">
+            <div class="muted">This letter is generated from the hospital management system.</div>
+            <div class="sign">Doctor Signature</div>
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+
+  const printConsultationLetter = (appointment) => {
+    const letterData = buildConsultationLetterData(appointment);
+    const printWindow = window.open('', '_blank', 'width=900,height=700');
+    if (!printWindow) {
+      alert('Please allow popups to print the consultation letter.');
+      return;
+    }
+    printWindow.document.open();
+    printWindow.document.write(getConsultationLetterHtml(letterData).replace('</body>', '<script>window.onload = () => { window.print(); };</script></body>'));
+    printWindow.document.close();
+  };
+
+  const ConsultationLetterModal = () => {
+    if (!selectedLetterAppointment) return null;
+    const letter = buildConsultationLetterData(selectedLetterAppointment);
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+        <div className="bg-white rounded-xl w-full max-w-4xl my-8 overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+            <div>
+              <h3 className="text-xl font-bold text-gray-800">Consultation Letter</h3>
+              <p className="text-sm text-gray-500">Appointment #{letter.appointmentId}</p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => printConsultationLetter(selectedLetterAppointment)}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+              >
+                <Printer size={18} />
+                Print / Save PDF
+              </button>
+              <button onClick={() => setSelectedLetterAppointment(null)} className="p-2 text-gray-500 hover:text-gray-700">
+                <X size={22} />
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6 bg-gray-50">
+            <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-5">
+              <div className="border-b border-green-200 pb-4">
+                <h1 className="text-2xl font-bold text-green-700">Hospital Consultation Letter</h1>
+                <p className="text-sm text-gray-500">{formatLetterDate(letter.appointmentDate)} at {letter.appointmentTime}</p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div><p className="text-xs uppercase font-semibold text-gray-500">Patient</p><p className="font-medium">{letter.patientName}</p></div>
+                <div><p className="text-xs uppercase font-semibold text-gray-500">Doctor</p><p className="font-medium">Dr. {letter.doctorName}</p></div>
+                <div><p className="text-xs uppercase font-semibold text-gray-500">Location</p><p className="font-medium">{letter.location}</p></div>
+                <div><p className="text-xs uppercase font-semibold text-gray-500">Next Checkup</p><p className="font-medium">{formatLetterDate(letter.nextCheckup)}</p></div>
+              </div>
+              {[
+                ['Diagnosis', letter.diagnosis],
+                ['Prescription / Medications', letter.prescription],
+                ['Tests / Lab Work Ordered', letter.tests],
+                ['Advice / Notes', letter.advice]
+              ].map(([label, value]) => (
+                <div key={label}>
+                  <p className="text-sm font-semibold text-gray-700 mb-1">{label}</p>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-800 whitespace-pre-wrap">{value}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const fetchBills = async () => {
@@ -1262,12 +1546,7 @@ function PatientPortal() {
                         </span>
                       </div>
                       
-                      {apt.notes && (
-                        <div className="bg-gray-50 rounded-lg p-4 mb-4 border-l-4 border-gray-300">
-                          <p className="text-xs font-semibold text-gray-600 mb-1">Notes:</p>
-                          <p className="text-sm text-gray-700 whitespace-pre-wrap">{apt.notes}</p>
-                        </div>
-                      )}
+                      <AppointmentNotes notes={apt.notes} />
                       
                       <div className="flex items-center justify-between pt-3 border-t border-gray-200">
                         <div className="text-sm text-gray-500">
@@ -1285,6 +1564,16 @@ function PatientPortal() {
                         </div>
                         
                         <div className="flex gap-2">
+                          {(apt.status === 'Completed' && getNoteValue(apt.notes, 'Diagnosis')) && (
+                            <button
+                              onClick={() => setSelectedLetterAppointment(apt)}
+                              className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition font-medium"
+                            >
+                              <FileText size={18} />
+                              View Letter
+                            </button>
+                          )}
+
                           {(rescheduleInfo?.suggestions?.length > 0 && !apt.notes?.includes('[PATIENT ACCEPTED]')) && (
                             <button
                               onClick={() => {
@@ -1374,6 +1663,7 @@ function PatientPortal() {
       {showReschedule && <RescheduleModal />}
       {showRescheduleChoices && <RescheduleSelectionModal />}
       {showInvoice && <InvoiceModal />}
+      {selectedLetterAppointment && <ConsultationLetterModal />}
     </div>
   );
 }
