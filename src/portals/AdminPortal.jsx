@@ -71,24 +71,6 @@ const statCardStyles = {
     icon: 'text-violet-100'
   }
 };
-const lightStatCardStyles = {
-  blue: {
-    card: 'bg-blue-50 border border-blue-100',
-    label: 'text-blue-700',
-    icon: 'text-blue-600'
-  },
-  green: {
-    card: 'bg-emerald-50 border border-emerald-100',
-    label: 'text-emerald-700',
-    icon: 'text-emerald-600'
-  },
-  purple: {
-    card: 'bg-violet-50 border border-violet-100',
-    label: 'text-violet-700',
-    icon: 'text-violet-600'
-  }
-};
-
 function AdminPortal() {
   const [activeTab, setActiveTab]               = useState('dashboard');
   const [isLoggedIn, setIsLoggedIn]             = useState(false);
@@ -1376,15 +1358,15 @@ function AdminPortal() {
           { label: 'Active', value: hospitalLocations.filter(loc => loc.status === 'Active').length, icon: Activity, color: 'green' },
           { label: 'Time Windows', value: hospitalLocations.filter(loc => getLocationStartTime(loc) && getLocationEndTime(loc)).length, icon: Clock, color: 'purple' },
         ].map(({ label, value, icon: Icon, color }) => {
-          const style = lightStatCardStyles[color] || lightStatCardStyles.blue;
+          const style = statCardStyles[color] || statCardStyles.blue;
           return (
-            <div key={label} className={`${style.card} rounded-xl p-5`}>
+            <div key={label} className={`${style.card} rounded-xl p-5 text-white shadow-lg`}>
               <div className="flex items-center justify-between">
                 <div>
                   <p className={`${style.label} text-sm font-medium`}>{label}</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+                  <p className="text-2xl font-bold mt-1 leading-tight">{value}</p>
                 </div>
-                <Icon size={34} className={style.icon} />
+                <Icon size={34} className={`${style.icon} opacity-90`} />
               </div>
             </div>
           );
