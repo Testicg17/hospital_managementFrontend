@@ -35,6 +35,20 @@ api.interceptors.response.use(
 );
 
 const defaultStats = { totalPatients: 0, todayAppointments: 0, pendingBills: 0, totalRevenue: 0 };
+const toNumber = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const normalizeStats = (data = {}) => ({
+  ...defaultStats,
+  ...data,
+  totalPatients: toNumber(data.totalPatients ?? data.total_patients ?? data.totalpatients),
+  todayAppointments: toNumber(data.todayAppointments ?? data.today_appointments ?? data.todayappointments),
+  pendingBills: toNumber(data.pendingBills ?? data.pending_bills ?? data.pendingbills),
+  totalRevenue: toNumber(data.totalRevenue ?? data.total_revenue ?? data.totalrevenue)
+});
+
 const statCardStyles = {
   blue: {
     card: 'bg-gradient-to-br from-blue-600 to-blue-700 shadow-blue-100',
@@ -173,14 +187,7 @@ function AdminPortal() {
   const fetchStats = useCallback(async () => {
     try {
       const { data } = await api.get('/dashboard/stats');
-      setStats({
-        ...defaultStats,
-        ...data,
-        totalPatients: Number(data?.totalPatients || 0),
-        todayAppointments: Number(data?.todayAppointments || 0),
-        pendingBills: Number(data?.pendingBills || 0),
-        totalRevenue: Number(data?.totalRevenue || 0)
-      });
+      setStats(normalizeStats(data));
     } catch (err) {
       console.error('Error fetching stats:', err);
     }
@@ -1110,14 +1117,26 @@ function AdminPortal() {
   const Dashboard = () => {
     const today      = new Date().toISOString().split('T')[0];
     const todayAppts = appointments.filter(a => a.date?.startsWith(today));
+    const calculatedStats = {
+      totalPatients: patients.filter((patient) => !patient.status || patient.status === 'Active').length,
+      todayAppointments: todayAppts.filter((appointment) => appointment.status !== 'Cancelled').length,
+      pendingBills: bills.filter((bill) => bill.status === 'Pending').length,
+      totalRevenue: bills.reduce((sum, bill) => sum + toNumber(bill.amount), 0)
+    };
+    const displayStats = {
+      totalPatients: stats.totalPatients || calculatedStats.totalPatients,
+      todayAppointments: stats.todayAppointments || calculatedStats.todayAppointments,
+      pendingBills: stats.pendingBills || calculatedStats.pendingBills,
+      totalRevenue: stats.totalRevenue || calculatedStats.totalRevenue
+    };
     return (
       <div className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {[
-            { label: 'Total Patients',        value: stats.totalPatients,                         icon: Users,       color: 'blue' },
-            { label: "Today's Appointments",  value: stats.todayAppointments,                     icon: Calendar,    color: 'green' },
-            { label: 'Pending Bills',         value: stats.pendingBills,                          icon: AlertCircle, color: 'orange' },
-            { label: 'Total Revenue',         value: `₹${stats.totalRevenue?.toLocaleString()}`, icon: TrendingUp,  color: 'purple' },
+            { label: 'Total Patients',        value: displayStats.totalPatients,                               icon: Users,       color: 'blue' },
+            { label: "Today's Appointments",  value: displayStats.todayAppointments,                          icon: Calendar,    color: 'green' },
+            { label: 'Pending Bills',         value: displayStats.pendingBills,                               icon: AlertCircle, color: 'orange' },
+            { label: 'Total Revenue',         value: `₹${displayStats.totalRevenue.toLocaleString()}`, icon: TrendingUp,  color: 'purple' },
           ].map(({ label, value, icon: Icon, color }) => {
             const style = statCardStyles[color] || statCardStyles.blue;
             return (
