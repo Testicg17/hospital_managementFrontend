@@ -34,6 +34,30 @@ api.interceptors.response.use(
   }
 );
 
+const defaultStats = { totalPatients: 0, todayAppointments: 0, pendingBills: 0, totalRevenue: 0 };
+const statCardStyles = {
+  blue: {
+    card: 'bg-gradient-to-br from-blue-600 to-blue-700 shadow-blue-100',
+    label: 'text-blue-100',
+    icon: 'text-blue-100'
+  },
+  green: {
+    card: 'bg-gradient-to-br from-emerald-600 to-emerald-700 shadow-emerald-100',
+    label: 'text-emerald-100',
+    icon: 'text-emerald-100'
+  },
+  orange: {
+    card: 'bg-gradient-to-br from-amber-500 to-orange-600 shadow-amber-100',
+    label: 'text-amber-50',
+    icon: 'text-amber-50'
+  },
+  purple: {
+    card: 'bg-gradient-to-br from-violet-600 to-fuchsia-700 shadow-violet-100',
+    label: 'text-violet-100',
+    icon: 'text-violet-100'
+  }
+};
+
 function AdminPortal() {
   const [activeTab, setActiveTab]               = useState('dashboard');
   const [isLoggedIn, setIsLoggedIn]             = useState(false);
@@ -45,7 +69,7 @@ function AdminPortal() {
   const [users, setUsers]                       = useState([]);
   const [doctors, setDoctors]                   = useState([]);
   const [hospitalLocations, setHospitalLocations] = useState([]);
-  const [stats, setStats]                       = useState({ totalPatients: 0, todayAppointments: 0, pendingBills: 0, totalRevenue: 0 });
+  const [stats, setStats]                       = useState(defaultStats);
   const [showAddPatient, setShowAddPatient]     = useState(false);
   const [showAddAppointment, setShowAddAppointment] = useState(false);
   const [showAddBill, setShowAddBill]           = useState(false);
@@ -149,7 +173,14 @@ function AdminPortal() {
   const fetchStats = useCallback(async () => {
     try {
       const { data } = await api.get('/dashboard/stats');
-      setStats(data);
+      setStats({
+        ...defaultStats,
+        ...data,
+        totalPatients: Number(data?.totalPatients || 0),
+        todayAppointments: Number(data?.todayAppointments || 0),
+        pendingBills: Number(data?.pendingBills || 0),
+        totalRevenue: Number(data?.totalRevenue || 0)
+      });
     } catch (err) {
       console.error('Error fetching stats:', err);
     }
@@ -1087,14 +1118,20 @@ function AdminPortal() {
             { label: "Today's Appointments",  value: stats.todayAppointments,                     icon: Calendar,    color: 'green' },
             { label: 'Pending Bills',         value: stats.pendingBills,                          icon: AlertCircle, color: 'orange' },
             { label: 'Total Revenue',         value: `₹${stats.totalRevenue?.toLocaleString()}`, icon: TrendingUp,  color: 'purple' },
-          ].map(({ label, value, icon: Icon, color }) => (
-            <div key={label} className={`bg-gradient-to-br from-${color}-500 to-${color}-600 rounded-xl p-6 text-white shadow-lg`}>
-              <div className="flex items-center justify-between">
-                <div><p className={`text-${color}-100 text-sm font-medium`}>{label}</p><p className="text-3xl font-bold mt-2">{value}</p></div>
-                <Icon size={40} className="opacity-80" />
+          ].map(({ label, value, icon: Icon, color }) => {
+            const style = statCardStyles[color] || statCardStyles.blue;
+            return (
+              <div key={label} className={`${style.card} rounded-xl p-6 text-white shadow-lg`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className={`${style.label} text-sm font-medium`}>{label}</p>
+                    <p className="text-3xl font-bold mt-2 leading-tight">{value ?? 0}</p>
+                  </div>
+                  <Icon size={40} className={`${style.icon} opacity-90`} />
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <div className="bg-white rounded-xl shadow-md p-6">
           <h3 className="text-lg font-bold text-gray-800 mb-4">Today's Appointments</h3>
