@@ -189,9 +189,20 @@ function AdminPortal() {
     const storedToken = localStorage.getItem('admin_token');
     const storedUser  = localStorage.getItem('admin_user');
     if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
-      setIsLoggedIn(true);
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        if (parsedUser?.role !== 'admin') {
+          localStorage.removeItem('admin_token');
+          localStorage.removeItem('admin_user');
+          return;
+        }
+        setToken(storedToken);
+        setUser(parsedUser);
+        setIsLoggedIn(true);
+      } catch (error) {
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_user');
+      }
     }
   }, []);
 

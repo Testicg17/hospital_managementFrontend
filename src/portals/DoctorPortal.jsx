@@ -54,11 +54,14 @@ const api = {
       ...options,
       headers: { ...headers, ...options.headers }
     });
-    if (response.status === 401) {
+    const data = await response.json();
+    const authFailed = [401, 403].includes(response.status)
+      && ['Access token required', 'Token expired', 'Invalid token', 'Access denied'].includes(data?.error);
+
+    if (authFailed) {
       api.clearAuth();
       window.location.reload();
     }
-    const data = await response.json();
     if (!response.ok) {
       throw new Error(data.error || data.message || `HTTP ${response.status}`);
     }
