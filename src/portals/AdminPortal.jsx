@@ -71,6 +71,23 @@ const statCardStyles = {
     icon: 'text-violet-100'
   }
 };
+const lightStatCardStyles = {
+  blue: {
+    card: 'bg-blue-50 border border-blue-100',
+    label: 'text-blue-700',
+    icon: 'text-blue-600'
+  },
+  green: {
+    card: 'bg-emerald-50 border border-emerald-100',
+    label: 'text-emerald-700',
+    icon: 'text-emerald-600'
+  },
+  purple: {
+    card: 'bg-violet-50 border border-violet-100',
+    label: 'text-violet-700',
+    icon: 'text-violet-600'
+  }
+};
 
 function AdminPortal() {
   const [activeTab, setActiveTab]               = useState('dashboard');
@@ -1358,17 +1375,20 @@ function AdminPortal() {
           { label: 'Total Locations', value: hospitalLocations.length, icon: Building2, color: 'blue' },
           { label: 'Active', value: hospitalLocations.filter(loc => loc.status === 'Active').length, icon: Activity, color: 'green' },
           { label: 'Time Windows', value: hospitalLocations.filter(loc => getLocationStartTime(loc) && getLocationEndTime(loc)).length, icon: Clock, color: 'purple' },
-        ].map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className={`bg-${color}-50 border border-${color}-100 rounded-xl p-5`}>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className={`text-${color}-700 text-sm font-medium`}>{label}</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+        ].map(({ label, value, icon: Icon, color }) => {
+          const style = lightStatCardStyles[color] || lightStatCardStyles.blue;
+          return (
+            <div key={label} className={`${style.card} rounded-xl p-5`}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`${style.label} text-sm font-medium`}>{label}</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+                </div>
+                <Icon size={34} className={style.icon} />
               </div>
-              <Icon size={34} className={`text-${color}-600`} />
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="bg-white rounded-xl shadow-md overflow-x-auto">
@@ -1446,14 +1466,20 @@ function AdminPortal() {
             { label: 'Total Users', value: users.length,                              icon: Users,   color: 'purple' },
             { label: 'Admins',      value: users.filter(u => u.role === 'admin').length, icon: Shield,  color: 'blue' },
             { label: 'Active',      value: users.length,                              icon: Activity, color: 'green' },
-          ].map(({ label, value, icon: Icon, color }) => (
-            <div key={label} className={`bg-gradient-to-br from-${color}-500 to-${color}-600 rounded-xl p-6 text-white`}>
-              <div className="flex items-center justify-between">
-                <div><p className={`text-${color}-100 text-sm font-medium`}>{label}</p><p className="text-3xl font-bold mt-2">{value}</p></div>
-                <Icon size={40} className="opacity-80" />
+          ].map(({ label, value, icon: Icon, color }) => {
+            const style = statCardStyles[color] || statCardStyles.blue;
+            return (
+              <div key={label} className={`${style.card} rounded-xl p-6 text-white shadow-lg`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className={`${style.label} text-sm font-medium`}>{label}</p>
+                    <p className="text-3xl font-bold mt-2 leading-tight">{value}</p>
+                  </div>
+                  <Icon size={40} className={`${style.icon} opacity-90`} />
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <div className="bg-white rounded-xl shadow-md overflow-x-auto">
           <table className="w-full">
