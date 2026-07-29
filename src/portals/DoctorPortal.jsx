@@ -314,6 +314,49 @@ function DoctorPortal() {
     .replace(/'/g, '&#039;')
     .replace(/\n/g, '<br>');
 
+  const parseMedicationPrescription = (prescription) => {
+    const rows = String(prescription || '')
+      .split('\n')
+      .map((line) => {
+        const match = line.match(/^\d+\.\s*Medication Name:\s*(.*?);\s*Dosing Schedule:\s*(.*?);\s*Treatment Duration:\s*(.*?)\s*day\(s\)$/i);
+        if (!match) return null;
+        return {
+          medicationName: match[1].trim(),
+          dosingSchedule: match[2].trim(),
+          durationDays: match[3].trim()
+        };
+      })
+      .filter(Boolean);
+
+    return rows.length ? rows : null;
+  };
+
+  const renderPrescriptionForPrint = (prescription) => {
+    const medicationRows = parseMedicationPrescription(prescription);
+    if (!medicationRows) return `<div class="box">${escapeHtml(prescription || 'None')}</div>`;
+
+    return `
+      <table class="med-table">
+        <thead>
+          <tr>
+            <th>Medication Name</th>
+            <th>Dosing Schedule</th>
+            <th>Treatment Duration</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${medicationRows.map((row) => `
+            <tr>
+              <td>${escapeHtml(row.medicationName)}</td>
+              <td>${escapeHtml(row.dosingSchedule)}</td>
+              <td>${escapeHtml(row.durationDays)} day(s)</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  };
+
   const formatDate = (value) => {
     if (!value || value === 'Not scheduled') return value || 'Not scheduled';
     const parsed = new Date(value);
@@ -360,6 +403,9 @@ function DoctorPortal() {
             .section { margin-top: 18px; }
             .section h2 { font-size: 15px; color: #111827; margin: 0 0 8px; }
             .box { background: #f9fafb; border: 1px solid #e5e7eb; padding: 12px; min-height: 34px; }
+            .med-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+            .med-table th { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; padding: 10px; text-align: left; font-size: 12px; text-transform: uppercase; }
+            .med-table td { border: 1px solid #e5e7eb; padding: 10px; vertical-align: top; }
             .footer { margin-top: 42px; display: flex; justify-content: space-between; align-items: end; }
             .sign { text-align: right; min-width: 220px; border-top: 1px solid #111827; padding-top: 8px; }
             @media print { body { padding: 0; } .letter { border: none; } }
@@ -380,7 +426,7 @@ function DoctorPortal() {
               <div class="field"><div class="label">Location</div><div class="value">${escapeHtml(letterData.location)}</div></div>
             </div>
             <div class="section"><h2>Diagnosis</h2><div class="box">${escapeHtml(letterData.diagnosis)}</div></div>
-            <div class="section"><h2>Prescription / Medications</h2><div class="box">${escapeHtml(letterData.prescription)}</div></div>
+            <div class="section"><h2>Prescription / Medications</h2>${renderPrescriptionForPrint(letterData.prescription)}</div>
             <div class="section"><h2>Tests / Lab Work Ordered</h2><div class="box">${escapeHtml(letterData.tests)}</div></div>
             <div class="section"><h2>Advice / Notes</h2><div class="box">${escapeHtml(letterData.advice)}</div></div>
             <div class="section"><h2>Next Checkup</h2><div class="box">${escapeHtml(formatDate(letterData.nextCheckup))}</div></div>
