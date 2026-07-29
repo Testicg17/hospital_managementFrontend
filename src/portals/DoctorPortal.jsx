@@ -74,6 +74,12 @@ const isSuccessfulResponse = (response) => (
   response?.success === true || response?.message || response?.appointment || response?.data || response?.id
 );
 
+const createMedicationRow = () => ({
+  medicationName: '',
+  dosingSchedule: '',
+  durationDays: ''
+});
+
 function DoctorPortal() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [doctor, setDoctor] = useState(null);
@@ -991,7 +997,7 @@ function DoctorPortal() {
 
   // Consultation Modal
   const ConsultationModal = () => {
-    const [prescription, setPrescription] = useState('');
+    const [medicationRows, setMedicationRows] = useState([createMedicationRow()]);
     const [tests, setTests] = useState('');
     const [diagnosis, setDiagnosis] = useState('');
     const [nextCheckupDate, setNextCheckupDate] = useState(
@@ -999,11 +1005,54 @@ function DoctorPortal() {
     );
     const [notes, setNotes] = useState('');
 
+    const updateMedicationRow = (index, field, value) => {
+      setMedicationRows((rows) => rows.map((row, rowIndex) => (
+        rowIndex === index ? { ...row, [field]: value } : row
+      )));
+    };
+
+    const addMedicationRow = () => {
+      setMedicationRows((rows) => [...rows, createMedicationRow()]);
+    };
+
+    const removeMedicationRow = (index) => {
+      setMedicationRows((rows) => rows.filter((_, rowIndex) => rowIndex !== index));
+    };
+
+    const formatMedicationPrescription = () => {
+      const filledRows = medicationRows
+        .map((row) => ({
+          medicationName: row.medicationName.trim(),
+          dosingSchedule: row.dosingSchedule.trim(),
+          durationDays: row.durationDays.trim()
+        }))
+        .filter((row) => row.medicationName || row.dosingSchedule || row.durationDays);
+
+      return filledRows
+        .map((row, index) => (
+          `${index + 1}. Medication Name: ${row.medicationName}; Dosing Schedule: ${row.dosingSchedule}; Treatment Duration: ${row.durationDays} day(s)`
+        ))
+        .join('\n');
+    };
+
+    const hasIncompleteMedicationRows = () => medicationRows.some((row) => {
+      const hasAnyValue = row.medicationName.trim() || row.dosingSchedule.trim() || row.durationDays.trim();
+      const hasAllValues = row.medicationName.trim() && row.dosingSchedule.trim() && row.durationDays.trim();
+      return hasAnyValue && !hasAllValues;
+    });
+
     const handleCompleteVisit = async () => {
       if (!diagnosis.trim()) {
         alert('Please enter a diagnosis');
         return;
       }
+
+      if (hasIncompleteMedicationRows()) {
+        alert('Please complete medication name, dosing schedule, and duration for each medication row');
+        return;
+      }
+
+      const prescription = formatMedicationPrescription();
 
       setLoading(true);
       try {
@@ -1078,13 +1127,71 @@ function DoctorPortal() {
                 <Pill size={18} />
                 Prescription / Medications
               </label>
-              <textarea
-                value={prescription}
-                onChange={(e) => setPrescription(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                rows="4"
-                placeholder="Enter medications, dosage, and duration..."
-              />
+              <div className="overflow-hidden rounded-lg border border-gray-200">
+                <div className="hidden grid-cols-[1.3fr_1.2fr_0.7fr_44px] gap-3 bg-gray-50 px-4 py-3 text-xs font-semibold uppercase text-gray-500 md:grid">
+                  <span>Medication Name</span>
+                  <span>Dosing Schedule</span>
+                  <span>Treatment Duration (Days)</span>
+                  <span className="sr-only">Action</span>
+                </div>
+                <div className="divide-y divide-gray-100">
+                  {medicationRows.map((row, index) => (
+                    <div key={index} className="grid grid-cols-1 gap-3 p-4 md:grid-cols-[1.3fr_1.2fr_0.7fr_44px] md:items-center">
+                      <label className="block md:sr-only">
+                        <span className="mb-1 block text-xs font-semibold uppercase text-gray-500">Medication Name</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={row.medicationName}
+                        onChange={(e) => updateMedicationRow(index, 'medicationName', e.target.value)}
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                        placeholder="Example: Tab. Paracetamol 500 mg"
+                      />
+
+                      <label className="block md:sr-only">
+                        <span className="mb-1 block text-xs font-semibold uppercase text-gray-500">Dosing Schedule</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={row.dosingSchedule}
+                        onChange={(e) => updateMedicationRow(index, 'dosingSchedule', e.target.value)}
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                        placeholder="Example: 1-0-1 after meals"
+                      />
+
+                      <label className="block md:sr-only">
+                        <span className="mb-1 block text-xs font-semibold uppercase text-gray-500">Treatment Duration (Days)</span>
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={row.durationDays}
+                        onChange={(e) => updateMedicationRow(index, 'durationDays', e.target.value)}
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                        placeholder="5"
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => removeMedicationRow(index)}
+                        disabled={medicationRows.length === 1}
+                        className="flex h-10 w-10 items-center justify-center rounded-lg border border-red-100 text-red-600 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40"
+                        title="Remove medication"
+                      >
+                        <X size={18} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={addMedicationRow}
+                className="mt-3 inline-flex items-center gap-2 rounded-lg border border-blue-200 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-50"
+              >
+                <Plus size={16} />
+                Add Medication
+              </button>
             </div>
 
             <div>
@@ -1146,12 +1253,12 @@ function DoctorPortal() {
             <button
               onClick={() => printConsultationLetter(buildConsultationLetterData(selectedAppointment, selectedPatient, {
                 diagnosis,
-                prescription,
+                prescription: formatMedicationPrescription(),
                 tests,
                 nextCheckupDate,
                 notes
               }))}
-              disabled={!diagnosis.trim()}
+              disabled={!diagnosis.trim() || hasIncompleteMedicationRows()}
               className="px-5 bg-white border border-blue-200 text-blue-700 py-3 rounded-lg hover:bg-blue-50 font-medium flex items-center justify-center gap-2 disabled:opacity-50"
             >
               <Printer size={20} />
@@ -1159,7 +1266,7 @@ function DoctorPortal() {
             </button>
             <button
               onClick={handleCompleteVisit}
-              disabled={loading || !diagnosis.trim()}
+              disabled={loading || !diagnosis.trim() || hasIncompleteMedicationRows()}
               className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {loading ? 'Processing...' : <><Check size={20} /> Complete Visit & Send Email</>}
