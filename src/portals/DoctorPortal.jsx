@@ -361,6 +361,139 @@ function DoctorPortal() {
     `;
   };
 
+  const parsePatientHistory = (historyText) => {
+    if (!historyText) return { mainHistory: '', visits: [] };
+
+    const visitRegex = /\[(\d{1,2}\/\d{1,2}\/\d{4})\] Visit Summary:\s*Diagnosis:\s*([\s\S]*?)\nPrescription:\s*([\s\S]*?)\nTests Ordered:\s*([\s\S]*?)(?:\nNext Checkup:\s*([\s\S]*?))?\nNotes:\s*([\s\S]*?)(?=\n\[\d{1,2}\/\d{1,2}\/\d{4}\] Visit Summary:|$)/g;
+    const visits = [];
+    let match;
+
+    while ((match = visitRegex.exec(historyText)) !== null) {
+      visits.push({
+        date: match[1],
+        diagnosis: match[2].trim(),
+        prescription: match[3].trim(),
+        tests: match[4].trim(),
+        nextCheckup: (match[5] || '').trim(),
+        notes: match[6].trim()
+      });
+    }
+
+    const firstVisitIndex = historyText.search(/\[\d{1,2}\/\d{1,2}\/\d{4}\] Visit Summary:/);
+    const mainHistory = firstVisitIndex > 0 ? historyText.substring(0, firstVisitIndex).trim() : '';
+
+    return { mainHistory, visits };
+  };
+
+  const MedicationPrescriptionTable = ({ prescription }) => {
+    const medicationRows = parseMedicationPrescription(prescription);
+    if (!medicationRows) {
+      return (
+        <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-800 whitespace-pre-wrap">
+          {prescription || 'None'}
+        </div>
+      );
+    }
+
+    return (
+      <div className="overflow-hidden rounded-lg border border-blue-100">
+        <div className="hidden grid-cols-[1.3fr_1.2fr_0.7fr] gap-3 bg-blue-50 px-4 py-3 text-xs font-semibold uppercase text-blue-700 md:grid">
+          <span>Medication Name</span>
+          <span>Dosing Schedule</span>
+          <span>Treatment Duration</span>
+        </div>
+        <div className="divide-y divide-blue-100 bg-white">
+          {medicationRows.map((row, index) => (
+            <div key={`${row.medicationName}-${index}`} className="grid grid-cols-1 gap-3 p-4 text-sm md:grid-cols-[1.3fr_1.2fr_0.7fr]">
+              <div>
+                <p className="mb-1 text-xs font-semibold uppercase text-gray-500 md:hidden">Medication Name</p>
+                <p className="font-medium text-gray-900">{row.medicationName}</p>
+              </div>
+              <div>
+                <p className="mb-1 text-xs font-semibold uppercase text-gray-500 md:hidden">Dosing Schedule</p>
+                <p className="text-gray-800">{row.dosingSchedule}</p>
+              </div>
+              <div>
+                <p className="mb-1 text-xs font-semibold uppercase text-gray-500 md:hidden">Treatment Duration</p>
+                <p className="text-gray-800">{row.durationDays} day(s)</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const PatientHistoryView = ({ historyText }) => {
+    const { mainHistory, visits } = parsePatientHistory(historyText);
+
+    if (!mainHistory && !visits.length) {
+      return (
+        <div className="rounded-lg bg-gray-50 p-4 text-gray-800 whitespace-pre-wrap">
+          {historyText}
+        </div>
+      );
+    }
+
+    return (
+      <div className="max-h-[28rem] space-y-4 overflow-y-auto pr-1">
+        {mainHistory && (
+          <div className="rounded-xl border border-blue-100 bg-blue-50 p-4">
+            <div className="mb-2 flex items-center gap-2">
+              <FileText size={17} className="text-blue-700" />
+              <h5 className="font-semibold text-blue-950">Background Notes</h5>
+            </div>
+            <p className="text-sm leading-relaxed text-blue-950 whitespace-pre-wrap">{mainHistory}</p>
+          </div>
+        )}
+
+        {visits.map((visit, index) => (
+          <div key={`${visit.date}-${index}`} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div className="mb-4 flex flex-col gap-2 border-b border-gray-100 pb-3 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-center gap-2">
+                <Calendar size={17} className="text-blue-600" />
+                <h5 className="font-semibold text-gray-900">Visit Summary</h5>
+              </div>
+              <span className="w-fit rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+                {formatDate(visit.date)}
+              </span>
+            </div>
+
+            <div className="grid gap-4">
+              <div>
+                <p className="mb-1 text-xs font-semibold uppercase text-gray-500">Diagnosis</p>
+                <p className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-900">{visit.diagnosis || 'Not specified'}</p>
+              </div>
+
+              <div>
+                <p className="mb-1 text-xs font-semibold uppercase text-gray-500">Prescription / Medications</p>
+                <MedicationPrescriptionTable prescription={visit.prescription} />
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <p className="mb-1 text-xs font-semibold uppercase text-gray-500">Tests / Lab Work Ordered</p>
+                  <p className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-900 whitespace-pre-wrap">{visit.tests || 'None'}</p>
+                </div>
+                <div>
+                  <p className="mb-1 text-xs font-semibold uppercase text-gray-500">Next Checkup</p>
+                  <p className="rounded-lg border border-orange-100 bg-orange-50 p-3 text-sm font-medium text-orange-900">
+                    {visit.nextCheckup ? formatDate(visit.nextCheckup) : 'Not scheduled'}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <p className="mb-1 text-xs font-semibold uppercase text-gray-500">Clinical Notes</p>
+                <p className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-900 whitespace-pre-wrap">{visit.notes || 'No additional notes'}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   const formatDate = (value) => {
     if (!value || value === 'Not scheduled') return value || 'Not scheduled';
     const parsed = new Date(value);
@@ -1374,9 +1507,7 @@ function DoctorPortal() {
             Medical History
           </h4>
           {selectedPatient?.history ? (
-            <div className="bg-gray-50 rounded-lg p-4 max-h-96 overflow-y-auto">
-              <p className="text-gray-800 whitespace-pre-wrap">{selectedPatient.history}</p>
-            </div>
+            <PatientHistoryView historyText={selectedPatient.history} />
           ) : (
             <p className="text-gray-500">No medical history recorded</p>
           )}
