@@ -306,7 +306,7 @@ function DoctorPortal() {
     const nextLabelPattern = labels
       .filter((item) => item !== label)
       .join('|');
-    const match = String(notes || '').match(new RegExp(`^${label}:\\s*([\\s\\S]*?)(?=\\n(?:${nextLabelPattern}):|\\n\\[|$)`, 'im'));
+    const match = String(notes || '').match(new RegExp(`(?:^|\\n)${label}:\\s*([\\s\\S]*?)(?=\\n(?:${nextLabelPattern}):|\\n\\[|$)`, 'i'));
     return match?.[1]?.trim() || '';
   };
 
