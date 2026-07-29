@@ -36,22 +36,22 @@ function PublicLayout({ children }) {
   return (
     <div className="min-h-screen bg-[#fff7fc] text-slate-900">
       <header className="sticky top-0 z-40 border-b border-pink-100 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          <Link to="/" className="flex items-center gap-3">
-            <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-pink-100">
+        <div className="mx-auto flex w-full max-w-none items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8 2xl:px-10">
+          <Link to="/" className="flex min-w-0 flex-1 items-center gap-3 lg:max-w-[520px] xl:max-w-[620px]">
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-pink-100">
               <img
                 src="/images/logo.jpeg"
                 alt="Eva Fertility & Laparoscopy logo"
                 className="h-full w-full object-cover"
               />
             </span>
-            <span>
-              <span className="block text-lg font-bold leading-tight text-[#3157b7]">{clinic.name}</span>
-              <span className="block text-xs font-medium text-pink-500">{dictionary.clinic.tagline}</span>
+            <span className="min-w-0">
+              <span className="block truncate text-base font-bold leading-tight text-[#3157b7] xl:text-lg 2xl:text-xl">{clinic.name}</span>
+              <span className="block truncate text-xs font-medium text-pink-500 xl:text-sm">{dictionary.clinic.tagline}</span>
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex">
+          <nav className="hidden shrink-0 items-center gap-0 xl:gap-1 lg:flex">
             {navItems.map((item) => (
               <NavLink key={item.key} to={item.to} end={item.to === '/'} className={linkClass}>
                 {dictionary.nav[item.key]}
@@ -59,17 +59,17 @@ function PublicLayout({ children }) {
             ))}
           </nav>
 
-          <div className="hidden items-center gap-3 lg:flex">
+          <div className="hidden shrink-0 items-center gap-2 xl:gap-3 lg:flex">
             <LanguageSelect />
-            <a href={`tel:${clinic.phone}`} className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-              <Phone size={17} className="text-[#3157b7]" />
+            <a href={`tel:${clinic.phone}`} className="flex shrink-0 items-center gap-2 whitespace-nowrap text-sm font-semibold text-slate-700">
+              <Phone size={17} className="shrink-0 text-[#3157b7]" />
               {clinic.phone}
             </a>
             <Link
               to="/contact"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#e84faf] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#d83d9f]"
+              className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg bg-[#e84faf] px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#d83d9f] xl:px-4"
             >
-              <CalendarCheck size={18} />
+              <CalendarCheck size={18} className="shrink-0" />
               {dictionary.common.bookAppointment}
             </Link>
           </div>
