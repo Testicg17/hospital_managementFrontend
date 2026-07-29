@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Calendar, Users, Activity, AlertCircle, TrendingUp, UserPlus, Search, X, Edit2, Trash2, Bell, Phone, Mail, LogOut, LogIn, Eye, Printer, Download, Shield, UserCog, MapPin, Building2, Clock } from 'lucide-react';
+import LogoLoader from '../components/LogoLoader';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
 
@@ -97,6 +98,7 @@ function AdminPortal() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showInvoice, setShowInvoice]           = useState(false);
   const [loading, setLoading]                   = useState(false);
+  const [dataLoading, setDataLoading]           = useState(false);
   const [actionLoading, setActionLoading]       = useState(false);
   const [error, setError]                       = useState(null);
   const [alert, setAlert]                       = useState({ message: '', type: '' });
@@ -248,6 +250,7 @@ function AdminPortal() {
     if (!isLoggedIn || !token) return;
 
     const fetchData = async () => {
+      setDataLoading(true);
       try {
         await Promise.all([
           fetchPatients(),
@@ -260,6 +263,8 @@ function AdminPortal() {
         ]);
       } catch (err) {
         console.error('Error fetching data:', err);
+      } finally {
+        setDataLoading(false);
       }
     };
 
@@ -1548,14 +1553,7 @@ function AdminPortal() {
       )}
 
       {/* Global loader */}
-      {actionLoading && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 z-50 flex items-center justify-center">
-          <div className="bg-white px-6 py-4 rounded-lg shadow flex items-center gap-3">
-            <div className="animate-spin h-5 w-5 border-2 border-blue-600 rounded-full border-t-transparent" />
-            Processing...
-          </div>
-        </div>
-      )}
+      {actionLoading && <LogoLoader overlay label="Processing request..." />}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-wrap gap-4 mb-6">
@@ -1567,12 +1565,20 @@ function AdminPortal() {
           ))}
         </div>
 
-        {activeTab === 'dashboard'    && <Dashboard />}
-        {activeTab === 'users'        && <UsersManagement />}
-        {activeTab === 'patients'     && <Patients />}
-        {activeTab === 'appointments' && <Appointments />}
-        {activeTab === 'locations'    && <HospitalLocations />}
-        {activeTab === 'billing'      && <Billing />}
+        {dataLoading ? (
+          <div className="rounded-xl bg-white py-20 shadow-sm">
+            <LogoLoader label="Loading dashboard data..." />
+          </div>
+        ) : (
+          <>
+            {activeTab === 'dashboard'    && <Dashboard />}
+            {activeTab === 'users'        && <UsersManagement />}
+            {activeTab === 'patients'     && <Patients />}
+            {activeTab === 'appointments' && <Appointments />}
+            {activeTab === 'locations'    && <HospitalLocations />}
+            {activeTab === 'billing'      && <Billing />}
+          </>
+        )}
       </div>
 
       {showAddUser      && <UserForm        onClose={() => { setShowAddUser(false);      setSelectedUser(null);    }} editUser={selectedUser} />}

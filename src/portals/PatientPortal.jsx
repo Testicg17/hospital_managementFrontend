@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, Calendar, CreditCard, Phone, Mail, LogOut, Activity, Clock, AlertCircle, Eye, RefreshCw, FileText, X, History, MapPin, Plus, Printer } from 'lucide-react';
+import LogoLoader from '../components/LogoLoader';
 
 const API_ROOT_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
 const API_BASE_URL = `${API_ROOT_URL}/patient-portal`;
@@ -39,6 +40,7 @@ function PatientPortal() {
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(false);
   const [error, setError] = useState('');
   const [patient, setPatient] = useState(null);
   const [activeTab, setActiveTab] = useState('profile');
@@ -73,15 +75,22 @@ function PatientPortal() {
 
   useEffect(() => {
     if (step === 'portal' && patient) {
-      if (activeTab === 'profile') {
-        fetchProfile();
-        fetchHistory();
-      } else if (activeTab === 'appointments') {
-        fetchAppointments();
-        fetchHospitalLocations();
-      } else if (activeTab === 'bills') {
-        fetchBills();
-      }
+      const fetchPortalData = async () => {
+        setDataLoading(true);
+        try {
+          if (activeTab === 'profile') {
+            await Promise.all([fetchProfile(), fetchHistory()]);
+          } else if (activeTab === 'appointments') {
+            await Promise.all([fetchAppointments(), fetchHospitalLocations()]);
+          } else if (activeTab === 'bills') {
+            await fetchBills();
+          }
+        } finally {
+          setDataLoading(false);
+        }
+      };
+
+      fetchPortalData();
     }
   }, [activeTab, step, patient]);
 
@@ -1224,6 +1233,8 @@ function PatientPortal() {
   // Main Portal
   return (
     <div className="min-h-screen bg-gray-100">
+      {dataLoading && <LogoLoader overlay label="Loading patient portal data..." />}
+      {loading && step === 'portal' && <LogoLoader overlay label="Processing request..." />}
       <nav className="bg-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">

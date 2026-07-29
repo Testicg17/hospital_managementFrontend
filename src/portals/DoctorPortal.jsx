@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, Calendar, FileText, LogOut, LogIn, AlertCircle, Check, X, Eye, Stethoscope, Pill, FlaskConical, History, ClipboardList, Mail, Send, MapPin, Plus, Printer } from 'lucide-react';
+import LogoLoader from '../components/LogoLoader';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
 
@@ -91,6 +92,7 @@ function DoctorPortal() {
   const [showCreateAppointment, setShowCreateAppointment] = useState(false);
   
   const [loading, setLoading] = useState(false);
+  const [dataLoading, setDataLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
@@ -117,12 +119,20 @@ function DoctorPortal() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      fetchHospitalLocations();
-      if (activeTab === 'appointments') {
-        fetchAppointments();
-        fetchPatients();
-      }
-      else if (activeTab === 'patients') fetchPatients();
+      const fetchPortalData = async () => {
+        setDataLoading(true);
+        try {
+          await fetchHospitalLocations();
+          if (activeTab === 'appointments') {
+            await Promise.all([fetchAppointments(), fetchPatients()]);
+          }
+          else if (activeTab === 'patients') await fetchPatients();
+        } finally {
+          setDataLoading(false);
+        }
+      };
+
+      fetchPortalData();
     }
   }, [isLoggedIn, activeTab]);
 
@@ -1489,6 +1499,7 @@ function DoctorPortal() {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      {loading && isLoggedIn && <LogoLoader overlay label="Processing request..." />}
       <nav className="bg-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
@@ -1534,8 +1545,16 @@ function DoctorPortal() {
           </button>
         </div>
 
-        {activeTab === 'appointments' && <AppointmentsView />}
-        {activeTab === 'patients' && <PatientsView />}
+        {dataLoading ? (
+          <div className="rounded-xl bg-white py-20 shadow-sm">
+            <LogoLoader label="Loading doctor portal data..." />
+          </div>
+        ) : (
+          <>
+            {activeTab === 'appointments' && <AppointmentsView />}
+            {activeTab === 'patients' && <PatientsView />}
+          </>
+        )}
       </div>
 
       {showRescheduleApproval && <RescheduleApprovalModal />}
