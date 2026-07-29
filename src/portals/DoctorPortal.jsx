@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, Calendar, FileText, LogOut, LogIn, AlertCircle, Check, X, Eye, Stethoscope, Pill, FlaskConical, History, ClipboardList, Mail, Send, MapPin, Plus, Printer } from 'lucide-react';
 import LogoLoader from '../components/LogoLoader';
+import BrandMark from '../components/BrandMark';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
 
@@ -530,7 +531,8 @@ function DoctorPortal() {
           <style>
             body { font-family: Arial, sans-serif; color: #111827; margin: 0; padding: 32px; }
             .letter { max-width: 820px; margin: 0 auto; border: 1px solid #d1d5db; padding: 32px; }
-            .header { border-bottom: 2px solid #2563eb; padding-bottom: 16px; margin-bottom: 24px; }
+            .header { border-bottom: 2px solid #2563eb; padding-bottom: 16px; margin-bottom: 24px; display: flex; align-items: center; gap: 16px; }
+            .logo { width: 72px; height: 72px; object-fit: contain; border: 1px solid #dbeafe; border-radius: 14px; padding: 4px; }
             h1 { margin: 0; color: #1d4ed8; font-size: 26px; }
             .muted { color: #6b7280; font-size: 13px; }
             .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; margin-bottom: 24px; }
@@ -551,8 +553,12 @@ function DoctorPortal() {
         <body>
           <div class="letter">
             <div class="header">
-              <h1>${escapeHtml(process.env.REACT_APP_HOSPITAL_NAME || 'Hospital Consultation Letter')}</h1>
-              <div class="muted">Generated on ${new Date().toLocaleString('en-IN')}</div>
+              <img class="logo" src="/images/logo.jpeg" alt="Hospital Logo" />
+              <div>
+                <h1>${escapeHtml(process.env.REACT_APP_HOSPITAL_NAME || 'Eva Fertility & Laparoscopy')}</h1>
+                <div class="muted">Consultation Letter</div>
+                <div class="muted">Generated on ${new Date().toLocaleString('en-IN')}</div>
+              </div>
             </div>
             <div class="grid">
               <div class="field"><div class="label">Patient</div><div class="value">${escapeHtml(letterData.patientName)}</div></div>
@@ -600,9 +606,8 @@ function DoctorPortal() {
       <div className="min-h-screen bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
           <div className="text-center mb-8">
-            <Stethoscope className="mx-auto text-blue-600 mb-4" size={48} />
-            <h1 className="text-3xl font-bold text-gray-800">Doctor Portal</h1>
-            <p className="text-gray-600 mt-2">Sign in to access patient records</p>
+            <BrandMark size="lg" centered title="Eva Fertility & Laparoscopy" subtitle="Doctor Portal Login" />
+            <p className="text-gray-600 mt-4">Sign in to access patient records</p>
           </div>
 
           {error && (
@@ -1792,8 +1797,7 @@ function DoctorPortal() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <Stethoscope className="text-blue-600" size={32} />
-              <span className="ml-2 text-xl font-bold text-gray-800">Doctor Portal</span>
+              <BrandMark size="sm" title="Eva Fertility & Laparoscopy" subtitle="Doctor Portal" />
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-600">

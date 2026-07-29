@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Calendar, Users, Activity, AlertCircle, TrendingUp, UserPlus, Search, X, Edit2, Trash2, Bell, Phone, Mail, LogOut, LogIn, Eye, Printer, Download, Shield, UserCog, MapPin, Building2, Clock } from 'lucide-react';
 import LogoLoader from '../components/LogoLoader';
+import BrandMark from '../components/BrandMark';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
 
@@ -568,9 +569,7 @@ function AdminPortal() {
       <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
           <div className="text-center mb-8">
-            <Activity className="mx-auto text-blue-600 mb-4" size={48} />
-            <h1 className="text-3xl font-bold text-gray-800">Hospital Management</h1>
-            <p className="text-gray-600 mt-2">Sign in to continue</p>
+            <BrandMark size="lg" centered title="Eva Fertility & Laparoscopy" subtitle="Admin & Reception Login" />
           </div>
           {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">{error}</div>}
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -1044,10 +1043,7 @@ function AdminPortal() {
           </div>
           <div className="p-8">
             <div className="text-center mb-8 pb-6 border-b-2 border-gray-300">
-              <div className="flex items-center justify-center gap-3 mb-2">
-                <Activity className="text-blue-600" size={40} />
-                <h1 className="text-3xl font-bold text-gray-800">Hospital Management System</h1>
-              </div>
+              <BrandMark size="lg" centered title="Eva Fertility & Laparoscopy" subtitle="Hospital Management System" className="mb-3" />
               <p className="text-gray-600">123 Medical Center Drive, Healthcare City</p>
               <p className="text-gray-600">Phone: +91 98765 00000 | Email: info@hospital.com</p>
             </div>
@@ -1532,8 +1528,7 @@ function AdminPortal() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <Activity className="text-blue-600" size={32} />
-              <span className="ml-2 text-xl font-bold text-gray-800">Hospital Management System</span>
+              <BrandMark size="sm" title="Eva Fertility & Laparoscopy" subtitle="Hospital Management System" />
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-600">Welcome, <span className="font-semibold">{user?.username}</span></span>

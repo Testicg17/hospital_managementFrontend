@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, Calendar, CreditCard, Phone, Mail, LogOut, Activity, Clock, AlertCircle, Eye, RefreshCw, FileText, X, History, MapPin, Plus, Printer } from 'lucide-react';
 import LogoLoader from '../components/LogoLoader';
+import BrandMark from '../components/BrandMark';
 
 const API_ROOT_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
 const API_BASE_URL = `${API_ROOT_URL}/patient-portal`;
@@ -523,7 +524,8 @@ function PatientPortal() {
         <style>
           body { font-family: Arial, sans-serif; color: #111827; margin: 0; padding: 32px; }
           .letter { max-width: 820px; margin: 0 auto; border: 1px solid #d1d5db; padding: 32px; }
-          .header { border-bottom: 2px solid #16a34a; padding-bottom: 16px; margin-bottom: 24px; }
+          .header { border-bottom: 2px solid #16a34a; padding-bottom: 16px; margin-bottom: 24px; display: flex; align-items: center; gap: 16px; }
+          .logo { width: 72px; height: 72px; object-fit: contain; border: 1px solid #bbf7d0; border-radius: 14px; padding: 4px; }
           h1 { margin: 0; color: #15803d; font-size: 26px; }
           .muted { color: #6b7280; font-size: 13px; }
           .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; margin-bottom: 24px; }
@@ -544,8 +546,12 @@ function PatientPortal() {
       <body>
         <div class="letter">
           <div class="header">
-            <h1>${escapeHtml(process.env.REACT_APP_HOSPITAL_NAME || 'Hospital Consultation Letter')}</h1>
-            <div class="muted">Generated on ${new Date().toLocaleString('en-IN')}</div>
+            <img class="logo" src="/images/logo.jpeg" alt="Hospital Logo" />
+            <div>
+              <h1>${escapeHtml(process.env.REACT_APP_HOSPITAL_NAME || 'Eva Fertility & Laparoscopy')}</h1>
+              <div class="muted">Consultation Letter</div>
+              <div class="muted">Generated on ${new Date().toLocaleString('en-IN')}</div>
+            </div>
           </div>
           <div class="grid">
             <div class="field"><div class="label">Patient</div><div class="value">${escapeHtml(letterData.patientName)}</div></div>
@@ -610,7 +616,7 @@ function PatientPortal() {
           <div className="p-6 bg-gray-50">
             <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-5">
               <div className="border-b border-green-200 pb-4">
-                <h1 className="text-2xl font-bold text-green-700">Hospital Consultation Letter</h1>
+                <BrandMark size="md" title="Eva Fertility & Laparoscopy" subtitle="Consultation Letter" />
                 <p className="text-sm text-gray-500">{formatLetterDate(letter.appointmentDate)} at {letter.appointmentTime}</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -765,10 +771,8 @@ function PatientPortal() {
       <div className="min-h-screen bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
           <div className="text-center mb-8">
-            <Activity className="mx-auto text-green-600 mb-4" size={48} />
-            <h1 className="text-3xl font-bold text-gray-800">
-              {step === 'email' ? 'Patient Portal' : 'Enter OTP'}
-            </h1>
+            <BrandMark size="lg" centered title="Eva Fertility & Laparoscopy" subtitle={step === 'email' ? 'Patient Portal Login' : 'Patient Verification'} />
+            {step === 'otp' && <h1 className="mt-4 text-2xl font-bold text-gray-800">Enter OTP</h1>}
             <p className="text-gray-600 mt-2">
               {step === 'email' ? 'Choose your login method' : `OTP sent to ${email}`}
             </p>
@@ -1193,10 +1197,7 @@ function PatientPortal() {
 
           <div className="p-8">
             <div className="text-center mb-8 pb-6 border-b-2 border-gray-300">
-              <div className="flex items-center justify-center gap-3 mb-2">
-                <Activity className="text-green-600" size={40} />
-                <h1 className="text-3xl font-bold text-gray-800">Hospital Management System</h1>
-              </div>
+              <BrandMark size="lg" centered title="Eva Fertility & Laparoscopy" subtitle="Hospital Management System" className="mb-3" />
               <p className="text-gray-600">123 Medical Center Drive, Healthcare City</p>
               <p className="text-gray-600">Phone: +91 98765 00000 | Email: info@hospital.com</p>
             </div>
@@ -1332,8 +1333,7 @@ function PatientPortal() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <Activity className="text-green-600" size={32} />
-              <span className="ml-2 text-xl font-bold text-gray-800">Patient Portal</span>
+              <BrandMark size="sm" title="Eva Fertility & Laparoscopy" subtitle="Patient Portal" />
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-600">
