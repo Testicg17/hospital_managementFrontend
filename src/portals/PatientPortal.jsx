@@ -390,7 +390,11 @@ function PatientPortal() {
   };
 
   const getNoteValue = (notes, label) => {
-    const match = String(notes || '').match(new RegExp(`^${label}:\\s*(.*)$`, 'im'));
+    const labels = ['Diagnosis', 'Prescription', 'Tests Ordered', 'Next Checkup', 'Advice', 'Notes'];
+    const nextLabelPattern = labels
+      .filter((item) => item !== label)
+      .join('|');
+    const match = String(notes || '').match(new RegExp(`^${label}:\\s*([\\s\\S]*?)(?=\\n(?:${nextLabelPattern}):|\\n\\[|$)`, 'im'));
     return match?.[1]?.trim() || '';
   };
 
@@ -443,6 +447,45 @@ function PatientPortal() {
         </tbody>
       </table>
     `;
+  };
+
+  const MedicationPrescriptionTable = ({ prescription }) => {
+    const medicationRows = parseMedicationPrescription(prescription);
+    if (!medicationRows) {
+      return (
+        <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-800 whitespace-pre-wrap">
+          {prescription || 'None'}
+        </div>
+      );
+    }
+
+    return (
+      <div className="overflow-hidden rounded-lg border border-green-100">
+        <div className="hidden grid-cols-[1.3fr_1.2fr_0.7fr] gap-3 bg-green-50 px-4 py-3 text-xs font-semibold uppercase text-green-700 md:grid">
+          <span>Medication Name</span>
+          <span>Dosing Schedule</span>
+          <span>Treatment Duration</span>
+        </div>
+        <div className="divide-y divide-green-100 bg-white">
+          {medicationRows.map((row, index) => (
+            <div key={`${row.medicationName}-${index}`} className="grid grid-cols-1 gap-3 p-4 text-sm md:grid-cols-[1.3fr_1.2fr_0.7fr]">
+              <div>
+                <p className="mb-1 text-xs font-semibold uppercase text-gray-500 md:hidden">Medication Name</p>
+                <p className="font-medium text-gray-900">{row.medicationName}</p>
+              </div>
+              <div>
+                <p className="mb-1 text-xs font-semibold uppercase text-gray-500 md:hidden">Dosing Schedule</p>
+                <p className="text-gray-800">{row.dosingSchedule}</p>
+              </div>
+              <div>
+                <p className="mb-1 text-xs font-semibold uppercase text-gray-500 md:hidden">Treatment Duration</p>
+                <p className="text-gray-800">{row.durationDays} day(s)</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   };
 
   const formatLetterDate = (value) => {
@@ -584,7 +627,11 @@ function PatientPortal() {
               ].map(([label, value]) => (
                 <div key={label}>
                   <p className="text-sm font-semibold text-gray-700 mb-1">{label}</p>
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-800 whitespace-pre-wrap">{value}</div>
+                  {label === 'Prescription / Medications' ? (
+                    <MedicationPrescriptionTable prescription={value} />
+                  ) : (
+                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-800 whitespace-pre-wrap">{value}</div>
+                  )}
                 </div>
               ))}
             </div>
@@ -1445,7 +1492,7 @@ function PatientPortal() {
                                     
                                     <div>
                                       <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Prescription</p>
-                                      <p className="text-sm text-gray-800">{visit.prescription || 'None'}</p>
+                                      <MedicationPrescriptionTable prescription={visit.prescription} />
                                     </div>
                                     
                                     <div>

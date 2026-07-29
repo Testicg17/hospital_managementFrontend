@@ -302,7 +302,11 @@ function DoctorPortal() {
   };
 
   const getNoteValue = (notes, label) => {
-    const match = String(notes || '').match(new RegExp(`^${label}:\\s*(.*)$`, 'im'));
+    const labels = ['Diagnosis', 'Prescription', 'Tests Ordered', 'Next Checkup', 'Advice', 'Notes'];
+    const nextLabelPattern = labels
+      .filter((item) => item !== label)
+      .join('|');
+    const match = String(notes || '').match(new RegExp(`^${label}:\\s*([\\s\\S]*?)(?=\\n(?:${nextLabelPattern}):|\\n\\[|$)`, 'im'));
     return match?.[1]?.trim() || '';
   };
 
