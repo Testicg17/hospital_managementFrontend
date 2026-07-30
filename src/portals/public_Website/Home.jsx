@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, CalendarCheck, Clock, MapPin, MessageCircle, Phone } from 'lucide-react';
-import { articles, carePromises, clinic, highlights, services } from './siteData';
+import { articles, carePromises, clinic, doctor, highlights, services } from './siteData';
 import { useLanguage } from './LanguageContext';
 
 function Home() {
   const { dictionary } = useLanguage();
+  const localizedDoctor = dictionary.doctor || doctor;
   const localizedServices = services.map((service, index) => ({
     ...service,
     title: dictionary.services[index]?.[0] || service.title,
@@ -32,8 +33,10 @@ function Home() {
       <section className="relative overflow-hidden bg-white">
         <div className="absolute inset-y-0 right-0 hidden w-1/2 lg:block">
           <img
-            src="/images/logo.jpeg"
+            src="/images/logo-optimized.jpg"
             alt="Eva Fertility & Laparoscopy logo"
+            width="1200"
+            height="800"
             className="h-full w-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-white via-white/40 to-white/10" />
@@ -92,6 +95,35 @@ function Home() {
       </section>
 
       <section className="bg-white py-16">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:px-8">
+          <div className="rounded-lg border border-pink-100 bg-[#fff7fc] p-6">
+            <span className="flex h-20 w-20 overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-pink-100">
+              <img src="/images/logo-optimized.jpg" alt="Eva Fertility & Laparoscopy logo" className="h-full w-full object-cover" loading="lazy" width="80" height="80" />
+            </span>
+            <p className="mt-5 text-sm font-semibold uppercase tracking-wide text-[#e84faf]">{dictionary.labels?.leadConsultant || 'Lead Consultant'}</p>
+            <h2 className="mt-2 text-3xl font-bold text-slate-950">{localizedDoctor.name}</h2>
+            <p className="mt-2 text-lg font-semibold text-[#3157b7]">{localizedDoctor.role}</p>
+            <p className="mt-2 text-sm font-medium text-slate-600">{localizedDoctor.qualifications}</p>
+            <div className="mt-5 inline-flex rounded-lg bg-white px-4 py-2 text-sm font-bold text-[#3157b7] ring-1 ring-pink-100">
+              {localizedDoctor.experience} {dictionary.labels?.experienceSuffix || 'experience'}
+            </div>
+          </div>
+          <div className="flex flex-col justify-center">
+            <p className="text-sm font-semibold uppercase tracking-wide text-[#e84faf]">{dictionary.labels?.careFocus || 'Eva care focus'}</p>
+            <h2 className="mt-3 text-3xl font-bold text-slate-950">{localizedDoctor.focusTitle}</h2>
+            <p className="mt-4 text-base leading-7 text-slate-600">{localizedDoctor.note}</p>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {localizedDoctor.expertise.map((item) => (
+                <span key={item} className="rounded-lg border border-pink-100 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
@@ -140,7 +172,7 @@ function Home() {
           <div className="mt-8 grid gap-6 lg:grid-cols-3">
             {localizedArticles.map((article) => (
               <article key={article.slug} className="overflow-hidden rounded-lg border border-pink-100 bg-white shadow-sm">
-                <img src={article.image} alt="" className="h-48 w-full object-cover" />
+                <img src={article.image} alt={article.title} className="h-48 w-full object-cover" loading="lazy" width="600" height="300" />
                 <div className="p-5">
                   <p className="text-xs font-semibold uppercase tracking-wide text-[#e84faf]">{article.category}</p>
                   <h3 className="mt-2 text-lg font-bold text-slate-950">{article.title}</h3>

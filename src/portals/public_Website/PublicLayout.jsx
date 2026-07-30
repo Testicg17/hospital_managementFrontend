@@ -1,8 +1,19 @@
 import React, { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { CalendarCheck, Menu, Phone, X } from 'lucide-react';
+import SEO from '../../components/SEO';
 import { clinic } from './siteData';
 import { languageOptions, useLanguage } from './LanguageContext';
+import Breadcrumbs from './Breadcrumbs';
+import {
+  breadcrumbSchema,
+  doctorSchema,
+  medicalClinicSchema,
+  organizationSchema,
+  seoPages,
+  webPageSchema,
+  websiteSchema,
+} from './seoData';
 
 const navItems = [
   { key: 'home', to: '/' },
@@ -15,7 +26,18 @@ const navItems = [
 
 function PublicLayout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
   const { language, setLanguage, dictionary } = useLanguage();
+  const normalizedPath = location.pathname.replace(/\/$/, '') || '/';
+  const pageSeo = seoPages[normalizedPath];
+  const pathSegments = normalizedPath.split('/').filter(Boolean);
+  const breadcrumbItems = [
+    { name: 'Home', path: '/' },
+    ...pathSegments.map((segment, index) => ({
+      name: segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' '),
+      path: `/${pathSegments.slice(0, index + 1).join('/')}`,
+    })),
+  ];
   const linkClass = ({ isActive }) =>
     `px-3 py-2 text-sm font-medium transition ${isActive ? 'text-[#e84faf]' : 'text-slate-600 hover:text-[#e84faf]'}`;
   const LanguageSelect = ({ compact = false }) => (
@@ -40,13 +62,16 @@ function PublicLayout({ children }) {
           <Link to="/" className="flex min-w-0 flex-1 items-center gap-3 lg:max-w-[520px] xl:max-w-[620px]">
             <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-pink-100">
               <img
-                src="/images/logo.jpeg"
+                src="/images/logo-optimized.jpg"
                 alt="Eva Fertility & Laparoscopy logo"
+                width="48"
+                height="48"
                 className="h-full w-full object-cover"
               />
             </span>
             <span className="min-w-0">
               <span className="block truncate text-base font-bold leading-tight text-[#3157b7] xl:text-lg 2xl:text-xl">{clinic.name}</span>
+              {clinic.localName && <span className="block truncate text-xs font-semibold text-[#3157b7]">{clinic.localName}</span>}
               <span className="block truncate text-xs font-medium text-pink-500 xl:text-sm">{dictionary.clinic.tagline}</span>
             </span>
           </Link>
@@ -111,17 +136,36 @@ function PublicLayout({ children }) {
           </div>
         )}
       </header>
+      <Breadcrumbs />
 
+      {pageSeo && !normalizedPath.startsWith('/blog/') && !normalizedPath.startsWith('/articles/') && (
+        <SEO
+          {...pageSeo}
+          path={normalizedPath}
+          locale={language === 'hi' ? 'hi_IN' : language === 'mr' ? 'mr_IN' : 'en_IN'}
+          schemas={[
+            organizationSchema,
+            websiteSchema,
+            medicalClinicSchema,
+            doctorSchema,
+            webPageSchema({ path: normalizedPath, title: pageSeo.title, description: pageSeo.description }),
+            breadcrumbSchema(breadcrumbItems),
+          ]}
+        />
+      )}
       <main>{children}</main>
 
       <footer className="bg-[#17245c] text-white">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-4 lg:px-8">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 md:grid-cols-5 lg:px-8">
           <div className="md:col-span-2">
             <div className="flex items-center gap-3">
               <span className="flex h-12 w-12 overflow-hidden rounded-lg bg-white shadow-sm">
-                <img src="/images/logo.jpeg" alt="Eva Fertility & Laparoscopy logo" className="h-full w-full object-cover" />
+                <img src="/images/logo-optimized.jpg" alt="Eva Fertility & Laparoscopy logo" className="h-full w-full object-cover" loading="lazy" width="48" height="48" />
               </span>
-              <span className="text-xl font-bold">{clinic.name}</span>
+              <span>
+                <span className="block text-xl font-bold">{clinic.name}</span>
+                {clinic.localName && <span className="block text-sm text-pink-200">{clinic.localName}</span>}
+              </span>
             </div>
             <p className="mt-4 max-w-xl text-sm leading-6 text-slate-300">
               {dictionary.clinic.footer}
@@ -145,6 +189,27 @@ function PublicLayout({ children }) {
               ))}
             </div>
           </div>
+          <div>
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-pink-200">Pages</h3>
+            <nav className="mt-3 grid gap-2 text-sm text-slate-300" aria-label="Footer navigation">
+              {navItems.map((item) => (
+                <Link key={item.key} to={item.to} className="hover:text-white">{dictionary.nav[item.key]}</Link>
+              ))}
+            </nav>
+          </div>
+        </div>
+        <div className="border-t border-indigo-300/20 px-4 py-4 text-center sm:px-6 lg:px-8">
+          <a
+            href="https://www.webiconss.com/"
+            target="_blank"
+            rel="noreferrer"
+            className="group relative inline-flex text-xs text-slate-300 hover:text-white"
+          >
+            Design & Developed by&nbsp;<span className="font-bold text-white">WSS</span>
+            <span className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-full bg-slate-950 px-3 py-1.5 text-xs text-white opacity-0 shadow-lg transition group-hover:translate-y-0 group-hover:opacity-100">
+              Webicon Software Solutions
+            </span>
+          </a>
         </div>
       </footer>
     </div>

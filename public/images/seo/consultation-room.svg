@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Consultation room illustration</title>
+  <desc id="desc">A doctor consultation room with table, chair, and care records.</desc>
+  <rect width="1200" height="720" fill="#fff7fc"/>
+  <rect x="126" y="124" width="948" height="472" rx="34" fill="#fff" stroke="#f7cde7" stroke-width="4"/>
+  <rect x="248" y="365" width="704" height="44" rx="22" fill="#3157b7"/>
+  <rect x="346" y="408" width="64" height="130" rx="18" fill="#3157b7" opacity=".82"/>
+  <rect x="790" y="408" width="64" height="130" rx="18" fill="#3157b7" opacity=".82"/>
+  <circle cx="370" cy="284" r="48" fill="#e84faf"/>
+  <path d="M300 350c18-67 122-67 140 0" fill="none" stroke="#f7b5da" stroke-width="22" stroke-linecap="round"/>
+  <rect x="626" y="222" width="214" height="116" rx="18" fill="#edf4ff" stroke="#d7e4ff" stroke-width="4"/>
+  <path d="M666 266h134M666 304h96" stroke="#3157b7" stroke-width="12" stroke-linecap="round"/>
+  <path d="M881 240v58M852 269h58" stroke="#0ca678" stroke-width="14" stroke-linecap="round"/>
+</svg>

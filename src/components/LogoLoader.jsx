@@ -14,7 +14,7 @@ function LogoLoader({
         <span className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#e84faf] border-r-[#3157b7] animate-spin" />
         <span className="absolute inset-2 flex items-center justify-center overflow-hidden rounded-full bg-white shadow-lg">
           <img
-            src="/images/logo.jpeg"
+            src="/images/logo-optimized.jpg"
             alt="Hospital Logo"
             className={`${compact ? 'h-7 w-7' : 'h-12 w-12'} animate-pulse object-contain`}
           />

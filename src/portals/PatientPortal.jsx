@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Calendar, CreditCard, Phone, Mail, LogOut, Activity, Clock, AlertCircle, Eye, RefreshCw, FileText, X, History, MapPin, Plus, Printer } from 'lucide-react';
 import LogoLoader from '../components/LogoLoader';
 import BrandMark from '../components/BrandMark';
+import SEO from '../components/SEO';
 
 const API_ROOT_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
 const API_BASE_URL = `${API_ROOT_URL}/patient-portal`;
@@ -546,7 +547,7 @@ function PatientPortal() {
       <body>
         <div class="letter">
           <div class="header">
-            <img class="logo" src="/images/logo.jpeg" alt="Hospital Logo" />
+            <img class="logo" src="/images/logo-optimized.jpg" alt="Hospital Logo" />
             <div>
               <h1>${escapeHtml(process.env.REACT_APP_HOSPITAL_NAME || 'Eva Fertility & Laparoscopy')}</h1>
               <div class="muted">Consultation Letter</div>
@@ -769,6 +770,7 @@ function PatientPortal() {
   if (step === 'email' || step === 'otp') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center p-4">
+        <SEO title="Patient Portal | Eva Fertility & Laparoscopy" description="Private patient portal login." path="/patient" robots="noindex, nofollow" />
         <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
           <div className="text-center mb-8">
             <BrandMark size="lg" centered title="Eva Fertility & Laparoscopy" subtitle={step === 'email' ? 'Patient Portal Login' : 'Patient Verification'} />
@@ -1327,6 +1329,7 @@ function PatientPortal() {
   // Main Portal
   return (
     <div className="min-h-screen bg-gray-100">
+      <SEO title="Patient Portal | Eva Fertility & Laparoscopy" description="Private patient portal." path="/patient" robots="noindex, nofollow" />
       {dataLoading && <LogoLoader overlay label="Loading patient portal data..." />}
       {loading && step === 'portal' && <LogoLoader overlay label="Processing request..." />}
       <nav className="bg-white shadow-lg">

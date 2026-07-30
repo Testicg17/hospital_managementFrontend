@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Calendar, FileText, LogOut, LogIn, AlertCircle, Check, X, Eye, Stethoscope, Pill, FlaskConical, History, ClipboardList, Mail, Send, MapPin, Plus, Printer } from 'lucide-react';
 import LogoLoader from '../components/LogoLoader';
 import BrandMark from '../components/BrandMark';
+import SEO from '../components/SEO';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
 
@@ -553,7 +554,7 @@ function DoctorPortal() {
         <body>
           <div class="letter">
             <div class="header">
-              <img class="logo" src="/images/logo.jpeg" alt="Hospital Logo" />
+              <img class="logo" src="/images/logo-optimized.jpg" alt="Hospital Logo" />
               <div>
                 <h1>${escapeHtml(process.env.REACT_APP_HOSPITAL_NAME || 'Eva Fertility & Laparoscopy')}</h1>
                 <div class="muted">Consultation Letter</div>
@@ -1787,11 +1788,17 @@ function DoctorPortal() {
   };
 
   if (!isLoggedIn) {
-    return <LoginScreen />;
+    return (
+      <>
+        <SEO title="Doctor Portal | Eva Fertility & Laparoscopy" description="Private doctor portal." path="/doctor" robots="noindex, nofollow" />
+        <LoginScreen />
+      </>
+    );
   }
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <SEO title="Doctor Portal | Eva Fertility & Laparoscopy" description="Private doctor portal." path="/doctor" robots="noindex, nofollow" />
       {loading && isLoggedIn && <LogoLoader overlay label="Processing request..." />}
       <nav className="bg-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

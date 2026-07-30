@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Clinic care walkthrough illustration</title>
+  <desc id="desc">A video-style clinic walkthrough thumbnail with a play button and care pathway cards.</desc>
+  <rect width="1200" height="720" fill="#062b25"/>
+  <rect x="132" y="104" width="936" height="512" rx="34" fill="#0f766e"/>
+  <rect x="204" y="174" width="268" height="164" rx="22" fill="#fff" opacity=".16"/>
+  <rect x="204" y="382" width="268" height="164" rx="22" fill="#fff" opacity=".16"/>
+  <rect x="728" y="174" width="268" height="164" rx="22" fill="#fff" opacity=".16"/>
+  <rect x="728" y="382" width="268" height="164" rx="22" fill="#fff" opacity=".16"/>
+  <circle cx="600" cy="360" r="92" fill="#fff"/>
+  <path d="M574 310v100l84-50z" fill="#e84faf"/>
+  <path d="M277 258h122M277 466h122M800 258h122M800 466h122" stroke="#f7b5da" stroke-width="14" stroke-linecap="round"/>
+</svg>

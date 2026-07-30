@@ -1,4 +1,6 @@
 import { useMemo } from "react";
+import SEO from "../../components/SEO";
+import { doctorSchema, medicalClinicSchema, organizationSchema, seoPages, webPageSchema, websiteSchema } from "./seoData";
 
 /**
  * ============================================================
@@ -10,9 +12,9 @@ const CONFIG = {
   name: "Eva Fertility and Laparoscopy",
   namemarathi: "(स्त्री क्लिनिक)",
   credentials: "Dr. Raveendra Gondhali",
-  specialty: "MBBS, MS (Gynecology) F.MAS.",
-  specialty1: "Fellowship & Ex.Asst.Professor  in Reproductive Medicine(ivf) & endoscopy Surgery.",
-  photoUrl: "/images/logo.jpeg", // paste an image URL here, or leave blank for the monogram
+  specialty: "MBBS, MS (Gynecology), F.MAS.",
+  specialty1: "Fellowship & Ex. Asst. Professor in Reproductive Medicine (IVF) & Endoscopy Surgery.",
+  photoUrl: "/images/logo-optimized.jpg", // paste an image URL here, or leave blank for the monogram
 
 areas: [
   {
@@ -224,6 +226,21 @@ const currentSession = useMemo(() => {
 
   return (
     <div className="page">
+      <SEO
+        {...seoPages["/DrRaveendraGondhali"]}
+        path="/DrRaveendraGondhali"
+        schemas={[
+          organizationSchema,
+          websiteSchema,
+          medicalClinicSchema,
+          doctorSchema,
+          webPageSchema({
+            path: "/DrRaveendraGondhali",
+            title: seoPages["/DrRaveendraGondhali"].title,
+            description: seoPages["/DrRaveendraGondhali"].description,
+          }),
+        ]}
+      />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
@@ -314,7 +331,7 @@ const currentSession = useMemo(() => {
           overflow: hidden;
         }
         .avatar img { width: 100%; height: 100%; object-fit: cover; }
-        .hero-text { min-width: 0; flex: 1; }
+        .hero-text { min-width: 0; flex: 1; overflow: visible; }
         .name {
           font-family: var(--serif);
           font-weight: 600;
@@ -323,10 +340,13 @@ const currentSession = useMemo(() => {
           margin: 0;
         }
         .cred-spec {
-          font-size: clamp(13px, 2.4vw, 15px);
+          font-size: clamp(12px, 2.1vw, 15px);
           opacity: 0.92;
           margin-top: 6px;
-          line-height: 1.45;
+          line-height: 1.4;
+          max-width: 100%;
+          overflow-wrap: anywhere;
+          white-space: normal;
         }
         .status-row {
           display: inline-flex; align-items: center; gap: 7px;
@@ -339,6 +359,22 @@ const currentSession = useMemo(() => {
           padding: 5px 12px 5px 9px;
           border-radius: 999px;
         }
+        .status {
+          display: inline-flex;
+          flex-direction: column;
+          gap: 1px;
+          line-height: 1.1;
+        }
+        .status-main,
+        .status-session {
+          display: block;
+          white-space: nowrap;
+        }
+        .status-session {
+          font-size: 0.92em;
+          opacity: 0.95;
+        }
+        .status-legacy { display: none; }
         .dot {
           width: 7px; height: 7px; border-radius: 50%;
           background: ${isOpen ? "#7CE0B8" : "#f2a7a7"};
@@ -656,6 +692,44 @@ const currentSession = useMemo(() => {
             transform:translateY(-4px) scale(1.08);
             filter:brightness(1.05);
         }
+        .developer-credit {
+          align-self: center;
+          position: relative;
+          display: inline-flex;
+          justify-content: center;
+          color: rgba(255,255,255,0.72);
+          font-size: 11px;
+          letter-spacing: 0.02em;
+          text-decoration: none;
+        }
+        .developer-credit strong {
+          color: #fff;
+          font-weight: 700;
+        }
+        .developer-credit::after {
+          content: "Webicon Software Solutions";
+          position: absolute;
+          bottom: calc(100% + 8px);
+          left: 50%;
+          transform: translateX(-50%) translateY(4px);
+          white-space: nowrap;
+          border-radius: 999px;
+          background: rgba(2, 18, 17, 0.92);
+          color: #fff;
+          padding: 6px 10px;
+          font-size: 11px;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.16s ease, transform 0.16s ease;
+          box-shadow: var(--shadow-sm);
+        }
+        .developer-credit:hover {
+          color: #fff;
+        }
+        .developer-credit:hover::after {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
         .qr-mini {
           display: flex; align-items: center; gap: 10px;
           min-width: 0;
@@ -748,9 +822,10 @@ const currentSession = useMemo(() => {
           .cred-spec {
             font-size: clamp(11px, 2.8vw, 13px);
             margin-top: 3px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            overflow-wrap: anywhere;
           }
           .status-row {
             font-size: clamp(10.5px, 2.4vw, 12px);
@@ -864,7 +939,11 @@ const currentSession = useMemo(() => {
                 <div className="grid2">
                   <div className="status-row">
                      <span className={`dot ${isOpen ? "open" : ""}`} />
-           <div className={`status ${isOpen ? "open" : "closed"}`}>
+                     <div className={`status ${isOpen ? "open" : "closed"}`}>
+                       <span className="status-main">{isOpen ? "Open Now" : "Closed"}</span>
+                       {isOpen && currentSession && <span className="status-session">{currentSession}</span>}
+                     </div>
+           <div className={`status status-legacy ${isOpen ? "open" : "closed"}`}>
   <span className="dot"></span>
 
   {isOpen
@@ -968,6 +1047,9 @@ const currentSession = useMemo(() => {
         </div>
         <div className="book-appointment">
 </div>
+        <a className="developer-credit" href="https://www.webiconss.com/" target="_blank" rel="noreferrer">
+          Design & Developed by&nbsp;<strong>WSS</strong>
+        </a>
         {/* SOCIAL + QR */}
        
       </div>

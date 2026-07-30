@@ -5,6 +5,7 @@ import Home from './Home';
 import About from './About';
 import Services from './services';
 import Articles from './Articles';
+import ArticleDetail from './ArticleDetail';
 import Gallery from './Gallery';
 import Contact from './Contact';
 import { LanguageProvider } from './LanguageContext';
@@ -18,6 +19,10 @@ function PublicWebsite() {
           <Route path="about" element={<About />} />
           <Route path="services" element={<Services />} />
           <Route path="articles" element={<Articles />} />
+          <Route path="articles/:slug" element={<ArticleDetail />} />
+          <Route path="blog" element={<Articles />} />
+          <Route path="blog/:slug" element={<ArticleDetail />} />
+          <Route path="doctors" element={<Navigate to="/DrRaveendraGondhali" replace />} />
           <Route path="gallery" element={<Gallery />} />
           <Route path="contact" element={<Contact />} />
           <Route path="*" element={<Navigate to="/" replace />} />

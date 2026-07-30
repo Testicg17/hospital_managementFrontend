@@ -1,3 +1,10 @@
-# https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /admin
+Disallow: /doctor
+Disallow: /patient
+Disallow: /dashboard
+Disallow: /api
+Disallow: /*?token=
+
+Sitemap: https://evafertilitypune.com/sitemap.xml

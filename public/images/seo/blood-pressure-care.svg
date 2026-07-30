@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Blood pressure care illustration</title>
+  <desc id="desc">A heart health and blood pressure monitoring illustration for patient education.</desc>
+  <rect width="1200" height="720" fill="#f8fbff"/>
+  <circle cx="296" cy="360" r="180" fill="#fce3f3"/>
+  <path d="M296 478s-132-79-132-179c0-58 67-91 118-43 51-48 118-15 118 43 0 100-104 162-104 179z" fill="#e84faf"/>
+  <path d="M148 366h98l34-76 53 145 38-69h100" fill="none" stroke="#3157b7" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="575" y="174" width="448" height="372" rx="36" fill="#fff" stroke="#d7e4ff" stroke-width="4"/>
+  <circle cx="799" cy="328" r="104" fill="#edf4ff" stroke="#3157b7" stroke-width="16"/>
+  <path d="M799 328l66-48M799 328l-52-36" stroke="#e84faf" stroke-width="14" stroke-linecap="round"/>
+  <rect x="670" y="476" width="258" height="38" rx="14" fill="#e8fbf4"/>
+  <circle cx="957" cy="211" r="42" fill="#e84faf" opacity=".18"/>
+</svg>

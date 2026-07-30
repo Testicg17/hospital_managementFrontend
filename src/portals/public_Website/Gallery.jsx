@@ -30,12 +30,13 @@ function Gallery() {
                     className="h-full w-full"
                     src={item.src}
                     title={item.title}
+                    loading="lazy"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
                 </div>
               ) : (
-                <img src={item.src} alt={item.title} className="h-72 w-full object-cover" />
+                <img src={item.src} alt={item.title} className="h-72 w-full object-cover" loading="lazy" width="600" height="360" />
               )}
               <div className="flex items-center gap-2 p-4">
                 {item.type === 'video' && <PlayCircle size={20} className="text-[#e84faf]" />}

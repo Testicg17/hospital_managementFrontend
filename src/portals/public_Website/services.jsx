@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { CalendarCheck } from 'lucide-react';
-import { services } from './siteData';
+import { doctor, services } from './siteData';
 import { useLanguage } from './LanguageContext';
 
 function Services() {
   const { dictionary } = useLanguage();
+  const localizedDoctor = dictionary.doctor || doctor;
   const localizedServices = services.map((service, index) => ({
     ...service,
     title: dictionary.services[index]?.[0] || service.title,
@@ -31,6 +32,19 @@ function Services() {
               <p className="mt-3 text-sm leading-6 text-slate-600">{description}</p>
             </article>
           ))}
+        </div>
+
+        <div className="mt-10 rounded-lg border border-pink-100 bg-[#fff7fc] p-6">
+          <p className="text-sm font-semibold uppercase tracking-wide text-[#e84faf]">{dictionary.labels?.clinicalFocusAreas || 'Clinical focus areas'}</p>
+          <h2 className="mt-2 text-2xl font-bold text-slate-950">{localizedDoctor.name}</h2>
+          <p className="mt-2 text-sm font-semibold text-[#3157b7]">{localizedDoctor.role} | {localizedDoctor.qualifications}</p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {localizedDoctor.expertise.map((item) => (
+              <span key={item} className="rounded-lg bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-pink-100">
+                {item}
+              </span>
+            ))}
+          </div>
         </div>
 
         <div className="mt-12 flex flex-col items-start justify-between gap-5 rounded-lg bg-[#17245c] p-6 text-white md:flex-row md:items-center">

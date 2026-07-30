@@ -19,7 +19,7 @@ function BrandMark({
     <div className={`flex items-center gap-3 ${centered ? 'flex-col text-center' : ''} ${className}`}>
       <span className={`flex ${selected.wrap} shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-pink-100`}>
         <img
-          src="/images/logo.jpeg"
+          src="/images/logo-optimized.jpg"
           alt={`${title} logo`}
           className={`${selected.image} object-contain`}
         />

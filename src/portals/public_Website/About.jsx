@@ -1,9 +1,11 @@
 import React from 'react';
 import { Award, HeartHandshake, UsersRound } from 'lucide-react';
+import { clinic, doctor } from './siteData';
 import { useLanguage } from './LanguageContext';
 
 function About() {
   const { dictionary } = useLanguage();
+  const localizedDoctor = dictionary.doctor || doctor;
   const cards = [
     { title: dictionary.about.cards[0], icon: HeartHandshake },
     { title: dictionary.about.cards[1], icon: UsersRound },
@@ -29,11 +31,23 @@ function About() {
               </div>
             ))}
           </div>
+          <div className="mt-8 rounded-lg border border-pink-100 bg-[#fff7fc] p-5">
+            <p className="text-sm font-semibold uppercase tracking-wide text-[#e84faf]">{dictionary.labels?.doctorProfile || 'Doctor profile'}</p>
+            <h2 className="mt-2 text-2xl font-bold text-slate-950">{localizedDoctor.name}</h2>
+            <p className="mt-1 font-semibold text-[#3157b7]">{localizedDoctor.role}</p>
+            <p className="mt-1 text-sm text-slate-600">{localizedDoctor.qualifications} | {localizedDoctor.experience} {dictionary.labels?.experienceSuffix || 'experience'}</p>
+            <p className="mt-4 text-sm leading-6 text-slate-600">
+              {localizedDoctor.aboutNote || `Practicing at ${clinic.address}.`}
+            </p>
+          </div>
         </div>
         <div className="overflow-hidden rounded-lg">
           <img
-            src="https://images.unsplash.com/photo-1550831107-1553da8c8464?auto=format&fit=crop&w=1200&q=80"
-            alt="Care team in consultation"
+            src="/images/seo/care-consultation.svg"
+            alt="Eva Fertility consultation care illustration"
+            loading="lazy"
+            width="1200"
+            height="800"
             className="h-full min-h-[420px] w-full object-cover"
           />
         </div>

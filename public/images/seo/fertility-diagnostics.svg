@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">Fertility diagnostics illustration</title>
+  <desc id="desc">A fertility diagnostics illustration with microscope, reports, and clinical care symbols.</desc>
+  <rect width="1200" height="720" fill="#f8fbff"/>
+  <rect x="122" y="126" width="956" height="468" rx="36" fill="#fff" stroke="#d7e4ff" stroke-width="4"/>
+  <path d="M365 458h250" stroke="#3157b7" stroke-width="26" stroke-linecap="round"/>
+  <path d="M483 228l78 78-132 132-78-78z" fill="#e84faf" opacity=".9"/>
+  <path d="M585 310l88 88" stroke="#3157b7" stroke-width="24" stroke-linecap="round"/>
+  <circle cx="693" cy="424" r="58" fill="#edf4ff" stroke="#3157b7" stroke-width="14"/>
+  <rect x="770" y="230" width="202" height="254" rx="20" fill="#fff7fc" stroke="#f7cde7" stroke-width="4"/>
+  <path d="M812 286h118M812 342h92M812 398h124" stroke="#e84faf" stroke-width="12" stroke-linecap="round"/>
+  <path d="M286 250c40-42 103-42 143 0" fill="none" stroke="#0ca678" stroke-width="14" stroke-linecap="round"/>
+</svg>

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Calendar, Users, Activity, AlertCircle, TrendingUp, UserPlus, Search, X, Edit2, Trash2, Bell, Phone, Mail, LogOut, LogIn, Eye, Printer, Download, Shield, UserCog, MapPin, Building2, Clock } from 'lucide-react';
 import LogoLoader from '../components/LogoLoader';
 import BrandMark from '../components/BrandMark';
+import SEO from '../components/SEO';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
 
@@ -1511,7 +1512,14 @@ function AdminPortal() {
   };
 
   // ─── Render ──────────────────────────────────────────────────────────────────
-  if (!isLoggedIn) return <LoginForm />;
+  if (!isLoggedIn) {
+    return (
+      <>
+        <SEO title="Admin Portal | Eva Fertility & Laparoscopy" description="Private hospital administration portal login." path="/admin" robots="noindex, nofollow" />
+        <LoginForm />
+      </>
+    );
+  }
 
   const tabs = [
     { id: 'dashboard',    label: 'Dashboard',    icon: Activity },
@@ -1524,6 +1532,7 @@ function AdminPortal() {
 
   return (
     <div className="min-h-screen bg-gray-100">
+      <SEO title="Admin Portal | Eva Fertility & Laparoscopy" description="Private hospital administration portal." path="/admin" robots="noindex, nofollow" />
       <nav className="bg-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
