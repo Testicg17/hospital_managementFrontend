@@ -33,6 +33,9 @@ const dictionaries = {
       subtitle: 'Specialist fertility, gynecology, IVF guidance, pregnancy planning, and minimally invasive laparoscopy care with Dr. Raveendra Gondhali in Thergaon, Pune.',
       programsEyebrow: 'Care programs',
       programsTitle: 'Fertility and women care services',
+      successEyebrow: 'Patient thoughts',
+      successTitle: 'Our Success Stories',
+      successSubtitle: 'Anonymized patient feedback focused on communication, comfort, and guided follow-up care.',
       articlesEyebrow: 'Articles',
       articlesTitle: 'Fertility and women wellness notes',
     },
@@ -103,6 +106,11 @@ const dictionaries = {
       ['Specialist-led care', 'Consultation guided by obstetrics, gynecology, infertility, IVF, and minimally invasive surgery experience.'],
       ['Clear treatment steps', 'Structured plans for investigations, cycles, procedures, and follow-up care.'],
       ['Sensitive counseling', 'Private, respectful conversations for fertility, women wellness, pregnancy planning, and procedure care.'],
+    ],
+    successStories: [
+      ['Clear counseling from the first visit', 'The consultation felt private and calm. Reports were explained clearly, and we understood the next steps without confusion.', 'Structured fertility evaluation and follow-up plan'],
+      ['Confidence before procedure planning', 'The doctor explained why laparoscopy was advised, what to expect, and how recovery would be monitored.', 'Procedure counseling with careful recovery guidance'],
+      ['Supportive follow-up care', 'Appointments, medicines, and review dates were explained in simple language. It helped us feel more prepared.', 'Personalized care plan and review schedule'],
     ],
     articles: [
       ['Endometriosis and intimate health: why symptoms deserve sensitive discussion', 'Published Research', 'A patient-friendly summary of research on endometriosis, pain, and female sexual health in Indian women.'],
@@ -317,6 +325,8 @@ Object.assign(dictionaries.en, {
     patientTakeaway: 'Patient takeaway',
     viewSource: 'View source',
     experienceSuffix: 'experience',
+    achievements: 'Achievements',
+    conferencesAttended: 'Conferences Attended',
   },
   doctor: {
     name: 'Dr. Raveendra Gondhali',
@@ -339,6 +349,12 @@ Object.assign(dictionaries.en, {
 });
 
 Object.assign(dictionaries.hi, {
+  home: {
+    ...dictionaries.hi.home,
+    successEyebrow: 'मरीजों के विचार',
+    successTitle: 'हमारी सफलता की कहानियां',
+    successSubtitle: 'गोपनीय मरीज प्रतिक्रिया, जिसमें संवाद, आराम और व्यवस्थित फॉलो-अप पर ध्यान है.',
+  },
   labels: {
     leadConsultant: 'मुख्य सलाहकार',
     careFocus: 'ईवा केयर फोकस',
@@ -348,6 +364,8 @@ Object.assign(dictionaries.hi, {
     patientTakeaway: 'मरीज के लिए मुख्य बात',
     viewSource: 'स्रोत देखें',
     experienceSuffix: 'अनुभव',
+    achievements: 'उपलब्धियां',
+    conferencesAttended: 'सम्मेलन सहभागिता',
   },
   doctor: {
     name: 'डॉ. रवींद्र गोंधली',
@@ -401,6 +419,12 @@ Object.assign(dictionaries.hi, {
 });
 
 Object.assign(dictionaries.mr, {
+  home: {
+    ...dictionaries.mr.home,
+    successEyebrow: 'रुग्णांचे विचार',
+    successTitle: 'आमच्या यशोगाथा',
+    successSubtitle: 'गोपनीय रुग्ण प्रतिक्रिया, ज्यात संवाद, आराम आणि व्यवस्थित फॉलो-अपवर भर आहे.',
+  },
   labels: {
     leadConsultant: 'मुख्य सल्लागार',
     careFocus: 'ईवा केअर फोकस',
@@ -410,6 +434,8 @@ Object.assign(dictionaries.mr, {
     patientTakeaway: 'रुग्णांसाठी महत्त्वाची गोष्ट',
     viewSource: 'स्रोत पहा',
     experienceSuffix: 'अनुभव',
+    achievements: 'उपलब्धी',
+    conferencesAttended: 'परिषद सहभाग',
   },
   doctor: {
     name: 'डॉ. रवींद्र गोंधळी',

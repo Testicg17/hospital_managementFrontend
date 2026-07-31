@@ -12,7 +12,7 @@ const CONFIG = {
   credentials: "Dr. Raveendra Gondhali",
   specialty: "MBBS, MS (Gynecology) F.MAS.",
   specialty1: "Fellowship&Ex.Asst.Professor  in Reproductive Medicine(ivf)& endoscopy Surgery.",
-  photoUrl: "/images/logo-optimized.jpg", // paste an image URL here, or leave blank for the monogram
+  photoUrl: "/images/seo/DrRaveendraGondhali.jpeg", // paste an image URL here, or leave blank for the monogram
 
 areas: [
   {

@@ -48,6 +48,35 @@ const getLocationEndTime = (location) => (
   location?.appointment_end_time || location?.appointmentEndTime || location?.appointment_to_time || location?.appointmentToTime || location?.end_time || location?.to_time || location?.toTime || ''
 );
 
+const padDatePart = (value) => String(value).padStart(2, '0');
+
+const toDateInputValue = (date) => (
+  `${date.getFullYear()}-${padDatePart(date.getMonth() + 1)}-${padDatePart(date.getDate())}`
+);
+
+const getAppointmentScheduleLimits = () => {
+  const now = new Date();
+  const minDateTime = new Date(now.getTime() + (2 * 60 * 60 * 1000));
+  const maxDate = new Date(now);
+  maxDate.setMonth(maxDate.getMonth() + 1);
+
+  return {
+    minDate: toDateInputValue(now),
+    maxDate: toDateInputValue(maxDate),
+    minDateTime,
+  };
+};
+
+const parseAppointmentDateTime = (dateValue, timeValue = '00:00') => {
+  if (!dateValue) return null;
+
+  const [year, month, day] = dateValue.split('-').map(Number);
+  const [hour = 0, minute = 0] = String(timeValue || '00:00').split(':').map(Number);
+
+  if ([year, month, day, hour, minute].some(Number.isNaN)) return null;
+  return new Date(year, month - 1, day, hour, minute, 0, 0);
+};
+
 const buildFallbackSlots = (location) => {
   const start = getLocationStartTime(location);
   const end = getLocationEndTime(location);
@@ -81,6 +110,7 @@ function Contact() {
   const [alert, setAlert] = useState(null);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+  const scheduleLimits = useMemo(() => getAppointmentScheduleLimits(), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -146,7 +176,7 @@ function Contact() {
     const cleanedPhone = data.phone.replace(/\D/g, '');
     const trimmedEmail = data.email.trim();
     const age = Number(data.age);
-    const today = new Date().toISOString().split('T')[0];
+    const { minDate, maxDate, minDateTime } = scheduleLimits;
 
     if (!trimmedName) {
       nextErrors.name = 'Patient name is required.';
@@ -188,12 +218,19 @@ function Contact() {
 
     if (!data.date) {
       nextErrors.date = 'Appointment date is required.';
-    } else if (data.date < today) {
+    } else if (data.date < minDate) {
       nextErrors.date = 'Appointment date cannot be in the past.';
+    } else if (data.date > maxDate) {
+      nextErrors.date = 'Appointment date must be within 1 month from today.';
     }
 
     if (!data.time) {
       nextErrors.time = 'Select an available appointment time.';
+    } else {
+      const selectedDateTime = parseAppointmentDateTime(data.date, data.time);
+      if (!selectedDateTime || selectedDateTime < minDateTime) {
+        nextErrors.time = 'Select a time at least 2 hours from now.';
+      }
     }
 
     if (data.message.trim().length > MAX_MESSAGE_LENGTH) {
@@ -240,8 +277,15 @@ function Contact() {
   };
 
   const hasSlotLookupInput = Boolean(formData.hospitalLocationId && formData.date);
-  const selectableSlots = availableSlots.filter((slot) => slot.available !== false && !slot.booked);
-  const cannotSubmit = submitting;
+  const isSlotInsideScheduleWindow = (time) => {
+    const selectedDateTime = parseAppointmentDateTime(formData.date, time);
+    if (!selectedDateTime) return false;
+    return selectedDateTime >= scheduleLimits.minDateTime && formData.date <= scheduleLimits.maxDate;
+  };
+  const selectableSlots = availableSlots.filter((slot) => (
+    slot.available !== false && !slot.booked && isSlotInsideScheduleWindow(slot.time)
+  ));
+  const cannotSubmit = submitting || Boolean(formData.date && (formData.date < scheduleLimits.minDate || formData.date > scheduleLimits.maxDate));
 
   const localizedServices = services.map((service, index) => ({
     ...service,
@@ -455,11 +499,17 @@ function Contact() {
             </label>
             <label className="block text-sm font-medium text-slate-700">
               {dictionary.contactPage.date}
-              <input required type="date" min={new Date().toISOString().split('T')[0]} value={formData.date}
+              <input
+                required
+                type="date"
+                min={scheduleLimits.minDate}
+                max={scheduleLimits.maxDate}
+                value={formData.date}
                 onBlur={() => markFieldTouched('date')}
                 onChange={(event) => handleDateChange(event.target.value)}
                 className={inputClassName('date')} />
               {renderFieldError('date')}
+              <p className="mt-1 text-xs text-slate-500">Booking allowed from today up to 1 month ahead.</p>
             </label>
             <label className="block text-sm font-medium text-slate-700">
               {dictionary.contactPage.time}
@@ -481,15 +531,19 @@ function Contact() {
                         : dictionary.contactPage.noAvailableSlots}
                 </option>
                 {availableSlots.map((slot) => {
+                  const isOutsideScheduleWindow = !isSlotInsideScheduleWindow(slot.time);
                   const isBooked = slot.available === false || slot.booked;
                   return (
-                    <option key={slot.time} value={slot.time} disabled={isBooked}>
-                      {slot.time}{isBooked ? ` - ${dictionary.contactPage.booked}` : ''}
+                    <option key={slot.time} value={slot.time} disabled={isBooked || isOutsideScheduleWindow}>
+                      {slot.time}
+                      {isBooked ? ` - ${dictionary.contactPage.booked}` : ''}
+                      {!isBooked && isOutsideScheduleWindow ? ' - Not available' : ''}
                     </option>
                   );
                 })}
               </select>
               {renderFieldError('time')}
+              <p className="mt-1 text-xs text-slate-500">Same-day appointments must be at least 2 hours from now.</p>
               {loadingSlots && (
                 <div className="mt-2 rounded-lg border border-pink-100 bg-white py-3">
                   <LogoLoader compact label={dictionary.contactPage.loadingTimes} />

@@ -72,6 +72,36 @@ export const carePromises = [
   { title: 'Safe procedures', icon: Syringe, text: 'Sterile clinical workflows and careful medication guidance.' },
 ];
 
+export const successStories = [
+  {
+    initials: 'A.P.',
+    location: 'Thergaon',
+    careType: 'Fertility guidance',
+    rating: 5,
+    title: 'Clear counseling from the first visit',
+    quote: 'The consultation felt private and calm. Reports were explained clearly, and we understood the next steps without confusion.',
+    result: 'Structured fertility evaluation and follow-up plan',
+  },
+  {
+    initials: 'S.K.',
+    location: 'Pimpri-Chinchwad',
+    careType: 'Laparoscopy care',
+    rating: 5,
+    title: 'Confidence before procedure planning',
+    quote: 'The doctor explained why laparoscopy was advised, what to expect, and how recovery would be monitored.',
+    result: 'Procedure counseling with careful recovery guidance',
+  },
+  {
+    initials: 'M.R.',
+    location: 'Wakad',
+    careType: 'Pregnancy planning',
+    rating: 5,
+    title: 'Supportive follow-up care',
+    quote: 'Appointments, medicines, and review dates were explained in simple language. It helped us feel more prepared.',
+    result: 'Personalized care plan and review schedule',
+  },
+];
+
 export const articles = [
   {
     slug: 'prepare-for-your-first-consultation',
@@ -130,7 +160,34 @@ export const doctor = {
   role: 'Consultant Obstetrician, Gynaecologist & IVF Specialist',
   qualifications: 'MBBS, MS (OBGY), F. MAS',
   experience: '25+ years',
+  photoUrl: '/images/seo/DrRaveendraGondhali.jpeg',
   note: 'Patient-first consultation with clear counseling, privacy, and structured follow-up.',
+  conferencesAttended: [
+    {
+      title: 'Fertility Carnival',
+      location: 'Goa',
+      year: 'Oct 2025',
+      role: 'Attended',
+    },
+    {
+      title: 'Urogynaec',
+      location: 'Ahmedabad, Gujarat',
+      year: '2015, 2016, 2017',
+      role: 'Organising committee, speaker and panellist',
+    },
+    {
+      title: 'STAR',
+      location: 'Pune, Maharashtra',
+      year: '2018',
+      role: 'Speaker and chairperson',
+    },
+    {
+      title: 'Yuva FOGSI East Zone',
+      location: 'Gangtok, Sikkim',
+      year: '2018',
+      role: 'Visiting faculty',
+    },
+  ],
   expertise: [
     'Fertility evaluation and infertility treatment',
     'IVF and IUI guidance',

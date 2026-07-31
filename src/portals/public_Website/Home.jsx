@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, CalendarCheck, Clock, MapPin, MessageCircle, Phone } from 'lucide-react';
-import { articles, carePromises, clinic, doctor, highlights, services } from './siteData';
+import { ArrowRight, CalendarCheck, Clock, MapPin, MessageCircle, Phone, Quote, Star } from 'lucide-react';
+import { articles, carePromises, clinic, doctor, highlights, services, successStories } from './siteData';
 import { useLanguage } from './LanguageContext';
 
 function Home() {
@@ -26,6 +26,12 @@ function Home() {
     title: dictionary.articles[index]?.[0] || article.title,
     category: dictionary.articles[index]?.[1] || article.category,
     excerpt: dictionary.articles[index]?.[2] || article.excerpt,
+  }));
+  const localizedStories = successStories.map((story, index) => ({
+    ...story,
+    title: dictionary.successStories?.[index]?.[0] || story.title,
+    quote: dictionary.successStories?.[index]?.[1] || story.quote,
+    result: dictionary.successStories?.[index]?.[2] || story.result,
   }));
 
   return (
@@ -97,8 +103,8 @@ function Home() {
       <section className="bg-white py-16">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:px-8">
           <div className="rounded-lg border border-pink-100 bg-[#fff7fc] p-6">
-            <span className="flex h-20 w-20 overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-pink-100">
-              <img src="/images/logo-optimized.jpg" alt="Eva Fertility & Laparoscopy logo" className="h-full w-full object-cover" loading="lazy" width="80" height="80" />
+            <span className="flex h-28 w-28 overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-pink-100">
+              <img src={localizedDoctor.photoUrl || doctor.photoUrl} alt={localizedDoctor.name} className="h-full w-full object-cover object-top" loading="lazy" width="112" height="112" />
             </span>
             <p className="mt-5 text-sm font-semibold uppercase tracking-wide text-[#e84faf]">{dictionary.labels?.leadConsultant || 'Lead Consultant'}</p>
             <h2 className="mt-2 text-3xl font-bold text-slate-950">{localizedDoctor.name}</h2>
@@ -155,6 +161,86 @@ function Home() {
               <p className="mt-2 text-sm leading-6 text-indigo-50">{text}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="bg-white py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-wide text-[#e84faf]">
+                {dictionary.home.successEyebrow || 'Patient thoughts'}
+              </p>
+              <h2 className="mt-3 text-3xl font-bold text-slate-950">
+                {dictionary.home.successTitle || 'Our Success Stories'}
+              </h2>
+              <p className="mt-4 text-base leading-7 text-slate-600">
+                {dictionary.home.successSubtitle || 'Anonymized patient feedback focused on communication, comfort, and guided follow-up care.'}
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {[
+                ['Private', 'consultations'],
+                ['Clear', 'treatment steps'],
+                ['Guided', 'follow-up care'],
+              ].map(([value, label]) => (
+                <div key={label} className="rounded-lg border border-pink-100 bg-[#fff7fc] p-4">
+                  <p className="text-2xl font-bold text-[#3157b7]">{value}</p>
+                  <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-8 grid gap-5 lg:grid-cols-3">
+            {localizedStories.map((story) => (
+              <article key={`${story.initials}-${story.careType}`} className="flex h-full flex-col rounded-lg border border-pink-100 bg-white p-6 shadow-sm">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[#fff7fc] text-sm font-bold text-[#3157b7] ring-1 ring-pink-100">
+                      {story.initials}
+                    </span>
+                    <div>
+                      <p className="font-bold text-slate-950">{story.careType}</p>
+                      <p className="text-sm text-slate-500">{story.location}</p>
+                    </div>
+                  </div>
+                  <Quote size={24} className="shrink-0 text-pink-200" aria-hidden="true" />
+                </div>
+
+                <div className="mt-5 flex gap-1" aria-label={`${story.rating} out of 5 rating`}>
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <Star
+                      key={index}
+                      size={17}
+                      className={index < story.rating ? 'fill-[#e84faf] text-[#e84faf]' : 'text-slate-200'}
+                      aria-hidden="true"
+                    />
+                  ))}
+                </div>
+
+                <h3 className="mt-4 text-lg font-bold text-slate-950">{story.title}</h3>
+                <p className="mt-3 flex-1 text-sm leading-6 text-slate-600">"{story.quote}"</p>
+                <div className="mt-5 rounded-lg bg-[#fff7fc] px-4 py-3 text-sm font-semibold text-[#3157b7] ring-1 ring-pink-100">
+                  {story.result}
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className="mt-8 flex flex-col items-start justify-between gap-4 rounded-lg bg-[#17245c] p-6 text-white sm:flex-row sm:items-center">
+            <div>
+              <p className="text-lg font-bold">Start with a private consultation</p>
+              <p className="mt-1 text-sm text-indigo-50">The clinic team will help you choose an available appointment slot.</p>
+            </div>
+            <Link
+              to="/contact"
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-[#e84faf] px-5 py-3 text-sm font-semibold text-white hover:bg-[#d83d9f]"
+            >
+              <CalendarCheck size={18} />
+              {dictionary.common.bookAppointment}
+            </Link>
+          </div>
         </div>
       </section>
 
