@@ -82,6 +82,33 @@ const createMedicationRow = () => ({
   durationDays: ''
 });
 
+const padDatePart = (value) => String(value).padStart(2, '0');
+
+const toDateInputValue = (date) => (
+  `${date.getFullYear()}-${padDatePart(date.getMonth() + 1)}-${padDatePart(date.getDate())}`
+);
+
+const getAppointmentScheduleLimits = () => {
+  const now = new Date();
+  const minDateTime = new Date(now.getTime() + (2 * 60 * 60 * 1000));
+  const maxDate = new Date(now);
+  maxDate.setMonth(maxDate.getMonth() + 1);
+
+  return {
+    minDate: toDateInputValue(now),
+    maxDate: toDateInputValue(maxDate),
+    minDateTime
+  };
+};
+
+const parseAppointmentDateTime = (dateValue, timeValue = '00:00') => {
+  if (!dateValue) return null;
+  const [year, month, day] = dateValue.split('-').map(Number);
+  const [hour = 0, minute = 0] = String(timeValue || '00:00').split(':').map(Number);
+  if ([year, month, day, hour, minute].some(Number.isNaN)) return null;
+  return new Date(year, month - 1, day, hour, minute, 0, 0);
+};
+
 function DoctorPortal() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [doctor, setDoctor] = useState(null);
@@ -255,6 +282,19 @@ function DoctorPortal() {
     }
     return slots;
   };
+
+  const getScheduleValidationMessage = (date, time) => {
+    const { minDate, maxDate, minDateTime } = getAppointmentScheduleLimits();
+    if (!date) return 'Please select appointment date';
+    if (date < minDate) return 'Appointment date cannot be in the past';
+    if (date > maxDate) return 'Appointment date must be within 1 month from today';
+    if (!time) return 'Please select appointment time';
+    const selectedDateTime = parseAppointmentDateTime(date, time);
+    if (!selectedDateTime || selectedDateTime < minDateTime) return 'Appointment time must be at least 2 hours from now';
+    return '';
+  };
+
+  const isScheduleSlotAllowed = (date, time) => !getScheduleValidationMessage(date, time);
 
   const getAppointmentLocationText = (apt) => {
     const hospitalName = apt.hospital_name || apt.hospitalName;
@@ -665,9 +705,15 @@ function DoctorPortal() {
     });
     const selectedLocation = hospitalLocations.find(loc => String(loc.id) === String(formData.hospitalLocationId));
     const timeOptions = selectedLocation ? getLocationTimeOptions(selectedLocation, formData.date) : [];
+    const scheduleLimits = getAppointmentScheduleLimits();
 
     const handleSubmit = async (e) => {
       e.preventDefault();
+      const scheduleError = getScheduleValidationMessage(formData.date, formData.time);
+      if (scheduleError) {
+        alert(scheduleError);
+        return;
+      }
       await createAppointment(formData);
     };
 
@@ -709,9 +755,10 @@ function DoctorPortal() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Date *</label>
-                <input type="date" required value={formData.date} min={new Date().toISOString().split('T')[0]}
+                <input type="date" required value={formData.date} min={scheduleLimits.minDate} max={scheduleLimits.maxDate}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value, time: '' })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
+                <p className="mt-1 text-xs text-gray-500">Allowed from today to 1 month ahead.</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Time *</label>
@@ -719,14 +766,20 @@ function DoctorPortal() {
                   <select required value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                     <option value="">Select available time...</option>
-                    {timeOptions.map(({ time, booked }) => (
-                      <option key={time} value={time} disabled={booked}>{time}{booked ? ' - booked' : ''}</option>
-                    ))}
+                    {timeOptions.map(({ time, booked }) => {
+                      const outsideWindow = !isScheduleSlotAllowed(formData.date, time);
+                      return (
+                        <option key={time} value={time} disabled={booked || outsideWindow}>
+                          {time}{booked ? ' - booked' : ''}{!booked && outsideWindow ? ' - not available' : ''}
+                        </option>
+                      );
+                    })}
                   </select>
                 ) : (
                   <input type="time" required value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
                 )}
+                <p className="mt-1 text-xs text-gray-500">Same-day time must be at least 2 hours from now.</p>
               </div>
             </div>
             <div>
@@ -769,6 +822,7 @@ function DoctorPortal() {
       { date: '', time: '' }
     ]);
     const selectedLocation = hospitalLocations.find(loc => String(loc.id) === String(hospitalLocationId));
+    const scheduleLimits = getAppointmentScheduleLimits();
 
     const handleAddSlot = () => {
       setSuggestedDates([...suggestedDates, { date: '', time: '' }]);
@@ -793,6 +847,11 @@ function DoctorPortal() {
       const validSlots = suggestedDates.filter(slot => slot.date && slot.time);
       if (validSlots.length === 0) {
         alert('Please provide at least one suggested date and time');
+        return;
+      }
+      const invalidSlot = validSlots.find(slot => getScheduleValidationMessage(slot.date, slot.time));
+      if (invalidSlot) {
+        alert(getScheduleValidationMessage(invalidSlot.date, invalidSlot.time));
         return;
       }
 
@@ -896,7 +955,8 @@ function DoctorPortal() {
                         )));
                       }}
                       className="flex-1 px-3 py-2 border rounded-lg"
-                      min={new Date().toISOString().split('T')[0]}
+                      min={scheduleLimits.minDate}
+                      max={scheduleLimits.maxDate}
                     />
                     {selectedLocation && getLocationTimeOptions(selectedLocation, slot.date, selectedAppointment?.id).length > 0 ? (
                       <select
@@ -905,9 +965,14 @@ function DoctorPortal() {
                         className="flex-1 px-3 py-2 border rounded-lg"
                       >
                         <option value="">Select time...</option>
-                        {getLocationTimeOptions(selectedLocation, slot.date, selectedAppointment?.id).map(({ time, booked }) => (
-                          <option key={time} value={time} disabled={booked}>{time}{booked ? ' - booked' : ''}</option>
-                        ))}
+                        {getLocationTimeOptions(selectedLocation, slot.date, selectedAppointment?.id).map(({ time, booked }) => {
+                          const outsideWindow = !isScheduleSlotAllowed(slot.date, time);
+                          return (
+                            <option key={time} value={time} disabled={booked || outsideWindow}>
+                              {time}{booked ? ' - booked' : ''}{!booked && outsideWindow ? ' - not available' : ''}
+                            </option>
+                          );
+                        })}
                       </select>
                     ) : (
                       <input
@@ -976,12 +1041,19 @@ function DoctorPortal() {
     const [alternateTime, setAlternateTime] = useState('');
     const selectedLocation = hospitalLocations.find(loc => String(loc.id) === String(hospitalLocationId));
     const alternateTimeOptions = selectedLocation ? getLocationTimeOptions(selectedLocation, alternateDate, selectedAppointment?.id) : [];
+    const scheduleLimits = getAppointmentScheduleLimits();
 
     const handleApprove = async () => {
       setLoading(true);
       try {
         const newDate = decision === 'approve' ? rescheduleInfo.requestedDate : alternateDate;
         const newTime = decision === 'approve' ? rescheduleInfo.requestedTime : alternateTime;
+        const scheduleError = getScheduleValidationMessage(newDate, newTime);
+        if (scheduleError) {
+          alert(scheduleError);
+          setLoading(false);
+          return;
+        }
         
         const body = {
           newDate: decision === 'approve' ? newDate : null,
@@ -1114,7 +1186,8 @@ function DoctorPortal() {
                       setAlternateTime('');
                     }}
                     className="w-full px-3 py-2 border rounded-lg"
-                    min={new Date().toISOString().split('T')[0]}
+                    min={scheduleLimits.minDate}
+                    max={scheduleLimits.maxDate}
                     required
                   />
                 </div>
@@ -1128,9 +1201,14 @@ function DoctorPortal() {
                       required
                     >
                       <option value="">Select time...</option>
-                      {alternateTimeOptions.map(({ time, booked }) => (
-                        <option key={time} value={time} disabled={booked}>{time}{booked ? ' - booked' : ''}</option>
-                      ))}
+                      {alternateTimeOptions.map(({ time, booked }) => {
+                        const outsideWindow = !isScheduleSlotAllowed(alternateDate, time);
+                        return (
+                          <option key={time} value={time} disabled={booked || outsideWindow}>
+                            {time}{booked ? ' - booked' : ''}{!booked && outsideWindow ? ' - not available' : ''}
+                          </option>
+                        );
+                      })}
                     </select>
                   ) : (
                     <input
@@ -1142,6 +1220,7 @@ function DoctorPortal() {
                     />
                   )}
                 </div>
+                <p className="col-span-2 -mt-1 text-xs text-gray-500">Alternate time must be within 1 month and at least 2 hours from now.</p>
               </div>
             )}
 
@@ -1373,6 +1452,7 @@ function DoctorPortal() {
                   ))}
                 </div>
               </div>
+              <p className="mt-2 text-xs text-gray-500">Suggested slots must be from today to 1 month ahead, and at least 2 hours from now.</p>
               <button
                 type="button"
                 onClick={addMedicationRow}
