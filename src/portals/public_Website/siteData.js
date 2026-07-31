@@ -110,7 +110,7 @@ export const articles = [
     date: 'July 02, 2026',
     readTime: '4 min read',
     excerpt: 'A simple checklist of records, questions, medicines, and symptoms to bring to your doctor visit.',
-    image: '/images/seo/patient-consultation.svg',
+    image: '/images/seo/DrRaveendraGondhali.jpeg',
   },
   {
     slug: 'blood-pressure-basics',
@@ -119,7 +119,7 @@ export const articles = [
     date: 'June 18, 2026',
     readTime: '5 min read',
     excerpt: 'Understand healthy ranges, warning signs, lifestyle habits, and when to book a medical review.',
-    image: '/images/seo/blood-pressure-care.svg',
+    image: '/images/seo/BeforeIVF_why_uterine_cavity_assessment.png',
   },
   {
     slug: 'seasonal-fever-care',
@@ -128,30 +128,30 @@ export const articles = [
     date: 'May 27, 2026',
     readTime: '3 min read',
     excerpt: 'Learn which symptoms need clinical attention and how diagnostics help guide treatment safely.',
-    image: '/images/seo/seasonal-fever-care.svg',
+    image: '/images/seo/Endometriosis_and_intimate_health.png',
   },
 ];
 
 export const galleryItems = [
   {
     type: 'image',
-    title: 'Reception and patient help desk',
-    src: '/images/seo/reception-helpdesk.svg',
+    title: 'Warm reception and patient help desk',
+    src: '/images/seo/warm-reception-patient-help-desk.jpg',
   },
   {
     type: 'image',
-    title: 'Consultation room',
-    src: '/images/seo/consultation-room.svg',
+    title: 'Fertility diagnostics support',
+    src: '/images/seo/fertility-diagnostics-support.jpg',
   },
   {
     type: 'image',
-    title: 'Diagnostics area',
-    src: '/images/seo/fertility-diagnostics.svg',
+    title: 'Private consultation room',
+    src: '/images/seo/private-consultation-room.jpg',
   },
   {
-    type: 'video',
-    title: 'Clinic care walkthrough',
-    src: 'https://www.youtube.com/embed/1APwq1df6Mw',
+    type: 'walkthrough',
+    title: 'Eva Fertility & Laparoscopy (स्त्री क्लिनिक) walkthrough',
+    src: '/images/logo-optimized.jpg',
   },
 ];
 

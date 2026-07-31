@@ -15,7 +15,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('patientToken');
+    const token = sessionStorage.getItem('patientToken') || localStorage.getItem('patientToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -42,9 +42,13 @@ function PatientPortal() {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('patientToken');
-    const storedPatient = localStorage.getItem('patientData');
+    const token = sessionStorage.getItem('patientToken') || localStorage.getItem('patientToken');
+    const storedPatient = sessionStorage.getItem('patientData') || localStorage.getItem('patientData');
     if (token && storedPatient) {
+      sessionStorage.setItem('patientToken', token);
+      sessionStorage.setItem('patientData', storedPatient);
+      localStorage.removeItem('patientToken');
+      localStorage.removeItem('patientData');
       setPatient(JSON.parse(storedPatient));
       setStep('dashboard');
       fetchDashboardData();
@@ -56,9 +60,8 @@ function PatientPortal() {
     setLoading(true);
     setError('');
     try {
-      const { data } = await api.post('/patient-portal/request-otp', { phone });
+      await api.post('/patient-portal/request-otp', { phone });
       setStep('otp');
-      alert(`Your OTP is: ${data.otp}\n(This will be sent via SMS in production)`);
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to send OTP');
     } finally {
@@ -72,8 +75,10 @@ function PatientPortal() {
     setError('');
     try {
       const { data } = await api.post('/patient-portal/verify-otp', { phone, otp });
-      localStorage.setItem('patientToken', data.token);
-      localStorage.setItem('patientData', JSON.stringify(data.patient));
+      sessionStorage.setItem('patientToken', data.token);
+      sessionStorage.setItem('patientData', JSON.stringify(data.patient));
+      localStorage.removeItem('patientToken');
+      localStorage.removeItem('patientData');
       setPatient(data.patient);
       setStep('dashboard');
       fetchDashboardData();
@@ -85,6 +90,8 @@ function PatientPortal() {
   };
 
   const handleLogout = () => {
+    sessionStorage.removeItem('patientToken');
+    sessionStorage.removeItem('patientData');
     localStorage.removeItem('patientToken');
     localStorage.removeItem('patientData');
     setPatient(null);

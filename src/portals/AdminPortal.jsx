@@ -15,7 +15,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('admin_token');
+    const token = sessionStorage.getItem('admin_token') || localStorage.getItem('admin_token');
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
@@ -29,6 +29,8 @@ api.interceptors.response.use(
       && ['Access token required', 'Token expired', 'Invalid token', 'Forbidden: Insufficient permissions'].includes(error.response?.data?.error);
 
     if (authFailed) {
+      sessionStorage.removeItem('admin_token');
+      sessionStorage.removeItem('admin_user');
       localStorage.removeItem('admin_token');
       localStorage.removeItem('admin_user');
       window.location.reload();
@@ -267,12 +269,14 @@ function AdminPortal() {
 
   // ─── Check stored token on mount ────────────────────────────────────────────
   useEffect(() => {
-    const storedToken = localStorage.getItem('admin_token');
-    const storedUser  = localStorage.getItem('admin_user');
+    const storedToken = sessionStorage.getItem('admin_token') || localStorage.getItem('admin_token');
+    const storedUser  = sessionStorage.getItem('admin_user') || localStorage.getItem('admin_user');
     if (storedToken && storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
         if (parsedUser?.role !== 'admin') {
+          sessionStorage.removeItem('admin_token');
+          sessionStorage.removeItem('admin_user');
           localStorage.removeItem('admin_token');
           localStorage.removeItem('admin_user');
           return;
@@ -280,7 +284,13 @@ function AdminPortal() {
         setToken(storedToken);
         setUser(parsedUser);
         setIsLoggedIn(true);
+        sessionStorage.setItem('admin_token', storedToken);
+        sessionStorage.setItem('admin_user', JSON.stringify(parsedUser));
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_user');
       } catch (error) {
+        sessionStorage.removeItem('admin_token');
+        sessionStorage.removeItem('admin_user');
         localStorage.removeItem('admin_token');
         localStorage.removeItem('admin_user');
       }
@@ -322,6 +332,8 @@ function AdminPortal() {
       const { data } = await api.post('/auth/login', { email, password });
       if (data.user?.role !== 'admin') {
         setError('Please login with an admin account.');
+        sessionStorage.removeItem('admin_token');
+        sessionStorage.removeItem('admin_user');
         localStorage.removeItem('admin_token');
         localStorage.removeItem('admin_user');
         return;
@@ -329,8 +341,10 @@ function AdminPortal() {
       setToken(data.token);
       setUser(data.user);
       setIsLoggedIn(true);
-      localStorage.setItem('admin_token', data.token);
-      localStorage.setItem('admin_user', JSON.stringify(data.user));
+      sessionStorage.setItem('admin_token', data.token);
+      sessionStorage.setItem('admin_user', JSON.stringify(data.user));
+      localStorage.removeItem('admin_token');
+      localStorage.removeItem('admin_user');
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed');
     } finally {
@@ -342,6 +356,8 @@ function AdminPortal() {
     setToken(null);
     setUser(null);
     setIsLoggedIn(false);
+    sessionStorage.removeItem('admin_token');
+    sessionStorage.removeItem('admin_user');
     localStorage.removeItem('admin_token');
     localStorage.removeItem('admin_user');
   };
@@ -604,7 +620,14 @@ function AdminPortal() {
   const LoginForm = () => {
     const [email, setEmail]       = useState('');
     const [password, setPassword] = useState('');
-    const handleSubmit = (e) => { e.preventDefault(); handleLogin(email, password); };
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      try {
+        await handleLogin(email, password);
+      } finally {
+        setPassword('');
+      }
+    };
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-4">
@@ -613,16 +636,19 @@ function AdminPortal() {
             <BrandMark size="lg" centered title="Eva Fertility & Laparoscopy" subtitle="Admin & Reception Login" />
           </div>
           {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">{error}</div>}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="on">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
               <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+                autoComplete="username"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="admin@hospital.com" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
               <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                spellCheck="false"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder="••••••••" />
             </div>
@@ -631,10 +657,6 @@ function AdminPortal() {
               {loading ? 'Signing in...' : <><LogIn size={20} /> Sign In</>}
             </button>
           </form>
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600 font-medium mb-1">Demo Credentials:</p>
-            <p className="text-xs text-gray-500">admin@hospital.com / password123</p>
-          </div>
         </div>
       </div>
     );
@@ -1019,6 +1041,7 @@ function AdminPortal() {
       if (dup) { showAlert('Username or email already exists', 'error'); return; }
       try {
         editUser ? await updateUser(editUser.id, formData) : await createUser(formData);
+        setFormData((current) => ({ ...current, password: '' }));
         setSelectedUser(null);
         onClose();
       } catch (_) {}
@@ -1046,6 +1069,8 @@ function AdminPortal() {
                 Password {editUser && <span className="text-gray-400 font-normal">(leave blank to keep current)</span>}
               </label>
               <input type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                autoComplete="new-password"
+                spellCheck="false"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 placeholder={editUser ? '••••••••' : 'Min 6 characters'}
                 {...(!editUser && { required: true, minLength: 6 })} />

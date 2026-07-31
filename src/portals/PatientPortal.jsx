@@ -90,9 +90,13 @@ function PatientPortal() {
 
   useEffect(() => {
     try {
-      const token = localStorage.getItem('patient_portal_token');
-      const storedPatient = localStorage.getItem('patient_portal_user');
+      const token = sessionStorage.getItem('patient_portal_token') || localStorage.getItem('patient_portal_token');
+      const storedPatient = sessionStorage.getItem('patient_portal_user') || localStorage.getItem('patient_portal_user');
       if (token && storedPatient) {
+        sessionStorage.setItem('patient_portal_token', token);
+        sessionStorage.setItem('patient_portal_user', storedPatient);
+        localStorage.removeItem('patient_portal_token');
+        localStorage.removeItem('patient_portal_user');
         authToken = token;
         setPatient(JSON.parse(storedPatient));
         setStep('portal');
@@ -128,12 +132,11 @@ function PatientPortal() {
     setLoading(true);
     setError('');
     try {
-      const data = await api.request('/request-otp', {
+      await api.request('/request-otp', {
         method: 'POST',
         body: JSON.stringify({ email })
       });
       setStep('otp');
-      alert(`Your OTP is: ${data.otp}\n(This will be emailed in production)`);
     } catch (err) {
       setError(err.message || 'Failed to send OTP');
     } finally {
@@ -153,8 +156,10 @@ function PatientPortal() {
         body: JSON.stringify({ email, otp })
       });
       authToken = data.token;
-      localStorage.setItem('patient_portal_token', data.token);
-      localStorage.setItem('patient_portal_user', JSON.stringify(data.patient));
+      sessionStorage.setItem('patient_portal_token', data.token);
+      sessionStorage.setItem('patient_portal_user', JSON.stringify(data.patient));
+      localStorage.removeItem('patient_portal_token');
+      localStorage.removeItem('patient_portal_user');
       setPatient(data.patient);
       setStep('portal');
     } catch (err) {
@@ -166,6 +171,8 @@ function PatientPortal() {
 
   const handleLogout = () => {
     authToken = null;
+    sessionStorage.removeItem('patient_portal_token');
+    sessionStorage.removeItem('patient_portal_user');
     localStorage.removeItem('patient_portal_token');
     localStorage.removeItem('patient_portal_user');
     setPatient(null);
@@ -221,14 +228,12 @@ function PatientPortal() {
       
       for (const url of endpoints) {
         try {
-          console.debug('[PatientPortal] fetching hospital locations from', url);
           const headers = { 'Content-Type': 'application/json' };
           if (authToken) {
             headers.Authorization = `Bearer ${authToken}`;
           }
           const res = await fetch(url, { headers });
           const responseData = await res.json();
-          console.debug('[PatientPortal] hospital-locations response', res.status, responseData);
           
           if (res.ok && Array.isArray(responseData)) {
             data = responseData;
@@ -239,7 +244,6 @@ function PatientPortal() {
           }
         } catch (err) {
           lastError = `${url}: ${err.message}`;
-          console.debug(`Endpoint ${url} failed, trying next...`);
         }
       }
       
@@ -847,6 +851,7 @@ function PatientPortal() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="username"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     placeholder="Enter your registered email"
                   />
@@ -874,6 +879,9 @@ function PatientPortal() {
                   required
                   value={otp}
                   onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  spellCheck="false"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg text-center text-2xl tracking-widest focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   placeholder="000000"
                   maxLength="6"

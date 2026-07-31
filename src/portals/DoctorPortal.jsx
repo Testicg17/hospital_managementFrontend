@@ -15,8 +15,10 @@ const api = {
     authToken = token;
     authUser = user;
     try {
-      localStorage.setItem('doctor_token', token);
-      localStorage.setItem('doctor_user', JSON.stringify(user));
+      sessionStorage.setItem('doctor_token', token);
+      sessionStorage.setItem('doctor_user', JSON.stringify(user));
+      localStorage.removeItem('doctor_token');
+      localStorage.removeItem('doctor_user');
     } catch (e) {
       // ignore storage errors
     }
@@ -27,6 +29,8 @@ const api = {
     try {
       localStorage.removeItem('doctor_token');
       localStorage.removeItem('doctor_user');
+      sessionStorage.removeItem('doctor_token');
+      sessionStorage.removeItem('doctor_user');
     } catch (e) {
       // ignore
     }
@@ -35,8 +39,8 @@ const api = {
     // prefer in-memory, fall back to localStorage
     if (authToken && authUser) return { token: authToken, user: authUser };
     try {
-      const token = localStorage.getItem('doctor_token');
-      const user = localStorage.getItem('doctor_user');
+      const token = sessionStorage.getItem('doctor_token') || localStorage.getItem('doctor_token');
+      const user = sessionStorage.getItem('doctor_user') || localStorage.getItem('doctor_user');
       if (token && user) {
         authToken = token;
         authUser = JSON.parse(user);
@@ -133,8 +137,8 @@ function DoctorPortal() {
 
   useEffect(() => {
     // restore auth from localStorage if present
-    const storedToken = localStorage.getItem('doctor_token');
-    const storedUser = localStorage.getItem('doctor_user');
+    const storedToken = sessionStorage.getItem('doctor_token') || localStorage.getItem('doctor_token');
+    const storedUser = sessionStorage.getItem('doctor_user') || localStorage.getItem('doctor_user');
     if (storedToken && storedUser) {
       try {
         api.setAuth(storedToken, JSON.parse(storedUser));
@@ -319,9 +323,7 @@ function DoctorPortal() {
         hospitalLocationId: appointmentData.hospitalLocationId || appointmentData.hospital_location_id || null,
         status: 'Scheduled'
       };
-      console.debug('[DoctorPortal] createAppointment payload', payload);
-      const resp = await api.request('/appointments', { method: 'POST', body: JSON.stringify(payload) });
-      console.debug('[DoctorPortal] createAppointment response', resp);
+      await api.request('/appointments', { method: 'POST', body: JSON.stringify(payload) });
       setSuccessMessage('Appointment scheduled');
       setShowCreateAppointment(false);
       fetchAppointments();
@@ -638,9 +640,13 @@ function DoctorPortal() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
       e.preventDefault();
-      handleLogin(email, password);
+      try {
+        await handleLogin(email, password);
+      } finally {
+        setPassword('');
+      }
     };
 
     return (
@@ -658,7 +664,7 @@ function DoctorPortal() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4" autoComplete="on">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
               <input
@@ -666,6 +672,7 @@ function DoctorPortal() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoComplete="username"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="doctor@hospital.com"
               />
@@ -677,6 +684,8 @@ function DoctorPortal() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                spellCheck="false"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="••••••••"
               />
@@ -863,12 +872,10 @@ function DoctorPortal() {
           doctorId: getAppointmentDoctorId(selectedAppointment) || null,
           suggestedDates: validSlots
         };
-        console.debug('[DoctorPortal] reschedule.suggest body', body);
         const response = await api.request(`/doctor/appointments/${selectedAppointment.id}/reschedule/suggest`, {
           method: 'POST',
           body: JSON.stringify(body)
         });
-        console.debug('[DoctorPortal] reschedule.suggest response', response);
 
         if (isSuccessfulResponse(response)) {
           setSuccessMessage('✉️ Reschedule request sent to patient via email');
@@ -1063,12 +1070,10 @@ function DoctorPortal() {
           hospitalLocationId: hospitalLocationId || null,
           doctorId: getAppointmentDoctorId(selectedAppointment) || null
         };
-        console.debug('[DoctorPortal] reschedule.approve body', body);
         const response = await api.request(`/doctor/appointments/${selectedAppointment.id}/reschedule/approve`, {
           method: 'PUT',
           body: JSON.stringify(body)
         });
-        console.debug('[DoctorPortal] reschedule.approve response', response);
 
         if (isSuccessfulResponse(response)) {
           setSuccessMessage('✉️ Reschedule approved! Patient notified via email');

@@ -117,7 +117,7 @@ const dictionaries = {
       ['Unicornuate uterus and pregnancy: careful monitoring can matter', 'Case Report', 'A case-report based explanation of a congenital uterine shape difference and pregnancy follow-up.'],
       ['Before IVF: why uterine cavity assessment may be advised', 'IVF Workup', 'A research-based overview of checking the uterine cavity before IVF treatment planning.'],
     ],
-    gallery: ['Warm reception and patient help desk', 'Private consultation room', 'Fertility diagnostics support', 'Eva clinic care walkthrough'],
+    gallery: ['Warm reception and patient help desk', 'Fertility diagnostics support', 'Private consultation room', 'Eva Fertility & Laparoscopy (स्त्री क्लिनिक) walkthrough'],
   },
   hi: {
     languageLabel: 'भाषा',
@@ -214,7 +214,7 @@ const dictionaries = {
       ['ओव्यूलेशन विंडो और साइकिल ट्रैकिंग समझें', 'फर्टिलिटी बेसिक्स', 'साइकिल पैटर्न, लक्षण और टेस्टिंग अगली सलाह में कैसे मदद करते हैं.'],
       ['स्त्री रोग देखभाल में लैप्रोस्कोपी कब सलाह दी जाती है', 'लैप्रोस्कोपी', 'मिनिमली इनवेसिव जांच उपचार योजना में कैसे मदद करती है.'],
     ],
-    gallery: ['स्वागत कक्ष और हेल्प डेस्क', 'निजी कंसल्टेशन रूम', 'फर्टिलिटी डायग्नोस्टिक्स सहायता', 'ईवा क्लिनिक वॉकथ्रू'],
+    gallery: ['स्वागत कक्ष और हेल्प डेस्क', 'फर्टिलिटी डायग्नोस्टिक्स सहायता', 'निजी कंसल्टेशन रूम', 'ईवा फर्टिलिटी एंड लैप्रोस्कोपी (स्त्री क्लिनिक) वॉकथ्रू'],
   },
   mr: {
     languageLabel: 'भाषा',
@@ -311,11 +311,25 @@ const dictionaries = {
       ['ओव्यूलेशन विंडो आणि सायकल ट्रॅकिंग समजून घ्या', 'फर्टिलिटी बेसिक्स', 'सायकल पॅटर्न, लक्षणे आणि टेस्टिंग पुढील सल्ल्यात कशी मदत करतात.'],
       ['स्त्रीरोग सेवेत लॅप्रोस्कोपी कधी सुचवली जाते', 'लॅप्रोस्कोपी', 'मिनिमली इनवेसिव्ह तपासणी उपचार नियोजनात कशी मदत करते.'],
     ],
-    gallery: ['स्वागत कक्ष आणि हेल्प डेस्क', 'खाजगी कन्सल्टेशन रूम', 'फर्टिलिटी डायग्नोस्टिक्स सहाय्य', 'ईवा क्लिनिक वॉकथ्रू'],
+    gallery: ['स्वागत कक्ष आणि हेल्प डेस्क', 'फर्टिलिटी डायग्नोस्टिक्स सहाय्य', 'खाजगी कन्सल्टेशन रूम', 'ईवा फर्टिलिटी अँड लैप्रोस्कोपी (स्त्री क्लिनिक) वॉकथ्रू'],
   },
 };
 
 Object.assign(dictionaries.en, {
+  introVideo: {
+    eyebrow: 'Clinic introduction',
+    title: 'A calm first look at Eva Fertility & Laparoscopy',
+    subtitle: 'Reception support, fertility diagnostics, private consultation, and clear appointment guidance in one patient-first clinic experience.',
+    cta: 'Book Appointment',
+    play: 'Play',
+    pause: 'Pause',
+    replay: 'Replay',
+    scenes: [
+      ['Warm reception and patient help desk', 'A welcoming front desk helps patients with appointments, visit guidance, and first-step support.'],
+      ['Fertility diagnostics support', 'Organized diagnostics and ultrasound support help build a clearer fertility and gynecology care plan.'],
+      ['Private consultation room', 'Confidential conversations with Dr. Raveendra Gondhali focus on comfort, privacy, and next steps.'],
+    ].map(([title, body]) => ({ title, body })),
+  },
   labels: {
     leadConsultant: 'Lead Consultant',
     careFocus: 'Eva care focus',
@@ -349,6 +363,20 @@ Object.assign(dictionaries.en, {
 });
 
 Object.assign(dictionaries.hi, {
+  introVideo: {
+    eyebrow: 'क्लिनिक परिचय',
+    title: 'ईवा फर्टिलिटी एंड लैप्रोस्कोपी की शांत झलक',
+    subtitle: 'स्वागत सहायता, फर्टिलिटी डायग्नोस्टिक्स, निजी परामर्श और स्पष्ट अपॉइंटमेंट मार्गदर्शन एक ही रोगी-केंद्रित अनुभव में.',
+    cta: 'अपॉइंटमेंट बुक करें',
+    play: 'चलाएं',
+    pause: 'रोकें',
+    replay: 'फिर से चलाएं',
+    scenes: [
+      ['स्वागत कक्ष और हेल्प डेस्क', 'हमारा फ्रंट डेस्क अपॉइंटमेंट, विजिट मार्गदर्शन और पहली सहायता में मरीजों की मदद करता है.'],
+      ['फर्टिलिटी डायग्नोस्टिक्स सहायता', 'व्यवस्थित डायग्नोस्टिक्स और अल्ट्रासाउंड सपोर्ट बेहतर फर्टिलिटी और स्त्रीरोग देखभाल योजना बनाने में मदद करता है.'],
+      ['निजी कंसल्टेशन रूम', 'डॉ. रवींद्र गोंधली के साथ गोपनीय बातचीत में आराम, निजता और अगले कदमों पर ध्यान दिया जाता है.'],
+    ].map(([title, body]) => ({ title, body })),
+  },
   home: {
     ...dictionaries.hi.home,
     successEyebrow: 'मरीजों के विचार',
@@ -419,6 +447,20 @@ Object.assign(dictionaries.hi, {
 });
 
 Object.assign(dictionaries.mr, {
+  introVideo: {
+    eyebrow: 'क्लिनिक परिचय',
+    title: 'ईवा फर्टिलिटी अँड लैप्रोस्कोपीची शांत झलक',
+    subtitle: 'स्वागत सहाय्य, फर्टिलिटी डायग्नोस्टिक्स, खाजगी सल्ला आणि स्पष्ट अपॉइंटमेंट मार्गदर्शन एकाच रुग्ण-केंद्रित अनुभवात.',
+    cta: 'अपॉइंटमेंट बुक करा',
+    play: 'चालू करा',
+    pause: 'थांबवा',
+    replay: 'पुन्हा चालू करा',
+    scenes: [
+      ['स्वागत कक्ष आणि हेल्प डेस्क', 'फ्रंट डेस्क अपॉइंटमेंट, भेटीचे मार्गदर्शन आणि पहिल्या टप्प्यातील सहाय्य यासाठी रुग्णांना मदत करते.'],
+      ['फर्टिलिटी डायग्नोस्टिक्स सहाय्य', 'व्यवस्थित डायग्नोस्टिक्स आणि अल्ट्रासाउंड सपोर्ट फर्टिलिटी व स्त्रीरोग काळजीची स्पष्ट योजना तयार करण्यात मदत करतो.'],
+      ['खाजगी कन्सल्टेशन रूम', 'डॉ. रवींद्र गोंधळी यांच्यासोबत गोपनीय चर्चेत आराम, गोपनीयता आणि पुढील पायऱ्यांवर लक्ष दिले जाते.'],
+    ].map(([title, body]) => ({ title, body })),
+  },
   home: {
     ...dictionaries.mr.home,
     successEyebrow: 'रुग्णांचे विचार',
@@ -486,6 +528,117 @@ Object.assign(dictionaries.mr, {
       'लैप्रोस्कोपी किंवा स्त्रीरोग शस्त्रक्रियेपूर्वी कोणत्या सुरक्षा तपासण्या होणार आहेत आणि डिस्चार्जनंतर कोणती लक्षणे पाहायची हे विचारा.',
     ],
   ],
+});
+
+Object.assign(dictionaries.en, {
+  introVideo: {
+    eyebrow: 'Voice-over introduction',
+    title: 'Eva Fertility & Laparoscopy (स्त्री क्लिनिक) walkthrough',
+    subtitle: 'A branded introduction with the Eva logo, Dr. Raveendra Gondhali, achievements, key services, and appointment guidance.',
+    cta: 'Book Appointment',
+    play: 'Play voice',
+    pause: 'Pause',
+    replay: 'Replay',
+    voiceLabel: 'Voice over playing',
+    voiceUnsupported: 'Voice over is not supported in this browser.',
+    voiceover: 'Welcome to Eva Fertility and Laparoscopy, Stree Clinic. Care is led by Dr. Raveendra Gondhali, Consultant Obstetrician, Gynaecologist and IVF Specialist, with MBBS, MS OBGY and F MAS qualifications. The clinic supports fertility evaluation, IVF and IUI guidance, PCOS care, pregnancy planning, hysteroscopy and laparoscopy. Dr. Gondhali has participated in Fertility Carnival Goa, Urogynaec Ahmedabad, STAR Pune and Yuva FOGSI East Zone. Patients can book appointments online and access records through the patient portal.',
+    scenes: [
+      {
+        title: 'Eva Fertility & Laparoscopy (स्त्री क्लिनिक)',
+        body: 'The Eva brand stands for patient-first fertility, gynecology, women care, and advanced laparoscopy support.',
+        points: ['Thergaon, Pune', 'Privacy-focused counseling', 'Book appointments online'],
+      },
+      {
+        title: 'Dr. Raveendra Gondhali',
+        body: 'Consultant Obstetrician, Gynaecologist and IVF Specialist focused on structured fertility and gynecology care.',
+        points: ['MBBS, MS (OBGY), F. MAS', '25+ years experience', 'Fertility, IVF, IUI, laparoscopy and hysteroscopy guidance'],
+      },
+      {
+        title: 'Important care information',
+        body: 'Consultations help patients understand symptoms, reports, treatment choices, and follow-up plans clearly.',
+        points: ['Fertility evaluation', 'PCOS and menstrual health care', 'Pregnancy and antenatal support'],
+      },
+      {
+        title: 'Achievements and participation',
+        body: 'Academic participation and conference roles support continuous learning and patient-centered practice.',
+        points: ['Fertility Carnival Goa - Oct 2025', 'Urogynaec Ahmedabad - speaker and panellist', 'STAR Pune and Yuva FOGSI East Zone faculty roles'],
+      },
+    ],
+  },
+});
+
+Object.assign(dictionaries.hi, {
+  introVideo: {
+    eyebrow: 'वॉइस-ओवर परिचय',
+    title: 'ईवा फर्टिलिटी एंड लैप्रोस्कोपी (स्त्री क्लिनिक) वॉकथ्रू',
+    subtitle: 'ईवा लोगो, डॉ. रवींद्र गोंधली, उपलब्धियां, महत्वपूर्ण सेवाएं और अपॉइंटमेंट मार्गदर्शन के साथ संक्षिप्त परिचय.',
+    cta: 'अपॉइंटमेंट बुक करें',
+    play: 'वॉइस चलाएं',
+    pause: 'रोकें',
+    replay: 'फिर से चलाएं',
+    voiceLabel: 'वॉइस ओवर चल रहा है',
+    voiceUnsupported: 'इस ब्राउज़र में वॉइस ओवर समर्थित नहीं है.',
+    voiceover: 'ईवा फर्टिलिटी एंड लैप्रोस्कोपी, स्त्री क्लिनिक में आपका स्वागत है. यहां देखभाल डॉ. रवींद्र गोंधली के मार्गदर्शन में दी जाती है. वे कंसल्टेंट ऑब्स्टेट्रिशियन, गायनेकोलॉजिस्ट और आई वी एफ स्पेशलिस्ट हैं. उनकी योग्यता एम बी बी एस, एम एस ओ बी जी वाय और एफ एम ए एस है. क्लिनिक में फर्टिलिटी मूल्यांकन, आई वी एफ और आई यू आई मार्गदर्शन, पी सी ओ एस केयर, गर्भावस्था योजना, हिस्टेरोस्कोपी और लैप्रोस्कोपी सहायता उपलब्ध है. डॉ. गोंधली ने फर्टिलिटी कार्निवल गोवा, यूरोगायनेक अहमदाबाद, स्टार पुणे और युवा फॉग्सी ईस्ट जोन जैसे मंचों में सहभागिता की है. मरीज ऑनलाइन अपॉइंटमेंट बुक कर सकते हैं और मरीज पोर्टल में रिकॉर्ड देख सकते हैं.',
+    scenes: [
+      {
+        title: 'ईवा फर्टिलिटी एंड लैप्रोस्कोपी (स्त्री क्लिनिक)',
+        body: 'ईवा ब्रांड मरीज-केंद्रित फर्टिलिटी, स्त्री रोग, महिला स्वास्थ्य और एडवांस लैप्रोस्कोपी सहायता को दर्शाता है.',
+        points: ['थेरगांव, पुणे', 'गोपनीय परामर्श', 'ऑनलाइन अपॉइंटमेंट बुकिंग'],
+      },
+      {
+        title: 'डॉ. रवींद्र गोंधली',
+        body: 'कंसल्टेंट ऑब्स्टेट्रिशियन, गायनेकोलॉजिस्ट और आई वी एफ स्पेशलिस्ट, जो संरचित फर्टिलिटी और स्त्री रोग देखभाल पर ध्यान देते हैं.',
+        points: ['MBBS, MS (OBGY), F. MAS', '25+ वर्ष अनुभव', 'फर्टिलिटी, IVF, IUI, लैप्रोस्कोपी और हिस्टेरोस्कोपी मार्गदर्शन'],
+      },
+      {
+        title: 'महत्वपूर्ण देखभाल जानकारी',
+        body: 'परामर्श में मरीजों को लक्षण, रिपोर्ट, उपचार विकल्प और फॉलो-अप योजना स्पष्ट रूप से समझाई जाती है.',
+        points: ['फर्टिलिटी मूल्यांकन', 'PCOS और मासिक धर्म स्वास्थ्य देखभाल', 'गर्भावस्था और एंटिनेटल सहायता'],
+      },
+      {
+        title: 'उपलब्धियां और सहभागिता',
+        body: 'शैक्षणिक सहभागिता और कॉन्फ्रेंस भूमिकाएं निरंतर सीखने और मरीज-केंद्रित अभ्यास को मजबूत करती हैं.',
+        points: ['फर्टिलिटी कार्निवल गोवा - Oct 2025', 'यूरोगायनेक अहमदाबाद - स्पीकर और पैनलिस्ट', 'STAR Pune और Yuva FOGSI East Zone फैकल्टी भूमिकाएं'],
+      },
+    ],
+  },
+});
+
+Object.assign(dictionaries.mr, {
+  introVideo: {
+    eyebrow: 'व्हॉइस-ओव्हर परिचय',
+    title: 'ईवा फर्टिलिटी अँड लैप्रोस्कोपी (स्त्री क्लिनिक) वॉकथ्रू',
+    subtitle: 'ईवा लोगो, डॉ. रवींद्र गोंधळी, उपलब्धी, महत्त्वाच्या सेवा आणि अपॉइंटमेंट मार्गदर्शनासह संक्षिप्त परिचय.',
+    cta: 'अपॉइंटमेंट बुक करा',
+    play: 'व्हॉइस चालू करा',
+    pause: 'थांबवा',
+    replay: 'पुन्हा चालू करा',
+    voiceLabel: 'व्हॉइस ओव्हर चालू आहे',
+    voiceUnsupported: 'या ब्राउझरमध्ये व्हॉइस ओव्हर समर्थित नाही.',
+    voiceover: 'ईवा फर्टिलिटी अँड लैप्रोस्कोपी, स्त्री क्लिनिकमध्ये आपले स्वागत आहे. येथे डॉ. रवींद्र गोंधळी यांच्या मार्गदर्शनाखाली सेवा दिली जाते. ते कन्सल्टंट ऑब्स्टेट्रिशियन, गायनेकोलॉजिस्ट आणि आय व्ही एफ स्पेशलिस्ट आहेत. त्यांची पात्रता एम बी बी एस, एम एस ओ बी जी वाय आणि एफ एम ए एस आहे. क्लिनिकमध्ये फर्टिलिटी मूल्यांकन, आय व्ही एफ आणि आय यू आय मार्गदर्शन, पी सी ओ एस केअर, गर्भधारणा नियोजन, हिस्टेरोस्कोपी आणि लैप्रोस्कोपी सहाय्य उपलब्ध आहे. डॉ. गोंधळी यांनी फर्टिलिटी कार्निवल गोवा, युरोगायनेक अहमदाबाद, स्टार पुणे आणि युवा फॉग्सी ईस्ट झोन अशा मंचांमध्ये सहभाग घेतला आहे. रुग्ण ऑनलाइन अपॉइंटमेंट बुक करू शकतात आणि रुग्ण पोर्टलमध्ये रेकॉर्ड पाहू शकतात.',
+    scenes: [
+      {
+        title: 'ईवा फर्टिलिटी अँड लैप्रोस्कोपी (स्त्री क्लिनिक)',
+        body: 'ईवा ब्रँड रुग्ण-केंद्रित फर्टिलिटी, स्त्रीरोग, महिला आरोग्य आणि प्रगत लैप्रोस्कोपी सहाय्य दर्शवतो.',
+        points: ['थेरगाव, पुणे', 'गोपनीय समुपदेशन', 'ऑनलाइन अपॉइंटमेंट बुकिंग'],
+      },
+      {
+        title: 'डॉ. रवींद्र गोंधळी',
+        body: 'कन्सल्टंट ऑब्स्टेट्रिशियन, गायनेकोलॉजिस्ट आणि आय व्ही एफ स्पेशलिस्ट, जे संरचित फर्टिलिटी व स्त्रीरोग काळजीवर लक्ष देतात.',
+        points: ['MBBS, MS (OBGY), F. MAS', '25+ वर्षे अनुभव', 'फर्टिलिटी, IVF, IUI, लैप्रोस्कोपी आणि हिस्टेरोस्कोपी मार्गदर्शन'],
+      },
+      {
+        title: 'महत्त्वाची काळजी माहिती',
+        body: 'सल्लामसलतीत रुग्णांना लक्षणे, रिपोर्ट, उपचार पर्याय आणि फॉलो-अप योजना स्पष्टपणे समजावली जाते.',
+        points: ['फर्टिलिटी मूल्यांकन', 'PCOS आणि मासिक पाळी आरोग्य सेवा', 'गर्भधारणा आणि अँटिनेटल सपोर्ट'],
+      },
+      {
+        title: 'उपलब्धी आणि सहभाग',
+        body: 'शैक्षणिक सहभाग आणि परिषद भूमिका सतत शिक्षण आणि रुग्ण-केंद्रित सेवेला बळ देतात.',
+        points: ['फर्टिलिटी कार्निवल गोवा - Oct 2025', 'युरोगायनेक अहमदाबाद - स्पीकर आणि पॅनेलिस्ट', 'STAR Pune आणि Yuva FOGSI East Zone फॅकल्टी भूमिका'],
+      },
+    ],
+  },
 });
 
 const LanguageContext = createContext(null);
