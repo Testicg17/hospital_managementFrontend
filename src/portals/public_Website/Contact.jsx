@@ -147,17 +147,22 @@ const uniqueOptions = (items) => {
 };
 
 const fetchFirstAvailableList = async (endpoints, keys, fallbackItems) => {
+  let lastError = null;
+
   for (const endpoint of endpoints) {
     try {
       const data = await apiRequest(endpoint);
       const options = uniqueOptions(extractList(data, keys));
       if (options.length > 0) return options;
     } catch (error) {
+      lastError = error;
       // Try the next compatible endpoint, then fall back to local defaults.
     }
   }
 
-  return uniqueOptions(fallbackItems);
+  const fallbackOptions = uniqueOptions(fallbackItems);
+  if (fallbackOptions.length > 0) return fallbackOptions;
+  throw lastError || new Error('Options unavailable');
 };
 
 function Contact() {
@@ -169,6 +174,7 @@ function Contact() {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [loadingLocations, setLoadingLocations] = useState(false);
   const [loadingFormOptions, setLoadingFormOptions] = useState(false);
+  const [categoryLoadError, setCategoryLoadError] = useState('');
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [alert, setAlert] = useState(null);
@@ -204,31 +210,38 @@ function Contact() {
 
     async function fetchFormOptions() {
       setLoadingFormOptions(true);
+      setCategoryLoadError('');
       try {
-        const [categories, departments] = await Promise.all([
-          fetchFirstAvailableList(
+        const categoryPromise = fetchFirstAvailableList(
             [PUBLIC_PATIENT_CATEGORIES_ENDPOINT],
             ['patientCategories', 'categories'],
             []
-          ),
-          fetchFirstAvailableList(
+          );
+        const departmentPromise = fetchFirstAvailableList(
             [PUBLIC_DEPARTMENTS_ENDPOINT, '/departments', '/services'],
             ['departments', 'services'],
             fallbackDepartments
-          ),
-        ]);
+          );
+
+        const [categoriesResult, departments] = await Promise.allSettled([categoryPromise, departmentPromise]);
 
         if (cancelled) return;
 
+        const categories = categoriesResult.status === 'fulfilled' ? categoriesResult.value : [];
+        if (categoriesResult.status === 'rejected') {
+          setCategoryLoadError(categoriesResult.reason?.message || 'Unable to load patient categories.');
+        }
+
         setPatientCategoryOptions(categories);
-        setDepartmentOptions(departments);
+        setDepartmentOptions(departments.status === 'fulfilled' ? departments.value : uniqueOptions(fallbackDepartments));
         setFormData((current) => {
           const nextCategory = categories.some((option) => option.value === current.category)
             ? current.category
             : categories[0]?.value || current.category;
-          const nextDepartment = departments.some((option) => option.value === current.department)
+          const nextDepartments = departments.status === 'fulfilled' ? departments.value : uniqueOptions(fallbackDepartments);
+          const nextDepartment = nextDepartments.some((option) => option.value === current.department)
             ? current.department
-            : departments[0]?.value || current.department;
+            : nextDepartments[0]?.value || current.department;
 
           return {
             ...current,
@@ -602,7 +615,9 @@ function Contact() {
               </select>
               {renderFieldError('category')}
               {patientCategoryOptions.length === 0 && !loadingFormOptions && (
-                <p className="mt-1 text-xs font-medium text-red-600">Patient categories could not be loaded from backend.</p>
+                <p className="mt-1 text-xs font-medium text-red-600">
+                  {categoryLoadError || 'Patient categories could not be loaded from backend.'}
+                </p>
               )}
             </label>
             <label className="block text-sm font-medium text-slate-700">
