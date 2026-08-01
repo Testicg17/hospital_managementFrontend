@@ -6,7 +6,10 @@ import { useLanguage } from './LanguageContext';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
 const PUBLIC_BOOKING_ENDPOINT = process.env.REACT_APP_PUBLIC_BOOKING_ENDPOINT || '/public/appointments';
-const patientCategories = ['General', 'Diabetes', 'Hypertension', 'Cardiac', 'Orthopedic', 'Other'];
+const PUBLIC_PATIENT_CATEGORIES_ENDPOINT = process.env.REACT_APP_PUBLIC_PATIENT_CATEGORIES_ENDPOINT || '/patients/categories';
+const PUBLIC_DEPARTMENTS_ENDPOINT = process.env.REACT_APP_PUBLIC_DEPARTMENTS_ENDPOINT || '/public/departments';
+const fallbackPatientCategories = ['General', 'Diabetes', 'Hypertension', 'Cardiac', 'Orthopedic', 'Other'];
+const fallbackDepartments = services.map((service) => service.title).filter(Boolean);
 const MAX_MESSAGE_LENGTH = 500;
 
 const initialFormData = {
@@ -99,12 +102,74 @@ const buildFallbackSlots = (location) => {
   return slots;
 };
 
+const extractList = (data, keys = []) => {
+  if (Array.isArray(data)) return data;
+  if (!data || typeof data !== 'object') return [];
+
+  for (const key of keys) {
+    if (Array.isArray(data[key])) return data[key];
+  }
+
+  if (Array.isArray(data.data)) return data.data;
+  if (Array.isArray(data.rows)) return data.rows;
+  if (Array.isArray(data.items)) return data.items;
+  return [];
+};
+
+const normalizeOption = (item) => {
+  if (typeof item === 'string') {
+    const trimmed = item.trim();
+    return trimmed ? { value: trimmed, label: trimmed } : null;
+  }
+
+  if (!item || typeof item !== 'object') return null;
+
+  const value = item.value || item.name || item.title || item.category || item.department || item.label || item.code;
+  const label = item.label || item.name || item.title || item.category || item.department || value;
+  if (!value) return null;
+
+  return {
+    value: String(value).trim(),
+    label: String(label || value).trim(),
+  };
+};
+
+const uniqueOptions = (items) => {
+  const seen = new Set();
+  return items
+    .map(normalizeOption)
+    .filter(Boolean)
+    .filter((option) => {
+      const key = option.value.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+};
+
+const fetchFirstAvailableList = async (endpoints, keys, fallbackItems) => {
+  for (const endpoint of endpoints) {
+    try {
+      const data = await apiRequest(endpoint);
+      const options = uniqueOptions(extractList(data, keys));
+      if (options.length > 0) return options;
+    } catch (error) {
+      // Try the next compatible endpoint, then fall back to local defaults.
+    }
+  }
+
+  return uniqueOptions(fallbackItems);
+};
+
 function Contact() {
   const { dictionary } = useLanguage();
   const [formData, setFormData] = useState(initialFormData);
+  const [patientCategoryOptions, setPatientCategoryOptions] = useState(uniqueOptions(fallbackPatientCategories));
+  const [departmentOptions, setDepartmentOptions] = useState(uniqueOptions(fallbackDepartments));
   const [hospitalLocations, setHospitalLocations] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
   const [loadingLocations, setLoadingLocations] = useState(false);
+  const [loadingFormOptions, setLoadingFormOptions] = useState(false);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [alert, setAlert] = useState(null);
@@ -130,6 +195,54 @@ function Contact() {
     }
 
     fetchLocations();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchFormOptions() {
+      setLoadingFormOptions(true);
+      try {
+        const [categories, departments] = await Promise.all([
+          fetchFirstAvailableList(
+            [PUBLIC_PATIENT_CATEGORIES_ENDPOINT, '/public/patient-categories', '/patient-categories', '/categories'],
+            ['patientCategories', 'categories'],
+            fallbackPatientCategories
+          ),
+          fetchFirstAvailableList(
+            [PUBLIC_DEPARTMENTS_ENDPOINT, '/departments', '/services'],
+            ['departments', 'services'],
+            fallbackDepartments
+          ),
+        ]);
+
+        if (cancelled) return;
+
+        setPatientCategoryOptions(categories);
+        setDepartmentOptions(departments);
+        setFormData((current) => {
+          const nextCategory = categories.some((option) => option.value === current.category)
+            ? current.category
+            : categories[0]?.value || current.category;
+          const nextDepartment = departments.some((option) => option.value === current.department)
+            ? current.department
+            : departments[0]?.value || current.department;
+
+          return {
+            ...current,
+            category: nextCategory,
+            department: nextDepartment,
+          };
+        });
+      } finally {
+        if (!cancelled) setLoadingFormOptions(false);
+      }
+    }
+
+    fetchFormOptions();
     return () => {
       cancelled = true;
     };
@@ -204,12 +317,12 @@ function Contact() {
       nextErrors.age = 'Enter age between 1 and 120.';
     }
 
-    if (!patientCategories.includes(data.category)) {
+    if (!patientCategoryOptions.some((option) => option.value === data.category)) {
       nextErrors.category = 'Select a valid patient category.';
     }
 
-    if (!data.department) {
-      nextErrors.department = 'Select a department.';
+    if (!departmentOptions.some((option) => option.value === data.department)) {
+      nextErrors.department = 'Select a valid department.';
     }
 
     if (!data.hospitalLocationId) {
@@ -287,10 +400,13 @@ function Contact() {
   ));
   const cannotSubmit = submitting || Boolean(formData.date && (formData.date < scheduleLimits.minDate || formData.date > scheduleLimits.maxDate));
 
-  const localizedServices = services.map((service, index) => ({
-    ...service,
-    localizedTitle: dictionary.services[index]?.[0] || service.title,
-  }));
+  const localizedDepartmentOptions = departmentOptions.map((option) => {
+    const serviceIndex = services.findIndex((service) => service.title === option.value);
+    return {
+      ...option,
+      localizedLabel: serviceIndex >= 0 ? dictionary.services[serviceIndex]?.[0] || option.label : option.label,
+    };
+  });
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -429,6 +545,11 @@ function Contact() {
               <LogoLoader compact label={dictionary.contactPage.loadingLocations} />
             </div>
           )}
+          {loadingFormOptions && (
+            <div className="mt-5 rounded-lg border border-pink-100 bg-white py-4">
+              <LogoLoader compact label="Loading categories and departments..." />
+            </div>
+          )}
 
           {alert && (
             <div className={`mt-5 flex gap-3 rounded-lg border p-4 text-sm ${
@@ -469,17 +590,19 @@ function Contact() {
             <label className="block text-sm font-medium text-slate-700">
               {dictionary.contactPage.category}
               <select value={formData.category} onBlur={() => markFieldTouched('category')} onChange={(event) => handleChange('category', event.target.value)}
-                className={inputClassName('category')}>
-                {patientCategories.map((category) => <option key={category}>{category}</option>)}
+                disabled={loadingFormOptions || patientCategoryOptions.length === 0}
+                className={`${inputClassName('category')} disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500`}>
+                {patientCategoryOptions.map((category) => <option key={category.value} value={category.value}>{category.label}</option>)}
               </select>
               {renderFieldError('category')}
             </label>
             <label className="block text-sm font-medium text-slate-700">
               {dictionary.contactPage.department}
               <select value={formData.department} onBlur={() => markFieldTouched('department')} onChange={(event) => handleChange('department', event.target.value)}
-                className={inputClassName('department')}>
-                {localizedServices.map((service) => (
-                  <option key={service.title} value={service.title}>{service.localizedTitle}</option>
+                disabled={loadingFormOptions || departmentOptions.length === 0}
+                className={`${inputClassName('department')} disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500`}>
+                {localizedDepartmentOptions.map((department) => (
+                  <option key={department.value} value={department.value}>{department.localizedLabel}</option>
                 ))}
               </select>
               {renderFieldError('department')}
