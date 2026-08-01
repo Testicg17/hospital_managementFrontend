@@ -5,6 +5,7 @@ import { Calendar, Users, Activity, AlertCircle, TrendingUp, UserPlus, Search, X
 import LogoLoader from '../components/LogoLoader';
 import BrandMark from '../components/BrandMark';
 import SEO from '../components/SEO';
+import { clinic as clinicInfo } from './public_Website/siteData';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
 
@@ -1120,9 +1121,9 @@ function AdminPortal() {
           </div>
           <div className="p-8">
             <div className="text-center mb-8 pb-6 border-b-2 border-gray-300">
-              <BrandMark size="lg" centered title="Eva Fertility & Laparoscopy" subtitle="Hospital Management System" className="mb-3" />
-              <p className="text-gray-600">123 Medical Center Drive, Healthcare City</p>
-              <p className="text-gray-600">Phone: +91 98765 00000 | Email: info@hospital.com</p>
+              <BrandMark size="lg" centered title={clinicInfo.name} subtitle={clinicInfo.localName || 'Hospital Management System'} className="mb-3" />
+              <p className="text-gray-600">{clinicInfo.address}</p>
+              <p className="text-gray-600">Phone: {clinicInfo.phone} | Email: {clinicInfo.email}</p>
             </div>
             <div className="grid grid-cols-2 gap-8 mb-8">
               <div>
