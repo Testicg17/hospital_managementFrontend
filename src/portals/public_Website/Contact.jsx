@@ -8,7 +8,6 @@ const API_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbac
 const PUBLIC_BOOKING_ENDPOINT = process.env.REACT_APP_PUBLIC_BOOKING_ENDPOINT || '/public/appointments';
 const PUBLIC_PATIENT_CATEGORIES_ENDPOINT = process.env.REACT_APP_PUBLIC_PATIENT_CATEGORIES_ENDPOINT || '/patients/categories';
 const PUBLIC_DEPARTMENTS_ENDPOINT = process.env.REACT_APP_PUBLIC_DEPARTMENTS_ENDPOINT || '/public/departments';
-const fallbackPatientCategories = ['General', 'Diabetes', 'Hypertension', 'Cardiac', 'Orthopedic', 'Other'];
 const fallbackDepartments = services.map((service) => service.title).filter(Boolean);
 const MAX_MESSAGE_LENGTH = 500;
 
@@ -17,7 +16,7 @@ const initialFormData = {
   age: '',
   phone: '',
   email: '',
-  category: 'General',
+  category: '',
   department: services[0]?.title || 'Consultation',
   hospitalLocationId: '',
   date: '',
@@ -164,7 +163,7 @@ const fetchFirstAvailableList = async (endpoints, keys, fallbackItems) => {
 function Contact() {
   const { dictionary } = useLanguage();
   const [formData, setFormData] = useState(initialFormData);
-  const [patientCategoryOptions, setPatientCategoryOptions] = useState(uniqueOptions(fallbackPatientCategories));
+  const [patientCategoryOptions, setPatientCategoryOptions] = useState([]);
   const [departmentOptions, setDepartmentOptions] = useState(uniqueOptions(fallbackDepartments));
   const [hospitalLocations, setHospitalLocations] = useState([]);
   const [availableSlots, setAvailableSlots] = useState([]);
@@ -208,9 +207,9 @@ function Contact() {
       try {
         const [categories, departments] = await Promise.all([
           fetchFirstAvailableList(
-            [PUBLIC_PATIENT_CATEGORIES_ENDPOINT, '/public/patient-categories', '/patient-categories', '/categories'],
+            [PUBLIC_PATIENT_CATEGORIES_ENDPOINT],
             ['patientCategories', 'categories'],
-            fallbackPatientCategories
+            []
           ),
           fetchFirstAvailableList(
             [PUBLIC_DEPARTMENTS_ENDPOINT, '/departments', '/services'],
@@ -398,7 +397,7 @@ function Contact() {
   const selectableSlots = availableSlots.filter((slot) => (
     slot.available !== false && !slot.booked && isSlotInsideScheduleWindow(slot.time)
   ));
-  const cannotSubmit = submitting || Boolean(formData.date && (formData.date < scheduleLimits.minDate || formData.date > scheduleLimits.maxDate));
+  const cannotSubmit = submitting || loadingFormOptions || patientCategoryOptions.length === 0 || Boolean(formData.date && (formData.date < scheduleLimits.minDate || formData.date > scheduleLimits.maxDate));
 
   const localizedDepartmentOptions = departmentOptions.map((option) => {
     const serviceIndex = services.findIndex((service) => service.title === option.value);
@@ -592,9 +591,19 @@ function Contact() {
               <select value={formData.category} onBlur={() => markFieldTouched('category')} onChange={(event) => handleChange('category', event.target.value)}
                 disabled={loadingFormOptions || patientCategoryOptions.length === 0}
                 className={`${inputClassName('category')} disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500`}>
+                <option value="">
+                  {loadingFormOptions
+                    ? 'Loading categories...'
+                    : patientCategoryOptions.length === 0
+                      ? 'Categories unavailable'
+                      : 'Select category'}
+                </option>
                 {patientCategoryOptions.map((category) => <option key={category.value} value={category.value}>{category.label}</option>)}
               </select>
               {renderFieldError('category')}
+              {patientCategoryOptions.length === 0 && !loadingFormOptions && (
+                <p className="mt-1 text-xs font-medium text-red-600">Patient categories could not be loaded from backend.</p>
+              )}
             </label>
             <label className="block text-sm font-medium text-slate-700">
               {dictionary.contactPage.department}
