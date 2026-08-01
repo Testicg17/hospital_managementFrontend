@@ -6,7 +6,7 @@ import { useLanguage } from './LanguageContext';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
 const PUBLIC_BOOKING_ENDPOINT = process.env.REACT_APP_PUBLIC_BOOKING_ENDPOINT || '/public/appointments';
-const PUBLIC_PATIENT_CATEGORIES_ENDPOINT = process.env.REACT_APP_PUBLIC_PATIENT_CATEGORIES_ENDPOINT || '/patients/categories';
+const PUBLIC_PATIENT_CATEGORIES_ENDPOINT = process.env.REACT_APP_PUBLIC_PATIENT_CATEGORIES_ENDPOINT || '/public/categories';
 const PUBLIC_DEPARTMENTS_ENDPOINT = process.env.REACT_APP_PUBLIC_DEPARTMENTS_ENDPOINT || '/public/departments';
 const fallbackDepartments = services.map((service) => service.title).filter(Boolean);
 const MAX_MESSAGE_LENGTH = 500;
