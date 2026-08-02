@@ -374,6 +374,18 @@ const currentSession = useMemo(() => {
           font-size: 0.92em;
           opacity: 0.95;
         }
+        @media (min-width: 701px) {
+          .status {
+            flex-direction: row;
+            align-items: center;
+            gap: 6px;
+          }
+          .status-session::before {
+            content: "•";
+            margin-right: 6px;
+            opacity: 0.8;
+          }
+        }
         .status-legacy { display: none; }
         .dot {
           width: 7px; height: 7px; border-radius: 50%;
@@ -942,13 +954,14 @@ const currentSession = useMemo(() => {
                      <div className={`status ${isOpen ? "open" : "closed"}`}>
                        <span className="status-main">{isOpen ? "Open Now" : "Closed"}</span>
                        {isOpen && currentSession && <span className="status-session">{currentSession}</span>}
+                       {!isOpen && <span className="status-session">Emergency only</span>}
                      </div>
            <div className={`status status-legacy ${isOpen ? "open" : "closed"}`}>
   <span className="dot"></span>
 
   {isOpen
     ? `Open Now${currentSession ? ` • ${currentSession}` : ""}`
-    : "Closed"}
+    : "Closed - Emergency only"}
 </div></div>
               <div className="social-row">
   {CONFIG.socials.map((s) => (
