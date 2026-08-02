@@ -237,7 +237,7 @@ function Contact() {
         setFormData((current) => {
           const nextCategory = categories.some((option) => option.value === current.category)
             ? current.category
-            : categories[0]?.value || current.category;
+            : '';
           const nextDepartments = departments.status === 'fulfilled' ? departments.value : uniqueOptions(fallbackDepartments);
           const nextDepartment = nextDepartments.some((option) => option.value === current.department)
             ? current.department
