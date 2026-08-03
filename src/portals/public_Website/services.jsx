@@ -52,7 +52,7 @@ function Services() {
             <h2 className="text-2xl font-bold">{dictionary.servicesPage.ctaTitle}</h2>
             <p className="mt-2 text-sm text-indigo-50">{dictionary.servicesPage.ctaBody}</p>
           </div>
-          <Link to="/contact" className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-semibold text-[#3157b7] hover:bg-pink-50">
+          <Link to="/contact#appointment-form" className="inline-flex items-center gap-2 rounded-lg bg-white px-5 py-3 text-sm font-semibold text-[#3157b7] hover:bg-pink-50">
             <CalendarCheck size={18} />
             {dictionary.common.bookAppointment}
           </Link>

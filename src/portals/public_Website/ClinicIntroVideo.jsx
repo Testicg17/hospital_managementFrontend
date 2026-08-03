@@ -208,7 +208,7 @@ function ClinicIntroVideo({ content = defaultContent }) {
                 <span className="hidden sm:inline">{intro.replay}</span>
               </button>
               <Link
-                to="/contact"
+                to="/contact#appointment-form"
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#e84faf] px-3 py-2 text-sm font-semibold text-white hover:bg-[#d83d9f]"
               >
                 <CalendarCheck size={17} />

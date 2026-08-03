@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import SEO from "../../components/SEO";
 import { doctorSchema, medicalClinicSchema, organizationSchema, seoPages, webPageSchema, websiteSchema } from "./seoData";
+import { buildWhatsAppUrl } from "./whatsapp";
 
 /**
  * ============================================================
@@ -220,8 +221,8 @@ const currentSession = useMemo(() => {
     .toUpperCase();
 
   const telHref = `tel:${CONFIG.phone.replace(/\s/g, "")}`;
-  const waHref = `https://wa.me/${CONFIG.whatsapp.replace(/[^0-9]/g, "")}`;
-  const bookingHref = `${CONFIG.website}/contact`;
+  const waHref = buildWhatsAppUrl(CONFIG.whatsapp, "Dr. Raveendra Gondhali profile page");
+  const bookingHref = "/contact#appointment-form";
  // const websiteHost = CONFIG.website.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
   return (
@@ -1052,7 +1053,7 @@ const currentSession = useMemo(() => {
               <svg viewBox="0 0 24 24">{ICONS.pin}</svg>
               Directions
             </a>
-              <a className="book-btn" href={bookingHref} target="_blank" rel="noreferrer">
+              <a className="book-btn" href={bookingHref}>
               <svg viewBox="0 0 24 24">{ICONS.calendar}</svg>
               Book Appointment
             </a>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, CalendarCheck, Clock, MapPin, MessageCircle, Phone, Quote, Star } from 'lucide-react';
 import { articles, carePromises, clinic, doctor, highlights, services, successStories } from './siteData';
 import { useLanguage } from './LanguageContext';
+import { buildWhatsAppUrl } from './whatsapp';
 
 function Home() {
   const { dictionary } = useLanguage();
@@ -58,7 +59,7 @@ function Home() {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
-                to="/contact"
+                to="/contact#appointment-form"
                 className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#e84faf] px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-[#d83d9f]"
               >
                 <CalendarCheck size={19} />
@@ -72,7 +73,7 @@ function Home() {
                 {dictionary.common.callClinic}
               </a>
               <a
-                href={`https://wa.me/${clinic.whatsapp}`}
+                href={buildWhatsAppUrl(clinic.whatsapp, 'Public website home page')}
                 className="inline-flex items-center justify-center gap-2 rounded-lg border border-pink-200 bg-white px-5 py-3 text-sm font-semibold text-[#3157b7] hover:border-[#e84faf]"
                 target="_blank"
                 rel="noreferrer"
@@ -234,7 +235,7 @@ function Home() {
               <p className="mt-1 text-sm text-indigo-50">The clinic team will help you choose an available appointment slot.</p>
             </div>
             <Link
-              to="/contact"
+              to="/contact#appointment-form"
               className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-[#e84faf] px-5 py-3 text-sm font-semibold text-white hover:bg-[#d83d9f]"
             >
               <CalendarCheck size={18} />

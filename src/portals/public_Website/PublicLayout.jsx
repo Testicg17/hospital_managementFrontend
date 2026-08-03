@@ -91,7 +91,7 @@ function PublicLayout({ children }) {
               {clinic.phone}
             </a>
             <Link
-              to="/contact"
+              to="/contact#appointment-form"
               className="inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg bg-[#e84faf] px-3 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#d83d9f] xl:px-4"
             >
               <CalendarCheck size={18} className="shrink-0" />
@@ -125,7 +125,7 @@ function PublicLayout({ children }) {
               ))}
               <LanguageSelect compact />
               <Link
-                to="/contact"
+                to="/contact#appointment-form"
                 onClick={() => setMenuOpen(false)}
                 className="mt-2 inline-flex items-center justify-center gap-2 rounded-lg bg-[#e84faf] px-4 py-3 text-sm font-semibold text-white"
               >

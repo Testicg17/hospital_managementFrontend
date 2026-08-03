@@ -9,6 +9,7 @@ const PUBLIC_BOOKING_ENDPOINT = process.env.REACT_APP_PUBLIC_BOOKING_ENDPOINT ||
 const PUBLIC_PATIENT_CATEGORIES_ENDPOINT = process.env.REACT_APP_PUBLIC_PATIENT_CATEGORIES_ENDPOINT || '/public/categories';
 const PUBLIC_DEPARTMENTS_ENDPOINT = process.env.REACT_APP_PUBLIC_DEPARTMENTS_ENDPOINT || '/public/departments';
 const fallbackDepartments = services.map((service) => service.title).filter(Boolean);
+const APPOINTMENT_FORM_ID = 'appointment-form';
 const MAX_MESSAGE_LENGTH = 500;
 
 const initialFormData = {
@@ -181,6 +182,21 @@ function Contact() {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
   const scheduleLimits = useMemo(() => getAppointmentScheduleLimits(), []);
+
+  useEffect(() => {
+    if (window.location.hash !== `#${APPOINTMENT_FORM_ID}`) return;
+
+    const scrollToForm = () => {
+      document.getElementById(APPOINTMENT_FORM_ID)?.scrollIntoView({
+        block: 'start',
+        inline: 'nearest',
+        behavior: 'auto',
+      });
+    };
+
+    const frame = window.requestAnimationFrame(scrollToForm);
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -545,7 +561,11 @@ function Contact() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="rounded-lg border border-pink-100 bg-[#fff7fc] p-6 shadow-sm">
+        <form
+          id={APPOINTMENT_FORM_ID}
+          onSubmit={handleSubmit}
+          className="scroll-mt-24 rounded-lg border border-pink-100 bg-[#fff7fc] p-6 shadow-sm lg:scroll-mt-28"
+        >
           {submitting && <LogoLoader overlay label="Submitting appointment..." />}
           <div className="flex items-center gap-3">
             <CalendarCheck size={28} className="text-[#e84faf]" />
