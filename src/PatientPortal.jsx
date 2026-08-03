@@ -6,7 +6,7 @@ import {
   RefreshCw
 } from 'lucide-react';
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
+const API_URL = process.env.REACT_APP_API_URL || 'https://evafertilitypune.com/api';
 
 const api = axios.create({
   baseURL: API_URL,

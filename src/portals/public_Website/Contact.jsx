@@ -4,7 +4,7 @@ import LogoLoader from '../../components/LogoLoader';
 import { clinic, services } from './siteData';
 import { useLanguage } from './LanguageContext';
 
-const API_URL = (process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api').replace(/\/$/, '');
+const API_URL = (process.env.REACT_APP_API_URL || 'https://evafertilitypune.com/api').replace(/\/$/, '');
 const PUBLIC_BOOKING_ENDPOINT = process.env.REACT_APP_PUBLIC_BOOKING_ENDPOINT || '/public/appointments';
 const PUBLIC_PATIENT_CATEGORIES_ENDPOINT = process.env.REACT_APP_PUBLIC_PATIENT_CATEGORIES_ENDPOINT || '/public/categories';
 const PUBLIC_DEPARTMENTS_ENDPOINT = process.env.REACT_APP_PUBLIC_DEPARTMENTS_ENDPOINT || '/public/departments';

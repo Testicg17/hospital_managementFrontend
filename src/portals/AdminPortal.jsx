@@ -7,7 +7,7 @@ import BrandMark from '../components/BrandMark';
 import SEO from '../components/SEO';
 import { clinic as clinicInfo } from './public_Website/siteData';
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
+const API_URL = process.env.REACT_APP_API_URL || 'https://evafertilitypune.com/api';
 const clinicAddressLine = clinicInfo.address
   .replace(clinicInfo.name, '')
   .replace(clinicInfo.localName || '', '')

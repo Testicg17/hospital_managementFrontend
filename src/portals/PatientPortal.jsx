@@ -5,7 +5,7 @@ import BrandMark from '../components/BrandMark';
 import SEO from '../components/SEO';
 import { clinic as clinicInfo } from './public_Website/siteData';
 
-const API_ROOT_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
+const API_ROOT_URL = process.env.REACT_APP_API_URL || 'https://evafertilitypune.com/api';
 const API_BASE_URL = `${API_ROOT_URL}/patient-portal`;
 const clinicLetterName = `${clinicInfo.name}${clinicInfo.localName ? ` ${clinicInfo.localName}` : ''}`;
 const clinicAddressLine = clinicInfo.address
