@@ -8,6 +8,12 @@ import SEO from '../components/SEO';
 import { clinic as clinicInfo } from './public_Website/siteData';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
+const clinicAddressLine = clinicInfo.address
+  .replace(clinicInfo.name, '')
+  .replace(clinicInfo.localName || '', '')
+  .replace(/^[\s,]+/, '')
+  .replace(/\s{2,}/g, ' ')
+  .trim();
 
 const api = axios.create({
   baseURL: API_URL,
@@ -1123,10 +1129,25 @@ function AdminPortal() {
             </div>
           </div>
           <div className="p-8">
-            <div className="text-center mb-8 pb-6 border-b-2 border-gray-300">
-              <BrandMark size="lg" centered title={clinicInfo.name} subtitle={clinicInfo.localName || 'Hospital Management System'} className="mb-3" />
-              <p className="text-gray-600">{clinicInfo.address}</p>
-              <p className="text-gray-600">Phone: {clinicInfo.phone} | Email: {clinicInfo.email}</p>
+            <div className="mb-8 overflow-hidden rounded-lg border border-pink-100 bg-gradient-to-br from-[#fff7fc] via-white to-blue-50 shadow-sm">
+              <div className="h-2 bg-gradient-to-r from-[#e84faf] via-[#3157b7] to-[#14b8a6]" />
+              <div className="p-6 text-center">
+                <BrandMark size="lg" centered title={clinicInfo.name} subtitle={clinicInfo.localName || 'Hospital Management System'} className="mb-3" />
+                <div className="mx-auto mt-4 grid max-w-3xl gap-3 text-sm text-slate-600 sm:grid-cols-[1fr_auto_auto] sm:items-center">
+                  <p className="flex items-center justify-center gap-2 leading-6 sm:justify-start">
+                    <MapPin size={16} className="shrink-0 text-[#e84faf]" />
+                    {clinicAddressLine}
+                  </p>
+                  <p className="flex items-center justify-center gap-2 font-semibold text-slate-700">
+                    <Phone size={16} className="text-[#3157b7]" />
+                    {clinicInfo.phone}
+                  </p>
+                  <p className="flex items-center justify-center gap-2 font-semibold text-slate-700">
+                    <Mail size={16} className="text-[#3157b7]" />
+                    {clinicInfo.email}
+                  </p>
+                </div>
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-8 mb-8">
               <div>
