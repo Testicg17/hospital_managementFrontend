@@ -3,8 +3,16 @@ import { User, Calendar, FileText, LogOut, LogIn, AlertCircle, Check, X, Eye, St
 import LogoLoader from '../components/LogoLoader';
 import BrandMark from '../components/BrandMark';
 import SEO from '../components/SEO';
+import { clinic as clinicInfo } from './public_Website/siteData';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
+const clinicLetterName = `${clinicInfo.name}${clinicInfo.localName ? ` ${clinicInfo.localName}` : ''}`;
+const clinicAddressLine = clinicInfo.address
+  .replace(clinicInfo.name, '')
+  .replace(clinicInfo.localName || '', '')
+  .replace(/^[\s,]+/, '')
+  .replace(/\s{2,}/g, ' ')
+  .trim();
 
 // Store auth in memory instead of localStorage
 let authToken = null;
@@ -574,10 +582,12 @@ function DoctorPortal() {
           <style>
             body { font-family: Arial, sans-serif; color: #111827; margin: 0; padding: 32px; }
             .letter { max-width: 820px; margin: 0 auto; border: 1px solid #d1d5db; padding: 32px; }
-            .header { border-bottom: 2px solid #2563eb; padding-bottom: 16px; margin-bottom: 24px; display: flex; align-items: center; gap: 16px; }
+            .header { border-bottom: 2px solid #2563eb; padding-bottom: 16px; margin-bottom: 24px; display: flex; align-items: flex-start; gap: 16px; }
             .logo { width: 72px; height: 72px; object-fit: contain; border: 1px solid #dbeafe; border-radius: 14px; padding: 4px; }
             h1 { margin: 0; color: #1d4ed8; font-size: 26px; }
             .muted { color: #6b7280; font-size: 13px; }
+            .clinic-address { margin-top: 6px; color: #374151; font-size: 13px; line-height: 1.45; }
+            .clinic-contact { margin-top: 4px; color: #1f2937; font-size: 13px; font-weight: 600; }
             .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; margin-bottom: 24px; }
             .field { border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; }
             .label { font-size: 11px; text-transform: uppercase; color: #6b7280; font-weight: 700; }
@@ -598,7 +608,9 @@ function DoctorPortal() {
             <div class="header">
               <img class="logo" src="/images/logo-optimized.jpg" alt="Hospital Logo" />
               <div>
-                <h1>${escapeHtml(process.env.REACT_APP_HOSPITAL_NAME || 'Eva Fertility & Laparoscopy')}</h1>
+                <h1>${escapeHtml(clinicLetterName)}</h1>
+                <div class="clinic-address">${escapeHtml(clinicAddressLine)}</div>
+                <div class="clinic-contact">Phone: ${escapeHtml(clinicInfo.phone)} | Email: ${escapeHtml(clinicInfo.email)}</div>
                 <div class="muted">Consultation Letter</div>
                 <div class="muted">Generated on ${new Date().toLocaleString('en-IN')}</div>
               </div>

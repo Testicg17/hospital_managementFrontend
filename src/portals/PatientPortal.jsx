@@ -7,6 +7,7 @@ import { clinic as clinicInfo } from './public_Website/siteData';
 
 const API_ROOT_URL = process.env.REACT_APP_API_URL || 'https://hospital-managementbackend.onrender.com/api';
 const API_BASE_URL = `${API_ROOT_URL}/patient-portal`;
+const clinicLetterName = `${clinicInfo.name}${clinicInfo.localName ? ` ${clinicInfo.localName}` : ''}`;
 const clinicAddressLine = clinicInfo.address
   .replace(clinicInfo.name, '')
   .replace(clinicInfo.localName || '', '')
@@ -576,10 +577,12 @@ function PatientPortal() {
         <style>
           body { font-family: Arial, sans-serif; color: #111827; margin: 0; padding: 32px; }
           .letter { max-width: 820px; margin: 0 auto; border: 1px solid #d1d5db; padding: 32px; }
-          .header { border-bottom: 2px solid #16a34a; padding-bottom: 16px; margin-bottom: 24px; display: flex; align-items: center; gap: 16px; }
+          .header { border-bottom: 2px solid #16a34a; padding-bottom: 16px; margin-bottom: 24px; display: flex; align-items: flex-start; gap: 16px; }
           .logo { width: 72px; height: 72px; object-fit: contain; border: 1px solid #bbf7d0; border-radius: 14px; padding: 4px; }
           h1 { margin: 0; color: #15803d; font-size: 26px; }
           .muted { color: #6b7280; font-size: 13px; }
+          .clinic-address { margin-top: 6px; color: #374151; font-size: 13px; line-height: 1.45; }
+          .clinic-contact { margin-top: 4px; color: #1f2937; font-size: 13px; font-weight: 600; }
           .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; margin-bottom: 24px; }
           .field { border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; }
           .label { font-size: 11px; text-transform: uppercase; color: #6b7280; font-weight: 700; }
@@ -600,7 +603,9 @@ function PatientPortal() {
           <div class="header">
             <img class="logo" src="/images/logo-optimized.jpg" alt="Hospital Logo" />
             <div>
-              <h1>${escapeHtml(process.env.REACT_APP_HOSPITAL_NAME || 'Eva Fertility & Laparoscopy')}</h1>
+              <h1>${escapeHtml(clinicLetterName)}</h1>
+              <div class="clinic-address">${escapeHtml(clinicAddressLine)}</div>
+              <div class="clinic-contact">Phone: ${escapeHtml(clinicInfo.phone)} | Email: ${escapeHtml(clinicInfo.email)}</div>
               <div class="muted">Consultation Letter</div>
               <div class="muted">Generated on ${new Date().toLocaleString('en-IN')}</div>
             </div>
@@ -668,7 +673,9 @@ function PatientPortal() {
           <div className="p-6 bg-gray-50">
             <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-5">
               <div className="border-b border-green-200 pb-4">
-                <BrandMark size="md" title="Eva Fertility & Laparoscopy" subtitle="Consultation Letter" />
+                <BrandMark size="md" title={clinicLetterName} subtitle="Consultation Letter" />
+                <p className="mt-2 text-sm text-gray-600">{clinicAddressLine}</p>
+                <p className="text-sm font-semibold text-gray-700">Phone: {clinicInfo.phone} | Email: {clinicInfo.email}</p>
                 <p className="text-sm text-gray-500">{formatLetterDate(letter.appointmentDate)} at {letter.appointmentTime}</p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
