@@ -651,6 +651,7 @@ function DoctorPortal() {
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center p-4">
+        {loading && <LogoLoader overlay label="Signing in..." />}
         <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
           <div className="text-center mb-8">
             <BrandMark size="lg" centered title="Eva Fertility & Laparoscopy" subtitle="Doctor Portal Login" />
@@ -728,13 +729,14 @@ function DoctorPortal() {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+        {loading && <LogoLoader overlay label="Creating appointment..." />}
         <div className="bg-white rounded-xl p-6 w-full max-w-2xl my-8">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
               <Calendar size={24} />
               New Appointment
             </h3>
-            <button onClick={() => setShowCreateAppointment(false)} className="text-gray-500 hover:text-gray-700">
+            <button onClick={() => setShowCreateAppointment(false)} disabled={loading} className="text-gray-500 hover:text-gray-700 disabled:cursor-not-allowed disabled:opacity-50">
               <X size={22} />
             </button>
           </div>
@@ -811,8 +813,8 @@ function DoctorPortal() {
                 className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50">
                 {loading ? 'Saving...' : 'Schedule Appointment'}
               </button>
-              <button type="button" onClick={() => setShowCreateAppointment(false)}
-                className="px-6 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300">
+              <button type="button" onClick={() => setShowCreateAppointment(false)} disabled={loading}
+                className="px-6 bg-gray-200 text-gray-700 py-3 rounded-lg hover:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-50">
                 Cancel
               </button>
             </div>

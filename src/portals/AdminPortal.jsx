@@ -632,6 +632,7 @@ function AdminPortal() {
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-4">
+        {loading && <LogoLoader overlay label="Signing in..." />}
         <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
           <div className="text-center mb-8">
             <BrandMark size="lg" centered title="Eva Fertility & Laparoscopy" subtitle="Admin & Reception Login" />
@@ -781,10 +782,11 @@ function AdminPortal() {
     };
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        {actionLoading && <LogoLoader overlay label={editAppointment ? 'Updating appointment...' : 'Creating appointment...'} />}
         <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-bold text-gray-800">{editAppointment ? 'Reschedule Appointment' : 'Schedule Appointment'}</h3>
-            <button onClick={onClose}><X size={24} className="text-gray-500" /></button>
+            <button onClick={onClose} disabled={actionLoading} className="disabled:cursor-not-allowed disabled:opacity-50"><X size={24} className="text-gray-500" /></button>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -871,7 +873,7 @@ function AdminPortal() {
                 className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50">
                 {actionLoading ? 'Saving...' : editAppointment ? 'Update Appointment' : 'Schedule'}
               </button>
-              <button type="button" onClick={onClose} className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 font-medium">Cancel</button>
+              <button type="button" onClick={onClose} disabled={actionLoading} className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 font-medium disabled:cursor-not-allowed disabled:opacity-50">Cancel</button>
             </div>
           </form>
         </div>
@@ -982,10 +984,11 @@ function AdminPortal() {
     const handleSubmit = async (e) => { e.preventDefault(); try { await createBill(formData); onClose(); } catch (_) {} };
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        {actionLoading && <LogoLoader overlay label="Creating bill..." />}
         <div className="bg-white rounded-lg p-6 w-full max-w-md">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-bold text-gray-800">Create Bill</h3>
-            <button onClick={onClose}><X size={24} className="text-gray-500" /></button>
+            <button onClick={onClose} disabled={actionLoading} className="disabled:cursor-not-allowed disabled:opacity-50"><X size={24} className="text-gray-500" /></button>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -1019,7 +1022,7 @@ function AdminPortal() {
                 className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50">
                 {actionLoading ? 'Saving...' : 'Create Bill'}
               </button>
-              <button type="button" onClick={onClose} className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 font-medium">Cancel</button>
+              <button type="button" onClick={onClose} disabled={actionLoading} className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 font-medium disabled:cursor-not-allowed disabled:opacity-50">Cancel</button>
             </div>
           </form>
         </div>

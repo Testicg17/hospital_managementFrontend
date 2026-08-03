@@ -826,6 +826,7 @@ function PatientPortal() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-500 to-teal-600 flex items-center justify-center p-4">
         <SEO title="Patient Portal | Eva Fertility & Laparoscopy" description="Private patient portal login." path="/patient" robots="noindex, nofollow" />
+        {loading && <LogoLoader overlay label={step === 'email' ? 'Sending OTP...' : 'Verifying OTP...'} />}
         <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
           <div className="text-center mb-8">
             <BrandMark size="lg" centered title="Eva Fertility & Laparoscopy" subtitle={step === 'email' ? 'Patient Portal Login' : 'Patient Verification'} />
