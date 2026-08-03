@@ -581,6 +581,8 @@ function PatientPortal() {
           .logo { width: 72px; height: 72px; object-fit: contain; border: 1px solid #bbf7d0; border-radius: 14px; padding: 4px; }
           h1 { margin: 0; color: #15803d; font-size: 26px; }
           .muted { color: #6b7280; font-size: 13px; }
+          .letter-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 3px; }
+          .letter-meta .muted + .muted::before { content: "& "; }
           .clinic-address { margin-top: 6px; color: #374151; font-size: 13px; line-height: 1.45; }
           .clinic-contact { margin-top: 4px; color: #1f2937; font-size: 13px; font-weight: 600; }
           .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 24px; margin-bottom: 24px; }
@@ -606,8 +608,10 @@ function PatientPortal() {
               <h1>${escapeHtml(clinicLetterName)}</h1>
               <div class="clinic-address">${escapeHtml(clinicAddressLine)}</div>
               <div class="clinic-contact">Phone: ${escapeHtml(clinicInfo.phone)} | Email: ${escapeHtml(clinicInfo.email)}</div>
-              <div class="muted">Consultation Letter</div>
-              <div class="muted">Generated on ${new Date().toLocaleString('en-IN')}</div>
+              <div class="letter-meta">
+                <span class="muted">Consultation Letter</span>
+                <span class="muted">Generated on ${new Date().toLocaleString('en-IN')}</span>
+              </div>
             </div>
           </div>
           <div class="grid">
